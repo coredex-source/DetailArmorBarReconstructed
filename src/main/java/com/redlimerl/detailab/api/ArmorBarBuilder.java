@@ -3,7 +3,7 @@ package com.redlimerl.detailab.api;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
-import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import org.apache.logging.log4j.Level;
@@ -11,14 +11,14 @@ import org.apache.logging.log4j.Level;
 import java.util.function.Function;
 
 public class ArmorBarBuilder {
-    private ArmorItem[] armor;
+    private Item[] armor;
     private Function<ItemStack, ArmorBarRenderManager> predicate;
 
     /**
-     * Specifies the {@link ArmorItem} on which the armor bar will appear when equipped.
-     * @throws IllegalStateException [armorItem] aren't {@link ArmorItem}.
+     * Specifies the {@link Item} on which the armor bar will appear when equipped.
+     * @throws IllegalStateException [armorItem] aren't {@link Item}.
      */
-    public ArmorBarBuilder armor(ArmorItem... armorItem) {
+    public ArmorBarBuilder armor(Item... armorItem) {
         try {
             armor = armorItem;
             return this;
@@ -38,12 +38,12 @@ public class ArmorBarBuilder {
 
     /**
      * Registers the Custom Armor Bar so that it can be displayed.
-     * @throws IllegalStateException Not all items have been initialized. check out {@link #armor(ArmorItem...)}, {@link #render(Function)}
+     * @throws IllegalStateException Not all items have been initialized. check out {@link #armor(Item...)}, {@link #render(Function)}
      */
     public void register() {
         try {
             CustomArmorBar armorBar = new CustomArmorBar(predicate);
-            for (ArmorItem armorItem : armor) {
+            for (Item armorItem : armor) {
                 DetailArmorBarAPI.staticArmorList.put(armorItem, armorBar);
             }
             if (armor.length != 0) {

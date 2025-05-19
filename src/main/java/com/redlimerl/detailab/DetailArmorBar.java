@@ -9,7 +9,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.resource.ResourceType;
@@ -52,43 +51,43 @@ public class DetailArmorBar implements ClientModInitializer {
         TextureOffset outline = new TextureOffset(9, 0);
         TextureOffset outlineHalf = new TextureOffset(27, 0);
 
-        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.NETHERITE_CHESTPLATE, (ArmorItem) Items.NETHERITE_HELMET, (ArmorItem) Items.NETHERITE_LEGGINGS, (ArmorItem) Items.NETHERITE_BOOTS)
+        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.NETHERITE_CHESTPLATE, Items.NETHERITE_HELMET, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS)
                 .render((ItemStack itemStack) ->
             new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(9, 9 + isVanillaTexture()), new TextureOffset(0, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.DIAMOND_HELMET, (ArmorItem) Items.DIAMOND_LEGGINGS, (ArmorItem) Items.DIAMOND_CHESTPLATE, (ArmorItem) Items.DIAMOND_BOOTS)
+        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.DIAMOND_HELMET, Items.DIAMOND_LEGGINGS, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_BOOTS)
                 .render((ItemStack itemStack) ->
             new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(27, 9 + isVanillaTexture()), new TextureOffset(18, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.TURTLE_HELMET)
+        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.TURTLE_HELMET)
                 .render((ItemStack itemStack) ->
             new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(45, 9 + isVanillaTexture()), new TextureOffset(36, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.IRON_HELMET, (ArmorItem) Items.IRON_LEGGINGS, (ArmorItem) Items.IRON_CHESTPLATE, (ArmorItem) Items.IRON_BOOTS)
+        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.IRON_HELMET, Items.IRON_LEGGINGS, Items.IRON_CHESTPLATE, Items.IRON_BOOTS)
                 .render((ItemStack itemStack) ->
             new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(63, 9 + isVanillaTexture()), new TextureOffset(54, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.CHAINMAIL_HELMET, (ArmorItem) Items.CHAINMAIL_LEGGINGS, (ArmorItem) Items.CHAINMAIL_CHESTPLATE, (ArmorItem) Items.CHAINMAIL_BOOTS)
+        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.CHAINMAIL_HELMET, Items.CHAINMAIL_LEGGINGS, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_BOOTS)
                 .render((ItemStack itemStack) ->
             new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(81, 9 + isVanillaTexture()), new TextureOffset(72, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.GOLDEN_HELMET, (ArmorItem) Items.GOLDEN_LEGGINGS, (ArmorItem) Items.GOLDEN_CHESTPLATE, (ArmorItem) Items.GOLDEN_BOOTS)
+        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.GOLDEN_HELMET, Items.GOLDEN_LEGGINGS, Items.GOLDEN_CHESTPLATE, Items.GOLDEN_BOOTS)
                 .render((ItemStack itemStack) ->
             new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(99, 9 + isVanillaTexture()), new TextureOffset(90, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-        DetailArmorBarAPI.customArmorBarBuilder().armor((ArmorItem) Items.LEATHER_HELMET, (ArmorItem) Items.LEATHER_LEGGINGS, (ArmorItem) Items.LEATHER_CHESTPLATE, (ArmorItem) Items.LEATHER_BOOTS)
+        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.LEATHER_HELMET, Items.LEATHER_LEGGINGS, Items.LEATHER_CHESTPLATE, Items.LEATHER_BOOTS)
                 .render((ItemStack itemStack) -> {
                     var leatherArmor = DyedColorComponent.getColor(itemStack, -6265536);
                     var color = new Color(leatherArmor);

@@ -1,23 +1,20 @@
 package com.redlimerl.detailab.data;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.*;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.JsonDataLoader;
+import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
@@ -32,7 +29,7 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
             json -> new Dynamic<>(JsonOps.INSTANCE, json)
     );
 
-    private Map<ArmorItem, CustomArmorBar> armorList;
+    private Map<Item, CustomArmorBar> armorList;
     private Map<Item, CustomArmorBar> itemList;
 
     public ArmorBarLoader() {
@@ -58,8 +55,8 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
 
     @Override
     protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, Profiler profiler) {
-        ImmutableMap.Builder<ArmorItem, CustomArmorBar> armorBuilder =
-                ImmutableMap.<ArmorItem, CustomArmorBar>builder().putAll(DetailArmorBarAPI.getStaticArmorBarList());
+        ImmutableMap.Builder<Item, CustomArmorBar> armorBuilder =
+                ImmutableMap.<Item, CustomArmorBar>builder().putAll(DetailArmorBarAPI.getStaticArmorBarList());
 
         ImmutableMap.Builder<Item, CustomArmorBar> itemBarBuilder =
                 ImmutableMap.<Item, CustomArmorBar>builder().putAll(DetailArmorBarAPI.getStaticItemBarList());
@@ -80,13 +77,13 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
                 }
 
                 if(type.equals("armor")) {
-                    Optional<ArmorItem[]> items = Codec.list(Identifier.CODEC)
+                    Optional<Item[]> items = Codec.list(Identifier.CODEC)
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in armor definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
                                     .map(Registries.ITEM::get)
                                     .filter(this::filterAndLogArmor)
-                                    .toArray(ArmorItem[]::new));
+                                    .toArray(Item[]::new));
 
                     Optional<ArmorBarRenderManager> renderer = ArmorBarRenderManager.CODEC.decode(JsonOps.INSTANCE, rendererJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Failed to load render manager [{}]: {}", id, err))
@@ -96,7 +93,7 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
                     Optional<CustomArmorBar> barOpt = renderer.map(r -> new CustomArmorBar(stack -> r));
 
                     items.ifPresentOrElse(list -> barOpt.ifPresentOrElse(bar -> {
-                                for (ArmorItem item : list) {
+                                for (Item item : list) {
                                     armorBuilder.put(item, bar);
                                 }
                             }, () -> DetailArmorBar.LOGGER.error("Armor definition {} is missing a renderer!", id)),
@@ -137,11 +134,15 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
     }
 
     private boolean filterAndLogArmor(Item input) {
-        if(input instanceof ArmorItem) {
+        /*if(input instanceof Item) {
             return true;
         } else {
             DetailArmorBar.LOGGER.warn("Non-armor item in armor bar manager. Ignoring.");
             return false;
-        }
+        }*/
+
+        // Armor is now determined by ItemStack's components and not Item type,
+        // so I make it always true here.
+        return true;
     }
 }
