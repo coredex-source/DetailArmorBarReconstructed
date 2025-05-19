@@ -133,7 +133,14 @@ public class ArmorBarRenderer {
             EquipmentSlot slot = pair.getLeft();
             if (!itemStack.isEmpty()) {
                 if (itemStack.getMaxDamage() != 0 && ((itemStack.getDamage() * 100f) / (itemStack.getMaxDamage() * 100f)) >= 0.92f) {
-                    count += itemStack.getItem() instanceof ArmorItem ? getDefense(itemStack, slot) : 2;
+                    if(itemStack.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
+                        AttributeModifiersComponent component = itemStack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+                        assert component != null;
+                        count += (int) component.modifiers().stream()
+                                .filter((attr) -> attr.attribute().equals(EntityAttributes.ARMOR)) //&& attr.slot().equals(slot))
+                                .findFirst()
+                                .get().modifier().value();
+                    }
                 }
             }
         }
@@ -168,10 +175,11 @@ public class ArmorBarRenderer {
             ItemStack itemStack = pair.getRight();
             EquipmentSlot slot = pair.getLeft();
             if (!itemStack.isEmpty()) {
-                if (itemStack.getItem() instanceof ArmorItem armor) {
+                var component = itemStack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+                if (component != null) {
                     CustomArmorBar barData;
                     if (getConfig().getOptions().toggleArmorTypes) {
-                        barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(armor, CustomArmorBar.DEFAULT);
+                        barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(itemStack.getItem(), CustomArmorBar.DEFAULT);
                     }
 //                    else if (getConfig().getOptions().toggleNetherites) {
 //                        barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(armor, CustomArmorBar.DEFAULT);
@@ -199,7 +207,7 @@ public class ArmorBarRenderer {
             for (Pair<EquipmentSlot, ItemStack> pair : equipment) {
                 ItemStack itemStack = pair.getRight();
                 EquipmentSlot slot = pair.getLeft();
-                if (!itemStack.isEmpty() && !(itemStack.getItem() instanceof ArmorItem) && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
+                if (!itemStack.isEmpty() && !itemStack.contains(DataComponentTypes.EQUIPPABLE) && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
                     if (armorItem.size() % 2 == 1)
                         armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
 
