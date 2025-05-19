@@ -414,6 +414,8 @@ public class ArmorBarRenderer {
                 }
             }
         }
+
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     private void drawEnchantTexture(DrawContext context, int x, int y, Color color, int half) {
