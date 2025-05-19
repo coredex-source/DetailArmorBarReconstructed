@@ -27,16 +27,19 @@ import java.util.Optional;
 
 public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements IdentifiableResourceReloadListener {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Codec<JsonElement> JSON_CODEC = Codec.PASSTHROUGH.xmap(
+            dynamic -> dynamic.convert(JsonOps.INSTANCE).getValue(),
+            json -> new Dynamic<>(JsonOps.INSTANCE, json)
+    );
 
     private Map<ArmorItem, CustomArmorBar> armorList;
     private Map<Item, CustomArmorBar> itemList;
 
     public ArmorBarLoader() {
-        super(GSON, "armor_bar");
+        super(JSON_CODEC, ResourceFinder.json("armor_bar"));
     }
 
-    public Map<ArmorItem, CustomArmorBar> getArmorList() {
+    public Map<Item, CustomArmorBar> getArmorList() {
         return armorList;
     }
 
