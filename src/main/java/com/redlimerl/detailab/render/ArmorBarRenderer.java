@@ -227,14 +227,27 @@ public class ArmorBarRenderer {
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final InGameHud hud = client.inGameHud;
 
+    private Iterable<ItemStack> getArmorItems(PlayerEntity player) {
+        var list = new ArrayList<ItemStack>();
+        Optional.ofNullable(player.getEquippedStack(EquipmentSlot.HEAD))
+                .ifPresent(list::add);
+        Optional.ofNullable(player.getEquippedStack(EquipmentSlot.CHEST))
+                .ifPresent(list::add);
+        Optional.ofNullable(player.getEquippedStack(EquipmentSlot.LEGS))
+                .ifPresent(list::add);
+        Optional.ofNullable(player.getEquippedStack(EquipmentSlot.FEET))
+                .ifPresent(list::add);
+        return list;
+    }
+
     public void render(DrawContext context, PlayerEntity player) {
-        var generic = getEnchantLevel(player.getArmorItems(), Enchantments.PROTECTION);
-        var projectile = getEnchantLevel(player.getArmorItems(), Enchantments.PROJECTILE_PROTECTION);
-        var explosive = getEnchantLevel(player.getArmorItems(), Enchantments.BLAST_PROTECTION);
-        var fire = getEnchantLevel(player.getArmorItems(), Enchantments.FIRE_PROTECTION);
+        var generic = getEnchantLevel(getArmorItems(player), Enchantments.PROTECTION);
+        var projectile = getEnchantLevel(getArmorItems(player), Enchantments.PROJECTILE_PROTECTION);
+        var explosive = getEnchantLevel(getArmorItems(player), Enchantments.BLAST_PROTECTION);
+        var fire = getEnchantLevel(getArmorItems(player), Enchantments.FIRE_PROTECTION);
         var protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
         var armorPoints = getArmorPoints(player);
-        var thorns = getEnchantLevel(player.getArmorItems(), Enchantments.THORNS);
+        var thorns = getEnchantLevel(getArmorItems(player), Enchantments.THORNS);
 
         var playerHealth = MathHelper.ceil(player.getHealth());
         var totalArmorPoint = armorPoints.size();
