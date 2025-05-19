@@ -7,7 +7,6 @@ import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.Animation;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.component.DataComponentTypes;
@@ -20,7 +19,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Pair;
@@ -270,9 +268,6 @@ public class ArmorBarRenderer {
         int stackCount = (totalArmorPoint - 1) / 20;
         int stackRow = stackCount * 20;
 
-        RenderSystem.enableBlend();
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX);
-
         //Default
         if (totalArmorPoint > 0) {
 
@@ -371,8 +366,6 @@ public class ArmorBarRenderer {
             }
         }
 
-        RenderSystem.setShaderTexture(0, GUI_ARMOR_BAR);
-
         //Armor Enchantments
         if (getConfig().getOptions().toggleEnchants && totalEnchants > 0 && totalArmorPoint > 0) {
             for (int count = 0; count * 2 + 1 <= totalEnchants; count++) {
@@ -421,9 +414,6 @@ public class ArmorBarRenderer {
                 }
             }
         }
-
-        RenderSystem.disableBlend();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
     private void drawEnchantTexture(DrawContext context, int x, int y, Color color, int half) {
