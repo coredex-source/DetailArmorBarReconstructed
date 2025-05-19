@@ -134,10 +134,11 @@ public class ArmorBarRenderer {
                     if(itemStack.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
                         AttributeModifiersComponent component = itemStack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
                         assert component != null;
-                        count += (int) component.modifiers().stream()
+                        count += component.modifiers().stream()
                                 .filter((attr) -> attr.attribute().equals(EntityAttributes.ARMOR) && attr.slot().getSlots().contains(slot))
                                 .findFirst()
-                                .get().modifier().value();
+                                .map(x -> x.modifier().value())
+                                .orElse(0.0);
                     }
                 }
             }
