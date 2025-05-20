@@ -26,7 +26,7 @@ public class InGameDrawer {
         if(!mirror) {
             context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight);
         } else {
-            context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight);
+            context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight);
         }
     }
 }
