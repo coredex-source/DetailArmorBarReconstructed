@@ -18,15 +18,22 @@ public class InGameDrawer {
     }
 
     public static void drawTexture(Identifier identifier, DrawContext context, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, Color color, boolean mirror) {
-        RenderSystem.setShaderColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, color.getAlpha()/100f);
-        drawTexture(identifier, context, x, y, width, height, u, v, width, height, textureWidth, textureHeight, mirror);
+        drawTexture(identifier, context, x, y, width, height, u, v, width, height, textureWidth, textureHeight, color, mirror);
     }
 
     public static void drawTexture(Identifier identifier, DrawContext context, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight, boolean mirror) {
+        drawTexture(identifier, context, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight, -1, mirror);
+    }
+
+    private static void drawTexture(Identifier identifier, DrawContext context, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight, Color color, boolean mirror) {
+        drawTexture(identifier, context, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight, color.getRGB(), mirror);
+    }
+
+    private static void drawTexture(Identifier identifier, DrawContext context, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight, int color, boolean mirror) {
         if(!mirror) {
-            context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight);
+            context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
         } else {
-            context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight);
+            context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight, color);
         }
     }
 }
