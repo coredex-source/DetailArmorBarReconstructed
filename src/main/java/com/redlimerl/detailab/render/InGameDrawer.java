@@ -1,6 +1,5 @@
 package com.redlimerl.detailab.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
@@ -31,9 +30,9 @@ public class InGameDrawer {
 
     private static void drawTexture(Identifier identifier, DrawContext context, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight, int color, boolean mirror) {
         if(!mirror) {
-            context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
+            context.drawTexture(RenderLayer::getGuiTexturedOverlay, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
         } else {
-            context.drawTexture(RenderLayer::getGuiTextured, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight, color);
+            context.drawTexture(RenderLayer::getGuiTexturedOverlay, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight, color);
         }
     }
 }
