@@ -6,11 +6,11 @@ Detail Armor Bar for 1.21.5+
 
 # Downloads
 - For 1.21.4 and below use the official mod by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/detail-armor-bar)
-- For 1.21.5 and above by clicking here: [Modrinth]() or [CurseForge]() or [Github-Releases](https://github.com/coredex-source/DetailArmorBarReconstructed/releases/latest)
+- For 1.21.5 and above by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar-reconstructed) or [CurseForge](https://curseforge.com/minecraft/mc-mods/detail-armor-bar-reconstructed) or [Github-Releases](https://github.com/coredex-source/DetailArmorBarReconstructed/releases/latest)
 
 # Credits
 - [RedLime](https://github.com/RedLime) for creating the [mod](https://github.com/redlime/DetailArmorBar).
-- [rambert or ram6ert] for creating the [fork](https://github.com/ram6ert/DetailArmorBar) to 1.21.5.
+- [rambert or ram6ert](https://github.com/ram6ert) for creating the [fork](https://github.com/ram6ert/DetailArmorBar) to 1.21.5.
 
 # Orignal Mod and Docs
 - https://github.com/redlime/DetailArmorBar
