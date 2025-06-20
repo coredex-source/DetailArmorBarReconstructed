@@ -1,18 +1,24 @@
 {
   "schemaVersion": 1,
-  "id": "detailab",
+  "id": "detailabreconst",
   "version": "${version}",
-  "name": "Detail Armor Bar",
+  "name": "Detail Armor Bar Reconstructed",
   "description": "Show more details of armors in Armor bar!",
   "authors": [
+    "coredex-source"
+  ],
+  "orignal authors": [
     "RedLime"
   ],
   "contributors": [
+    "RedLime - orignal author",
+    "coredex-source - current maintainer",
     "snessim",
-    "Heamaci"
+    "Heamaci",
+    "ram6ert or rambert"
   ],
   "contact": {
-    "sources": "https://github.com/RedLime/DetailArmorBar/tree/1.19"
+    "sources": "https://github.com/coredex-source/DetailArmorBarReconstructed"
   },
   "license": "MIT",
   "icon": "assets/detailab/icon.png",
@@ -34,7 +40,7 @@
   "depends": {
     "fabricloader": ">=0.11.6",
     "fabric": "*",
-    "minecraft": ">=1.21.5 <1.22-",
+    "minecraft": "1.21.6",
     "java": ">=17"
   }
 }
