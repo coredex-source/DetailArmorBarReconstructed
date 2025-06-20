@@ -8,9 +8,10 @@ java{
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
-archivesBaseName = project.archivesBaseName
-version = project.modVersion
-group = project.mavenGroup
+base {
+    version = project.modVersion
+    group = project.mavenGroup
+}
 
 repositories {
     maven {
@@ -46,7 +47,7 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${archivesBaseName}"}
+        rename { "${it}_${archivesName}"}
     }
 }
 
