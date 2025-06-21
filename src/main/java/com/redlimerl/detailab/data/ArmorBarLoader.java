@@ -11,7 +11,9 @@ import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.JsonDataLoader;
 import net.minecraft.resource.ResourceFinder;
@@ -81,7 +83,7 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in armor definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
-                                    .map(Registries.ITEM::get)
+                                    .map(itemId -> new ItemStack(Registries.ITEM.get(itemId)))
                                     .filter(this::filterAndLogArmor)
                                     .toArray(Item[]::new));
 
@@ -133,16 +135,14 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
         itemList = itemBarBuilder.buildKeepingLast();
     }
 
-    private boolean filterAndLogArmor(Item input) {
-        /*if(input instanceof Item) {
+    private boolean filterAndLogArmor(ItemStack stack) {
+        ComponentMap eqComp = stack.getComponents();
+        if (eqComp != null) {
+            // DEBUG: print the component data
+            DetailArmorBar.LOGGER.info("Equippable component for {}: {}", stack, eqComp);
             return true;
-        } else {
-            DetailArmorBar.LOGGER.warn("Non-armor item in armor bar manager. Ignoring.");
-            return false;
-        }*/
-
-        // Armor is now determined by ItemStack's components and not Item type,
-        // so I make it always true here.
-        return true;
+        }
+        DetailArmorBar.LOGGER.warn("Non-armor item: {}", stack.getItem());
+        return false;
     }
 }
