@@ -4,6 +4,11 @@
 Detail Armor Bar for 1.21.5+
 - Detail Armor Bar Reconstructed is a fork of a fork of the Detail Armor Bar mod created by [RedLime](https://github.com/RedLime). This fork will be maintained and will be worked upon constantly by [coredex-source](https://github.com/coredex-source).
 
+# Features that doesn't work properly for now (According to my testing):
+- Enchantment overlay (renders improperly)
+- Projectile protection overlay doesn't render
+- ~~API~~ - Should work with some changes to the mods which use the API .. will have to test by making my own mod for testing xD (Might push a PR to Detail Armor Bar Compat .. or if that feels like too much work might just make smth just for testing) FOR NOW I ASSUME THAT THE API IS FUNCTIONING HOW IT SHOULD BY DEFAULT.
+
 # Downloads
 - For 1.21.4 and below use the official mod by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/detail-armor-bar)
 - For 1.21.5 and above by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar-reconstructed) or [CurseForge](https://curseforge.com/minecraft/mc-mods/detail-armor-bar-reconstructed) or [Github-Releases](https://github.com/coredex-source/DetailArmorBarReconstructed/releases/latest)
