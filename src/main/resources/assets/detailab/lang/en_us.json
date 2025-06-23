@@ -51,5 +51,7 @@
   "option.detailarmorbar.toggle.sort_special_item": "Sort Special Items",
   "context.detailarmorbar.toggle.sort_special_item": "Sort special items (like Elytra) to the right on armor bar.",
   "option.detailarmorbar.toggle.align_enchantments": "Align Enchantments",
-  "context.detailarmorbar.toggle.align_enchantments": "Aligns enchantment effects with actual armor points instead of enchantment levels"
+  "context.detailarmorbar.toggle.align_enchantments": "Aligns enchantment effects with actual armor points instead of enchantment levels",
+  "option.detailarmorbar.toggle.uniform_color": "Uniform Enchantment Color",
+  "context.detailarmorbar.toggle.uniform_color": "Shows a single color for enchantment effects when all armor pieces have the same protection"
 }

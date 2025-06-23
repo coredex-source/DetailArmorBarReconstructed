@@ -247,6 +247,47 @@ public class ArmorBarRenderer {
         return list;
     }
 
+    // Add this helper method to check if all armor pieces have the same protection enchantments
+    private boolean hasSameProtectionEnchantments(Iterable<ItemStack> equipment) {
+        if (!getConfig().getOptions().toggleUniformColor) {
+            return false;
+        }
+        
+        List<ItemStack> armorPieces = new ArrayList<>();
+        equipment.forEach(item -> {
+            if (!item.isEmpty()) {
+                armorPieces.add(item);
+            }
+        });
+        
+        if (armorPieces.isEmpty()) {
+            return false;
+        }
+        
+        // Get enchantments of first piece to compare with others
+        var firstGeneric = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.PROTECTION);
+        var firstProjectile = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.PROJECTILE_PROTECTION);
+        var firstExplosive = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.BLAST_PROTECTION);
+        var firstFire = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.FIRE_PROTECTION);
+        
+        // Check if all pieces have the same enchantments
+        for (int i = 1; i < armorPieces.size(); i++) {
+            var nextGeneric = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.PROTECTION);
+            var nextProjectile = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.PROJECTILE_PROTECTION);
+            var nextExplosive = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.BLAST_PROTECTION);
+            var nextFire = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.FIRE_PROTECTION);
+            
+            if (firstGeneric.level != nextGeneric.level || 
+                firstProjectile.level != nextProjectile.level ||
+                firstExplosive.level != nextExplosive.level ||
+                firstFire.level != nextFire.level) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     public void render(DrawContext context, PlayerEntity player) {
         var generic = getEnchantLevel(getArmorItems(player), Enchantments.PROTECTION);
         var projectile = getEnchantLevel(getArmorItems(player), Enchantments.PROJECTILE_PROTECTION);
@@ -370,30 +411,112 @@ public class ArmorBarRenderer {
         //Armor Enchantments
         if (getConfig().getOptions().toggleEnchants && totalEnchants > 0 && totalArmorPoint > 0) {
             if (getConfig().getOptions().toggleAlignEnchantments) {
+                // Check if all armor pieces have the same enchantments for uniform color
+                boolean uniformColor = hasSameProtectionEnchantments(getArmorItems(player));
+                Color uniformEnchantColor = null;
+                
+                if (uniformColor) {
+                    // Get first armor piece to determine uniform color
+                    var allArmor = getArmorItems(player);
+                    ItemStack firstArmorPiece = null;
+                    for (ItemStack armor : allArmor) {
+                        if (!armor.isEmpty()) {
+                            firstArmorPiece = armor;
+                            break;
+                        }
+                    }
+                    
+                    if (firstArmorPiece != null) {
+                        var armorGeneric = getEnchantLevel(Collections.singleton(firstArmorPiece), Enchantments.PROTECTION);
+                        var armorProjectile = getEnchantLevel(Collections.singleton(firstArmorPiece), Enchantments.PROJECTILE_PROTECTION);
+                        var armorExplosive = getEnchantLevel(Collections.singleton(firstArmorPiece), Enchantments.BLAST_PROTECTION);
+                        var armorFire = getEnchantLevel(Collections.singleton(firstArmorPiece), Enchantments.FIRE_PROTECTION);
+                        var armorProtectArr = new int[] { armorGeneric.level, armorProjectile.level, armorExplosive.level, armorFire.level, 0 };
+                        
+                        uniformEnchantColor = getProtectColor(armorProtectArr);
+                    }
+                }
+                
                 // New behavior - align with armor points
                 int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
                 
                 for (int count = 0; count < displayedArmorIcons; count++) {
                     int xPos = screenWidth + count * 8;
-                    
-                    // Calculate the current armor position in the array
                     int armorIndex = count * 2 + stackRow;
                     int nextArmorIndex = armorIndex + 1;
-                    
-                    // Check if this position has valid armor points
                     boolean hasFirstPoint = armorIndex < totalArmorPoint;
                     boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
                     
                     if (hasFirstPoint || hasSecondPoint) {
-                        // Only display enchantment effect if there are enchantments
-                        if (totalEnchants > 0) {
-                            // Full armor icon (both points filled)
-                            if (hasFirstPoint && hasSecondPoint) {
-                                drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 0);
+                        if (uniformColor && uniformEnchantColor != null) {
+                            // Use uniform color for all armor points
+                            drawEnchantTexture(context, xPos, yPos, uniformEnchantColor, hasFirstPoint && hasSecondPoint ? 0 : 2);
+                        } else {
+                            // Original per-piece coloring logic
+                            if (hasFirstPoint) {
+                                ItemStack armorItem = armorPoints.get(armorIndex).getLeft();
+                                if (!armorItem.isEmpty()) {
+                                    var armorGeneric = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROTECTION);
+                                    var armorProjectile = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROJECTILE_PROTECTION);
+                                    var armorExplosive = getEnchantLevel(Collections.singleton(armorItem), Enchantments.BLAST_PROTECTION);
+                                    var armorFire = getEnchantLevel(Collections.singleton(armorItem), Enchantments.FIRE_PROTECTION);
+                                    var armorProtectArr = new int[] { armorGeneric.level, armorProjectile.level, armorExplosive.level, armorFire.level, 0 };
+                                    if (Arrays.stream(armorProtectArr).sum() > 0) {
+                                        if (hasSecondPoint) {
+                                            ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getLeft();
+                                            if (!nextArmorItem.isEmpty()) {
+                                                var nextGeneric = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROTECTION);
+                                                var nextProjectile = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROJECTILE_PROTECTION);
+                                                var nextExplosive = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.BLAST_PROTECTION);
+                                                var nextFire = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.FIRE_PROTECTION);
+                                                if (armorGeneric.level == nextGeneric.level && 
+                                                    armorProjectile.level == nextProjectile.level &&
+                                                    armorExplosive.level == nextExplosive.level &&
+                                                    armorFire.level == nextFire.level) {
+                                                    drawEnchantTexture(context, xPos, yPos, getProtectColor(armorProtectArr), 0);
+                                                } else {
+                                                    drawEnchantTexture(context, xPos, yPos, getProtectColor(armorProtectArr), 2);
+                                                }
+                                            } else {
+                                                drawEnchantTexture(context, xPos, yPos, getProtectColor(armorProtectArr), 2);
+                                            }
+                                        } else {
+                                            drawEnchantTexture(context, xPos, yPos, getProtectColor(armorProtectArr), 2);
+                                        }
+                                    }
+                                }
                             }
-                            // Half armor icon (only one point filled)
-                            else if (hasFirstPoint) {
-                                drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
+                            
+                            if (hasSecondPoint) {
+                                ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getLeft();
+                                if (!nextArmorItem.isEmpty()) {
+                                    var nextGeneric = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROTECTION);
+                                    var nextProjectile = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROJECTILE_PROTECTION);
+                                    var nextExplosive = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.BLAST_PROTECTION);
+                                    var nextFire = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.FIRE_PROTECTION);
+                                    var nextProtectArr = new int[] { nextGeneric.level, nextProjectile.level, nextExplosive.level, nextFire.level, 0 };
+                                    
+                                    if (Arrays.stream(nextProtectArr).sum() > 0) {
+                                        if (hasFirstPoint) {
+                                            ItemStack armorItem = armorPoints.get(armorIndex).getLeft();
+                                            if (!armorItem.isEmpty()) {
+                                                var armorGeneric = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROTECTION);
+                                                var armorProjectile = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROJECTILE_PROTECTION);
+                                                var armorExplosive = getEnchantLevel(Collections.singleton(armorItem), Enchantments.BLAST_PROTECTION);
+                                                var armorFire = getEnchantLevel(Collections.singleton(armorItem), Enchantments.FIRE_PROTECTION);
+                                                
+                                                if (armorGeneric.level != nextGeneric.level || 
+                                                    armorProjectile.level != nextProjectile.level ||
+                                                    armorExplosive.level != nextExplosive.level ||
+                                                    armorFire.level != nextFire.level) {
+                                                    drawEnchantTexture(context, xPos, yPos, getProtectColor(nextProtectArr), 1);
+                                                }
+                                            }
+                                        } else {
+                                            drawEnchantTexture(context, xPos, yPos, getProtectColor(nextProtectArr), 1);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

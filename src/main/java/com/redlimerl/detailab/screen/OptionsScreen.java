@@ -125,6 +125,15 @@ public class OptionsScreen extends Screen {
                     .build()
             );
             buttonCount++;
+
+            addDrawableChild(ButtonWidget.builder(getToggleName("uniform_color", getConfig().getOptions().toggleUniformColor), (button) -> {
+                        getConfig().getOptions().toggleUniformColor = !getConfig().getOptions().toggleUniformColor; getConfig().save();
+                        button.setMessage(getToggleName("uniform_color", getConfig().getOptions().toggleUniformColor));
+                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.uniform_color")))
+                    .build()
+            );
+            buttonCount++;
         }
 
         if (optionType == OptionType.ANIMATION) {

@@ -72,6 +72,7 @@ public class DetailArmorBarConfig {
         public boolean toggleInverseSlot = false;
         public boolean toggleSortSpecialItem = true;
         public boolean toggleAlignEnchantments = true; // New option for enchantment alignment
+        public boolean toggleUniformColor = false; // New option for uniform enchantment color
 
         boolean replaceInvalidOptions() {
             var invalid = false;

@@ -5,9 +5,12 @@ Detail Armor Bar for 1.21.5+
 - Detail Armor Bar Reconstructed is a fork of a fork of the Detail Armor Bar mod created by [RedLime](https://github.com/RedLime). This fork will be maintained and will be worked upon constantly by [coredex-source](https://github.com/coredex-source).
 
 # Features different from orignal mod:
-- Enchantment overlay alignment (config option) - Align the overlay using levels or armor points.
+- Enchantment overlay alignment (config option) - Align the overlay using levels or armor points
+- Per-piece enchantment coloring - When using aligned mode, each armor piece's enchantment shows its proper color (blast protection shows yellow, fire protection shows orange, etc.)
+- Uniform enchantment mode - in aligned mode, if all armor pieces are worn and enchanted a single color applies.
 
-# Features that doesn't work properly for now (According to my testing):
+# To-Do:
+- Implement thorns and mending in aligned mode too.
 - ~~API~~ - Should work with some changes to the mods which use the API .. will have to test by making my own mod for testing xD (Might push a PR to Detail Armor Bar Compat .. or if that feels like too much work might just make smth just for testing) FOR NOW I ASSUME THAT THE API IS FUNCTIONING HOW IT SHOULD BY DEFAULT.
 
 # Downloads
