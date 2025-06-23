@@ -411,34 +411,12 @@ public class ArmorBarRenderer {
         //Armor Enchantments
         if (getConfig().getOptions().toggleEnchants && totalEnchants > 0 && totalArmorPoint > 0) {
             if (getConfig().getOptions().toggleAlignEnchantments) {
-                // Check if all armor pieces have the same enchantments for uniform color
-                boolean uniformColor = hasSameProtectionEnchantments(getArmorItems(player));
-                Color uniformEnchantColor = null;
-                
-                if (uniformColor) {
-                    // Get first armor piece to determine uniform color
-                    var allArmor = getArmorItems(player);
-                    ItemStack firstArmorPiece = null;
-                    for (ItemStack armor : allArmor) {
-                        if (!armor.isEmpty()) {
-                            firstArmorPiece = armor;
-                            break;
-                        }
-                    }
-                    
-                    if (firstArmorPiece != null) {
-                        var armorGeneric = getEnchantLevel(Collections.singleton(firstArmorPiece), Enchantments.PROTECTION);
-                        var armorProjectile = getEnchantLevel(Collections.singleton(firstArmorPiece), Enchantments.PROJECTILE_PROTECTION);
-                        var armorExplosive = getEnchantLevel(Collections.singleton(firstArmorPiece), Enchantments.BLAST_PROTECTION);
-                        var armorFire = getEnchantLevel(Collections.singleton(firstArmorPiece), Enchantments.FIRE_PROTECTION);
-                        var armorProtectArr = new int[] { armorGeneric.level, armorProjectile.level, armorExplosive.level, armorFire.level, 0 };
-                        
-                        uniformEnchantColor = getProtectColor(armorProtectArr);
-                    }
-                }
-                
                 // New behavior - align with armor points
                 int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
+                
+                // Check if uniform color is enabled
+                boolean useUniformColor = getConfig().getOptions().toggleUniformColor;
+                Color uniformColor = useUniformColor ? getConfig().getOptions().uniformColorType.getColor() : null;
                 
                 for (int count = 0; count < displayedArmorIcons; count++) {
                     int xPos = screenWidth + count * 8;
@@ -448,9 +426,15 @@ public class ArmorBarRenderer {
                     boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
                     
                     if (hasFirstPoint || hasSecondPoint) {
-                        if (uniformColor && uniformEnchantColor != null) {
+                        if (useUniformColor) {
                             // Use uniform color for all armor points
-                            drawEnchantTexture(context, xPos, yPos, uniformEnchantColor, hasFirstPoint && hasSecondPoint ? 0 : 2);
+                            if (hasFirstPoint && hasSecondPoint) {
+                                drawEnchantTexture(context, xPos, yPos, uniformColor, 0);
+                            } else if (hasFirstPoint) {
+                                drawEnchantTexture(context, xPos, yPos, uniformColor, 2);
+                            } else if (hasSecondPoint) {
+                                drawEnchantTexture(context, xPos, yPos, uniformColor, 1);
+                            }
                         } else {
                             // Original per-piece coloring logic
                             if (hasFirstPoint) {

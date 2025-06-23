@@ -73,6 +73,7 @@ public class DetailArmorBarConfig {
         public boolean toggleSortSpecialItem = true;
         public boolean toggleAlignEnchantments = true; // New option for enchantment alignment
         public boolean toggleUniformColor = false; // New option for uniform enchantment color
+        public UniformColor uniformColorType = UniformColor.AQUA; // Default color selection
 
         boolean replaceInvalidOptions() {
             var invalid = false;
@@ -86,6 +87,10 @@ public class DetailArmorBarConfig {
             }
             if (effectThorn == null) {
                 effectThorn = Options.DEFAULT.effectThorn;
+                invalid = true;
+            }
+            if (uniformColorType == null) {
+                uniformColorType = Options.DEFAULT.uniformColorType;
                 invalid = true;
             }
             return invalid;

@@ -1,5 +1,6 @@
 package com.redlimerl.detailab.screen;
 
+import com.redlimerl.detailab.config.ConfigEnumType;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -166,6 +167,16 @@ public class OptionsScreen extends Screen {
                             .build()
             );
             buttonCount++;
+
+            addDrawableChild(ButtonWidget.builder(getUniformColorName("uniform_color", getConfig().getOptions().uniformColorType), (button) -> {
+                    getConfig().getOptions().uniformColorType = getUniformColorNext(getConfig().getOptions().uniformColorType);
+                    getConfig().save();
+                    button.setMessage(getUniformColorName("uniform_color", getConfig().getOptions().uniformColorType));
+                }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                        .tooltip(Tooltip.of(Text.literal(getUniformColorDescription("uniform_color", getConfig().getOptions().uniformColorType))))
+                .build()
+            );
+            buttonCount++;
         }
 
         if (optionType == OptionType.ETC) {
@@ -283,6 +294,22 @@ public class OptionsScreen extends Screen {
         return Text.translatable("option.detailarmorbar.toggle."+type)
                 .append(": ")
                 .append(target ? ScreenTexts.ON : ScreenTexts.OFF);
+    }
+    
+    // Add this helper method for uniform color enum
+    private <T extends Enum<T>> T getUniformColorNext(T value) {
+        T[] values = value.getDeclaringClass().getEnumConstants();
+        return values[(value.ordinal() + 1) % values.length];
+    }
+    
+    private MutableText getUniformColorName(String key, ConfigEnumType.UniformColor value) {
+        return Text.translatable("option.detailarmorbar.effects." + key)
+                .append(": ")
+                .append(Text.translatable("option.detailarmorbar.effects." + key + "." + value.name().toLowerCase(Locale.ROOT)));
+    }
+    
+    private String getUniformColorDescription(String key, ConfigEnumType.UniformColor value) {
+        return Text.translatable("context.detailarmorbar.effects." + key + "." + value.name().toLowerCase(Locale.ROOT)).getString();
     }
 
 }
