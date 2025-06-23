@@ -49,5 +49,7 @@
   "option.detailarmorbar.toggle.inverse_slot": "Reversed Slot",
   "context.detailarmorbar.toggle.inverse_slot": "Reverses the slot order of the armor bar.",
   "option.detailarmorbar.toggle.sort_special_item": "Sort Special Items",
-  "context.detailarmorbar.toggle.sort_special_item": "Sort special items (like Elytra) to the right on armor bar."
+  "context.detailarmorbar.toggle.sort_special_item": "Sort special items (like Elytra) to the right on armor bar.",
+  "option.detailarmorbar.toggle.align_enchantments": "Align Enchantments",
+  "context.detailarmorbar.toggle.align_enchantments": "Aligns enchantment effects with actual armor points instead of enchantment levels"
 }

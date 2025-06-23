@@ -71,6 +71,7 @@ public class DetailArmorBarConfig {
         public boolean toggleCompatibleHeartMod = false;
         public boolean toggleInverseSlot = false;
         public boolean toggleSortSpecialItem = true;
+        public boolean toggleAlignEnchantments = true; // New option for enchantment alignment
 
         boolean replaceInvalidOptions() {
             var invalid = false;

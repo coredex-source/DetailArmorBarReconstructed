@@ -369,33 +369,65 @@ public class ArmorBarRenderer {
 
         //Armor Enchantments
         if (getConfig().getOptions().toggleEnchants && totalEnchants > 0 && totalArmorPoint > 0) {
-            for (int count = 0; count * 2 + 1 <= totalEnchants; count++) {
-                if (count > 9) break;
-
-                var xPos = screenWidth + count * 8;
-                if (count * 2 + 1 < totalEnchants) {
-                    var min = -1;
-                    var max = -1;
-                    for (int pw = 0; pw < 5; pw++) {
-                        if (min == -1 && protectArr[pw] > 1) {
-                            min = pw;
-                            break;
-                        } else if (min == -1 && protectArr[pw] == 1) {
-                            min = pw;
-                        } else if (min != -1 && max == -1 && protectArr[pw] >= 1) max = pw;
-                    }
-                    if (min != -1 && max != -1) {
-                        drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
-                        protectArr[min] = 0;
-                        drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 1);
-                        protectArr[max] -= 1;
-                    } else {
-                        drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 0);
-                        protectArr[min] -= 2;
+            if (getConfig().getOptions().toggleAlignEnchantments) {
+                // New behavior - align with armor points
+                int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
+                
+                for (int count = 0; count < displayedArmorIcons; count++) {
+                    int xPos = screenWidth + count * 8;
+                    
+                    // Calculate the current armor position in the array
+                    int armorIndex = count * 2 + stackRow;
+                    int nextArmorIndex = armorIndex + 1;
+                    
+                    // Check if this position has valid armor points
+                    boolean hasFirstPoint = armorIndex < totalArmorPoint;
+                    boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
+                    
+                    if (hasFirstPoint || hasSecondPoint) {
+                        // Only display enchantment effect if there are enchantments
+                        if (totalEnchants > 0) {
+                            // Full armor icon (both points filled)
+                            if (hasFirstPoint && hasSecondPoint) {
+                                drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 0);
+                            }
+                            // Half armor icon (only one point filled)
+                            else if (hasFirstPoint) {
+                                drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
+                            }
+                        }
                     }
                 }
-                if (count * 2 + 1 == totalEnchants) {
-                    drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
+            } else {
+                // Original behavior - based on enchantment levels
+                for (int count = 0; count * 2 + 1 <= totalEnchants; count++) {
+                    if (count > 9) break;
+
+                    var xPos = screenWidth + count * 8;
+                    if (count * 2 + 1 < totalEnchants) {
+                        var min = -1;
+                        var max = -1;
+                        for (int pw = 0; pw < 5; pw++) {
+                            if (min == -1 && protectArr[pw] > 1) {
+                                min = pw;
+                                break;
+                            } else if (min == -1 && protectArr[pw] == 1) {
+                                min = pw;
+                            } else if (min != -1 && max == -1 && protectArr[pw] >= 1) max = pw;
+                        }
+                        if (min != -1 && max != -1) {
+                            drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
+                            protectArr[min] = 0;
+                            drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 1);
+                            protectArr[max] -= 1;
+                        } else {
+                            drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 0);
+                            protectArr[min] -= 2;
+                        }
+                    }
+                    if (count * 2 + 1 == totalEnchants) {
+                        drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
+                    }
                 }
             }
         }
