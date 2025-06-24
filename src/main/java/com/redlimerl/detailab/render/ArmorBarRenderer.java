@@ -76,10 +76,38 @@ public class ArmorBarRenderer {
         return Color.WHITE;
     }
 
+    // Make sure this method is properly defined
     private static Color getProtectColor(int[] s) {
+        if (s == null || s.length < 5) {
+            return Color.WHITE;
+        }
         return getProtectColor(s[0], s[1], s[2], s[3], s[4]);
     }
-
+    
+    // Add this new method to apply animations to uniform color
+    private static Color getAnimatedUniformColor(Color baseColor) {
+        int speed = getAnimationSpeed();
+        int alpha;
+        
+        if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
+            alpha = 80; // Same as in getProtectColor
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
+            long time = DetailArmorBar.getTicks();
+            if (time % (speed*4L) < (speed*2L)) {
+                alpha = 0;
+            } else if (time % (speed*2L) < speed) {
+                alpha = Math.round(MathHelper.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
+            } else {
+                alpha = Math.round(MathHelper.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
+            }
+        } else {
+            alpha = 0;
+        }
+        
+        // Apply the calculated alpha to the base color while preserving its RGB values
+        return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha);
+    }
+    
     private static Color getLowDurabilityColor() {
         int speed = getAnimationSpeed();
         long time = DetailArmorBar.getTicks();
@@ -416,7 +444,9 @@ public class ArmorBarRenderer {
                 
                 // Check if uniform color is enabled
                 boolean useUniformColor = getConfig().getOptions().toggleUniformColor;
-                Color uniformColor = useUniformColor ? getConfig().getOptions().uniformColorType.getColor() : null;
+                Color baseUniformColor = useUniformColor ? getConfig().getOptions().uniformColorType.getColor() : null;
+                // Apply animation to the uniform color
+                Color animatedUniformColor = baseUniformColor != null ? getAnimatedUniformColor(baseUniformColor) : null;
                 
                 for (int count = 0; count < displayedArmorIcons; count++) {
                     int xPos = screenWidth + count * 8;
@@ -427,13 +457,13 @@ public class ArmorBarRenderer {
                     
                     if (hasFirstPoint || hasSecondPoint) {
                         if (useUniformColor) {
-                            // Use uniform color for all armor points
+                            // Use animated uniform color for all armor points
                             if (hasFirstPoint && hasSecondPoint) {
-                                drawEnchantTexture(context, xPos, yPos, uniformColor, 0);
+                                drawEnchantTexture(context, xPos, yPos, animatedUniformColor, 0);
                             } else if (hasFirstPoint) {
-                                drawEnchantTexture(context, xPos, yPos, uniformColor, 2);
+                                drawEnchantTexture(context, xPos, yPos, animatedUniformColor, 2);
                             } else if (hasSecondPoint) {
-                                drawEnchantTexture(context, xPos, yPos, uniformColor, 1);
+                                drawEnchantTexture(context, xPos, yPos, animatedUniformColor, 1);
                             }
                         } else {
                             // Original per-piece coloring logic
@@ -557,9 +587,22 @@ public class ArmorBarRenderer {
     }
 
     private void drawEnchantTexture(DrawContext context, int x, int y, Color color, int half) {
+        // Apply the animation speed calculation for aura mode as well
         int u = 0;
         int v = 0;
-        var t = (hud.getTicks()/3) % 36;
+        
+        // Calculate animation speed factor based on the config
+        float speedFactor = 1.0f;
+        switch (getConfig().getOptions().effectSpeed) {
+            case VERY_SLOW -> speedFactor = 0.5f;
+            case SLOW -> speedFactor = 0.75f;
+            case FAST -> speedFactor = 1.25f;
+            case VERY_FAST -> speedFactor = 1.5f;
+        }
+        
+        // Apply speed factor to the animation timing
+        var tickDivisor = Math.max(1, Math.round(3.0f / speedFactor));
+        var t = (hud.getTicks() / tickDivisor) % 36;
 
         if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
             if (t < 12) {
