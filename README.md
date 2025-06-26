@@ -5,9 +5,11 @@ Detail Armor Bar for 1.21.5+
 - Detail Armor Bar Reconstructed is a fork of a fork of the Detail Armor Bar mod created by [RedLime](https://github.com/RedLime). This fork will be maintained and will be worked upon constantly by [coredex-source](https://github.com/coredex-source).
 
 # Features different from orignal mod:
-- Enchantment overlay alignment (config option) - Align the overlay using levels or armor points
-- Per-piece enchantment coloring - When using aligned mode, each armor piece's enchantment shows its proper color (blast protection shows yellow, fire protection shows orange, etc.)
-- Uniform color option - Apply a single customizable color to all enchantment effects regardless of protection type
+- Enchantment overlay alignment (config option) - Align the overlay using levels or armor points.
+- Per-piece enchantment coloring - When using aligned mode, each armor piece's enchantment shows its proper color (blast protection shows yellow, fire protection shows orange, etc.).
+- Uniform color option - Apply a single customizable color to all enchantment effects regardless of protection type.
+- Added animation speed to aura mode.
+- Added none for enchantment overlay config options.
 
 # To-Do:
 - Items like Elytra and Pumpkin head do not display - fix it.
