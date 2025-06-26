@@ -12,12 +12,12 @@ Detail Armor Bar for 1.21.5+
 - Added none for enchantment overlay config options.
 - Thorns overlay alignment - When using aligned mode, thorns overlay aligns with actual armor pieces.
 
-# To-Do:
-- ~~Elytra does not display - fix it.~~
-- ~~Fix no enchant overlay option showing as options.smth.none~~
-- ~~Add animations to uniform mode~~
-- ~~Fix animation speed not working on aura mode~~
-- ~~Implement thorns in aligned mode too.~~
+# To-Do (for version 4.2.0):
+- Fix Thorns animation.
+- Fix Sort Special Items (Just disables items rn).
+- Fix Reversed slot (Nothing changes rn).
+- Fix empty Armor bar (Does not show an armor bar if not wearing armor rn).
+- ~~Fix English in en_us.json.~~
 - ~~API~~ - Should work with some changes to the mods which use the API .. will have to test by making my own mod for testing xD (Might push a PR to Detail Armor Bar Compat .. or if that feels like too much work might just make smth just for testing) FOR NOW I ASSUME THAT THE API IS FUNCTIONING HOW IT SHOULD BY DEFAULT.
 
 # Downloads
