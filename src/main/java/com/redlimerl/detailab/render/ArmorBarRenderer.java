@@ -181,7 +181,12 @@ public class ArmorBarRenderer {
         for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
             ItemStack itemStack = player.getEquippedStack(equipmentSlot);
             EquippableComponent equippableComponent = itemStack.get(DataComponentTypes.EQUIPPABLE);
-            if (equippableComponent != null && equippableComponent.slot() == equipmentSlot) {
+            
+            // Check if item has equippable component OR if it's a special item like elytra
+            boolean isEquippable = equippableComponent != null && equippableComponent.slot() == equipmentSlot;
+            boolean isSpecialItem = !itemStack.isEmpty() && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem());
+            
+            if (isEquippable || isSpecialItem) {
                 if (getConfig().getOptions().toggleInverseSlot) {
                     equipment.push(new Pair<>(equipmentSlot, itemStack));
                 } else {
@@ -192,10 +197,10 @@ public class ArmorBarRenderer {
 
         EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.ARMOR);
         if (attribute != null) {
-        	double d = attribute.getBaseValue();
-        	for (int i = 0; i < d; i++) {
-        		armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-        	}
+            double d = attribute.getBaseValue();
+            for (int i = 0; i < d; i++) {
+                armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
+            }
         }
 
         for (Pair<EquipmentSlot, ItemStack> pair : equipment) {
@@ -204,6 +209,7 @@ public class ArmorBarRenderer {
             if (!itemStack.isEmpty()) {
                 var component = itemStack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
                 if (component != null) {
+                    // Handle regular armor items
                     CustomArmorBar barData;
                     if (getConfig().getOptions().toggleArmorTypes) {
                         barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(itemStack.getItem(), CustomArmorBar.DEFAULT);
@@ -218,14 +224,16 @@ public class ArmorBarRenderer {
                     for (int i = 0; i < getDefense(itemStack, slot); i++) {
                         armorItem.add(new Pair<>(itemStack, barData));
                     }
-                } else if (getConfig().getOptions().toggleItemBar && !getConfig().getOptions().toggleSortSpecialItem
-                        && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
-                    if (armorItem.size() % 2 == 1)
-                        armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
+                } else if (getConfig().getOptions().toggleItemBar && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
+                    // Handle special items like elytra
+                    if (!getConfig().getOptions().toggleSortSpecialItem) {
+                        if (armorItem.size() % 2 == 1)
+                            armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
 
-                    var barData = DetailArmorBarAPI.getItemBarList().get(itemStack.getItem());
-                    armorItem.add(new Pair<>(itemStack, barData));
-                    armorItem.add(new Pair<>(itemStack, barData));
+                        var barData = DetailArmorBarAPI.getItemBarList().get(itemStack.getItem());
+                        armorItem.add(new Pair<>(itemStack, barData));
+                        armorItem.add(new Pair<>(itemStack, barData));
+                    }
                 }
             }
         }
@@ -234,7 +242,7 @@ public class ArmorBarRenderer {
             for (Pair<EquipmentSlot, ItemStack> pair : equipment) {
                 ItemStack itemStack = pair.getRight();
                 EquipmentSlot slot = pair.getLeft();
-                if (!itemStack.isEmpty() && !itemStack.contains(DataComponentTypes.EQUIPPABLE) && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
+                if (!itemStack.isEmpty() && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
                     if (armorItem.size() % 2 == 1)
                         armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
 
@@ -572,15 +580,65 @@ public class ArmorBarRenderer {
         //Thorns Check
         if (getConfig().getOptions().toggleThorns && thorns.level > 0 && totalArmorPoint > 0) {
             Color thornsColor = getThornColor();
-            for (int count = 0; count < 10; count++) {
-                if (count * 2 + 1 > thorns.level) break;
-
-                int xPos = screenWidth + count * 8;
-                if (count * 2 + 1 < thorns.level) {
-                    InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 36, 18, thornsColor, false);
+            
+            if (getConfig().getOptions().toggleAlignEnchantments) {
+                // New behavior - align thorns with armor points (similar to protection overlay)
+                int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
+                
+                for (int count = 0; count < displayedArmorIcons; count++) {
+                    int xPos = screenWidth + count * 8;
+                    int armorIndex = count * 2 + stackRow;
+                    int nextArmorIndex = armorIndex + 1;
+                    boolean hasFirstPoint = armorIndex < totalArmorPoint;
+                    boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
+                    
+                    if (hasFirstPoint || hasSecondPoint) {
+                        boolean firstHasThorns = false;
+                        boolean secondHasThorns = false;
+                        
+                        // Check if first armor point has thorns
+                        if (hasFirstPoint) {
+                            ItemStack armorItem = armorPoints.get(armorIndex).getLeft();
+                            if (!armorItem.isEmpty()) {
+                                var thornLevel = getEnchantLevel(Collections.singleton(armorItem), Enchantments.THORNS);
+                                firstHasThorns = thornLevel.level > 0;
+                            }
+                        }
+                        
+                        // Check if second armor point has thorns
+                        if (hasSecondPoint) {
+                            ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getLeft();
+                            if (!nextArmorItem.isEmpty()) {
+                                var thornLevel = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.THORNS);
+                                secondHasThorns = thornLevel.level > 0;
+                            }
+                        }
+                        
+                        // Draw thorns overlay based on which armor points have thorns
+                        if (firstHasThorns && secondHasThorns) {
+                            // Both points have thorns - draw full icon
+                            InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 36, 18, thornsColor, false);
+                        } else if (firstHasThorns) {
+                            // Only first point has thorns - draw left half
+                            InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 27, 18, thornsColor, false);
+                        } else if (secondHasThorns) {
+                            // Only second point has thorns - draw right half
+                            InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 27, 18, thornsColor, true);
+                        }
+                    }
                 }
-                if (count * 2 + 1 == thorns.level) {
-                    InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 27, 18, thornsColor, false);
+            } else {
+                // Original behavior - based on total thorns level
+                for (int count = 0; count < 10; count++) {
+                    if (count * 2 + 1 > thorns.level) break;
+
+                    int xPos = screenWidth + count * 8;
+                    if (count * 2 + 1 < thorns.level) {
+                        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 36, 18, thornsColor, false);
+                    }
+                    if (count * 2 + 1 == thorns.level) {
+                        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 27, 18, thornsColor, false);
+                    }
                 }
             }
         }
