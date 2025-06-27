@@ -7,9 +7,6 @@
   "authors": [
     "coredex-source"
   ],
-  "orignal authors": [
-    "RedLime"
-  ],
   "contributors": [
     "RedLime - orignal author",
     "coredex-source - current maintainer",
@@ -38,10 +35,10 @@
     "detailab.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.11.6",
+    "fabricloader": "*",
     "fabric": "*",
     "fabric-api": "*",
     "minecraft": "1.21.6",
-    "java": ">=17"
+    "java": ">=21"
   }
 }
