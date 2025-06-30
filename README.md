@@ -12,7 +12,7 @@ Detail Armor Bar for 1.21.5+
 - Added none for enchantment overlay config options.
 - Thorns overlay alignment - When using aligned mode, thorns overlay aligns with actual armor pieces.
 
-# To-Do (for version 4.2.0):
+# To-Do (for version 4.2.5):
 - Fix Thorns animation.
 - Fix Sort Special Items (Just disables items rn).
 - Fix Reversed slot (Nothing changes rn).
