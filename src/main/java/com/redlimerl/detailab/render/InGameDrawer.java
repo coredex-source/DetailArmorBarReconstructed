@@ -3,8 +3,6 @@ package com.redlimerl.detailab.render;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
-import net.minecraft.client.gl.RenderPipelines;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 
 import java.awt.*;
 
@@ -30,12 +28,11 @@ public class InGameDrawer {
         drawTexture(identifier, context, x, y, width, height, u, v, regionWidth, regionHeight, textureWidth, textureHeight, color.getRGB(), mirror);
     }
 
-    static RenderPipeline pipeline = RenderPipelines.GUI_TEXTURED; // Update for 1.21.6
     private static void drawTexture(Identifier identifier, DrawContext context, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight, int color, boolean mirror) {
         if(!mirror) {
-            context.drawTexture(pipeline, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
+            context.drawTexture(RenderLayer::getGuiTexturedOverlay, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
         } else {
-            context.drawTexture(pipeline, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight, color);
+            context.drawTexture(RenderLayer::getGuiTexturedOverlay, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight, color);
         }
     }
 }

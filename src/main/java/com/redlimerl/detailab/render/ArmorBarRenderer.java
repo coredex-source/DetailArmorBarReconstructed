@@ -420,6 +420,7 @@ public class ArmorBarRenderer {
                     }
                 }
             }
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
 
         //Mending Color
