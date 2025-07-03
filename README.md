@@ -15,7 +15,7 @@ Detail Armor Bar for 1.21.5+
 # To-Do (for version 4.2.5):
 - Fix Thorns animation.
 - Fix Sort Special Items (Just disables items rn).
-- Fix Reversed slot (Nothing changes rn).
+- ~~Fix Reversed slot (Nothing changes rn).~~
 - Fix empty Armor bar (Does not show an armor bar if not wearing armor rn).
 - ~~Fix English in en_us.json.~~
 - ~~API~~ - Should work with some changes to the mods which use the API .. will have to test by making my own mod for testing xD (Might push a PR to Detail Armor Bar Compat .. or if that feels like too much work might just make smth just for testing) FOR NOW I ASSUME THAT THE API IS FUNCTIONING HOW IT SHOULD BY DEFAULT.
@@ -23,6 +23,12 @@ Detail Armor Bar for 1.21.5+
 # Downloads
 - For 1.21.4 and below use the official mod by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/detail-armor-bar)
 - For 1.21.5 and above by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar-reconstructed) or [CurseForge](https://curseforge.com/minecraft/mc-mods/detail-armor-bar-reconstructed) or [Github-Releases](https://github.com/coredex-source/DetailArmorBarReconstructed/releases/latest)
+
+# Version Support
+
+- The mod will be supported for upto 3 versions, for example if 1.21.7 is the latest Minecraft release then support will be provided for 1.21.5, 1.21.6 and 1.21.7.
+- If a backport is to be requested, it can be requested be creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
+- Port to a specific mod loader like NeoForge (I will most likely not port to Forge, I will likely port to NeoForge if an issue is created.) may also be requested by creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
 
 # Credits
 - [RedLime](https://github.com/RedLime) for creating the [mod](https://github.com/redlime/DetailArmorBar).
