@@ -350,7 +350,15 @@ public class ArmorBarRenderer {
         if (totalArmorPoint > 0) {
 
             for (int count = 0; count < 10; count++) {
-                int xPos = screenWidth + count * 8;
+                // Calculate xPos based on inverse slot setting
+                int xPos;
+                if (getConfig().getOptions().toggleInverseSlot) {
+                    // For inverse order (right to left), start from right and move left
+                    xPos = screenWidth + (9 - count) * 8;
+                } else {
+                    // Normal order (left to right)
+                    xPos = screenWidth + count * 8;
+                }
 
                 if (count * 2 + 1 + stackRow < totalArmorPoint) {
                     Pair<ItemStack, CustomArmorBar> am1 = armorPoints.get(count * 2 + stackRow);
@@ -401,7 +409,14 @@ public class ArmorBarRenderer {
                     for (int count = 0; count <= halfArmors; count++) {
                         if (lowDur <= 0) break;
 
-                        int xPos = screenWidth + (halfArmors - count) * 8;
+                        // Calculate xPos based on inverse slot setting
+                        int xPos;
+                        if (getConfig().getOptions().toggleInverseSlot) {
+                            xPos = screenWidth + (9 - (halfArmors - count)) * 8;
+                        } else {
+                            xPos = screenWidth + (halfArmors - count) * 8;
+                        }
+                        
                         Pair<ItemStack, CustomArmorBar> am = armorPoints.get((halfArmors - count) * 2 + stackRow);
                         if (armorPreset == (halfArmors - count) * 2 + 1) {
                             if (count == 0) {
@@ -430,7 +445,13 @@ public class ArmorBarRenderer {
             if (mendingTime < (mendingSpeed * 4)) {
                 for (int count = 0; count < 10; count++) {
                     if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
-                        int xPos = screenWidth + count * 8;
+                        // Calculate xPos based on inverse slot setting
+                        int xPos;
+                        if (getConfig().getOptions().toggleInverseSlot) {
+                            xPos = screenWidth + (9 - count) * 8;
+                        } else {
+                            xPos = screenWidth + count * 8;
+                        }
 
                         if (armorPoints.size() <= count * 2 + stackRow) {
                             if (getConfig().getOptions().toggleEmptyBar)
@@ -457,7 +478,14 @@ public class ArmorBarRenderer {
                 Color animatedUniformColor = baseUniformColor != null ? getAnimatedUniformColor(baseUniformColor) : null;
                 
                 for (int count = 0; count < displayedArmorIcons; count++) {
-                    int xPos = screenWidth + count * 8;
+                    // Calculate xPos based on inverse slot setting
+                    int xPos;
+                    if (getConfig().getOptions().toggleInverseSlot) {
+                        xPos = screenWidth + (9 - count) * 8;
+                    } else {
+                        xPos = screenWidth + count * 8;
+                    }
+                    
                     int armorIndex = count * 2 + stackRow;
                     int nextArmorIndex = armorIndex + 1;
                     boolean hasFirstPoint = armorIndex < totalArmorPoint;
@@ -548,7 +576,14 @@ public class ArmorBarRenderer {
                 for (int count = 0; count * 2 + 1 <= totalEnchants; count++) {
                     if (count > 9) break;
 
-                    var xPos = screenWidth + count * 8;
+                    // Calculate xPos based on inverse slot setting
+                    int xPos;
+                    if (getConfig().getOptions().toggleInverseSlot) {
+                        xPos = screenWidth + (9 - count) * 8;
+                    } else {
+                        xPos = screenWidth + count * 8;
+                    }
+                    
                     if (count * 2 + 1 < totalEnchants) {
                         var min = -1;
                         var max = -1;
@@ -586,7 +621,14 @@ public class ArmorBarRenderer {
                 int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
                 
                 for (int count = 0; count < displayedArmorIcons; count++) {
-                    int xPos = screenWidth + count * 8;
+                    // Calculate xPos based on inverse slot setting
+                    int xPos;
+                    if (getConfig().getOptions().toggleInverseSlot) {
+                        xPos = screenWidth + (9 - count) * 8;
+                    } else {
+                        xPos = screenWidth + count * 8;
+                    }
+                    
                     int armorIndex = count * 2 + stackRow;
                     int nextArmorIndex = armorIndex + 1;
                     boolean hasFirstPoint = armorIndex < totalArmorPoint;
@@ -632,7 +674,14 @@ public class ArmorBarRenderer {
                 for (int count = 0; count < 10; count++) {
                     if (count * 2 + 1 > thorns.level) break;
 
-                    int xPos = screenWidth + count * 8;
+                    // Calculate xPos based on inverse slot setting
+                    int xPos;
+                    if (getConfig().getOptions().toggleInverseSlot) {
+                        xPos = screenWidth + (9 - count) * 8;
+                    } else {
+                        xPos = screenWidth + count * 8;
+                    }
+                    
                     if (count * 2 + 1 < thorns.level) {
                         InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 36, 18, thornsColor, false);
                     }
