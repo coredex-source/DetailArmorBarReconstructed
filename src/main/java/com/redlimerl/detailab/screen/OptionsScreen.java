@@ -206,15 +206,6 @@ public class OptionsScreen extends Screen {
                             .build()
             );
             buttonCount++;
-
-            addDrawableChild(ButtonWidget.builder(getToggleName("sort_special_item", getConfig().getOptions().toggleSortSpecialItem), (button) -> {
-                        getConfig().getOptions().toggleSortSpecialItem = !getConfig().getOptions().toggleSortSpecialItem; getConfig().save();
-                        button.setMessage(getToggleName("sort_special_item", getConfig().getOptions().toggleSortSpecialItem));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.sort_special_item")))
-                            .build()
-            );
-            buttonCount++;
         }
 
         ButtonWidget features = addDrawableChild(ButtonWidget.builder(

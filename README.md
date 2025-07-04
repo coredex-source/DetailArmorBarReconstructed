@@ -14,7 +14,7 @@ Detail Armor Bar for 1.21.5+
 
 # To-Do (for version 4.2.5):
 - Fix Thorns animation.
-- Fix Sort Special Items (Just disables items rn).
+- ~~Fix Sort Special Items (Just disables items rn).~~ - Removed the option from the GUI.
 - ~~Fix Reversed slot (Nothing changes rn).~~
 - ~~Fix empty Armor bar (Does not show an armor bar if not wearing armor rn).~~
 - ~~Fix English in en_us.json.~~
