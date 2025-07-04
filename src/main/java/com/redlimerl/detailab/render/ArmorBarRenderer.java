@@ -346,6 +346,19 @@ public class ArmorBarRenderer {
         int stackCount = (totalArmorPoint - 1) / 20;
         int stackRow = stackCount * 20;
 
+        // Render empty armor bar if no armor is worn but toggleEmptyBar is true
+        if (totalArmorPoint == 0 && getConfig().getOptions().toggleEmptyBar) {
+            for (int count = 0; count < 10; count++) {
+                int xPos;
+                if (getConfig().getOptions().toggleInverseSlot) {
+                    xPos = screenWidth + (9 - count) * 8;
+                } else {
+                    xPos = screenWidth + count * 8;
+                }
+                CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
+            }
+        }
+        
         //Default
         if (totalArmorPoint > 0) {
 
