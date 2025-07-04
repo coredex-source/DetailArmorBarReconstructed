@@ -18,6 +18,11 @@ Detail Armor Bar for 1.21.5+
 - ~~Fix Reversed slot (Nothing changes rn).~~
 - ~~Fix empty Armor bar (Does not show an armor bar if not wearing armor rn).~~
 - ~~Fix English in en_us.json.~~
+
+# To-Do (for version 4.3.0):
+- Add Minimal Armor Bar option to only show worn armor points.
+
+# To-Do:
 - ~~API~~ - Should work with some changes to the mods which use the API .. will have to test by making my own mod for testing xD (Might push a PR to Detail Armor Bar Compat .. or if that feels like too much work might just make smth just for testing) FOR NOW I ASSUME THAT THE API IS FUNCTIONING HOW IT SHOULD BY DEFAULT.
 
 # Downloads
