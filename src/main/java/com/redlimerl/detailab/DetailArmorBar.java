@@ -102,6 +102,9 @@ public class DetailArmorBar implements ClientModInitializer {
                     new TextureOffset(36, 0), new TextureOffset(54, 0), true)
         ).register();
 
+        // Register damage event handler for thorns animation
+        com.redlimerl.detailab.events.DamageEventHandler.register();
+        
         for (String compatibilityMod : compatibilityMods) {
             if (FabricLoader.getInstance().getModContainer(compatibilityMod).isPresent()) {
                 getConfig().getOptions().toggleCompatibleHeartMod = true;
