@@ -123,26 +123,43 @@ public class ArmorBarRenderer {
     private static Color getThornColor() {
         if (getConfig().getOptions().effectThorn == Animation.STATIC) return Color.WHITE;
         
-        // Use the current game tick for continuous animation
-        long time = DetailArmorBar.getTicks() % 40;
+        // Check if player was recently hit
+        long currentTime = DetailArmorBar.getTicks();
+        long timeSinceLastHit = currentTime - LAST_THORNS;
         
-        // Create a pulsing effect by interpolating between white and red
-        float pulseFactor;
-        if (time < 20) {
-            // Fade in (0.0 to 1.0)
-            pulseFactor = time / 19f;
-        } else {
-            // Fade out (1.0 to 0.0)
-            pulseFactor = (40 - time) / 19f;
+        // Set total duration based on animation speed setting
+        int totalDuration;
+        switch (getConfig().getOptions().effectSpeed) {
+            case VERY_SLOW -> totalDuration = 20;
+            case SLOW -> totalDuration = 16;
+            case FAST -> totalDuration = 8;
+            case VERY_FAST -> totalDuration = 4;
+            default -> totalDuration = 12; // NORMAL speed
         }
         
-        // Ensure pulseFactor is within valid range [0, 1]
-        pulseFactor = Math.max(0.0f, Math.min(1.0f, pulseFactor));
+        // Calculate phase durations proportionally
+        int phase1Duration = totalDuration / 2;  // First half: bright red
+        int phase2Duration = phase1Duration + (totalDuration / 4);  // Next quarter: slightly dimmer
         
-        // Calculate color value and ensure it's within valid range [0, 255]
-        int colorValue = Math.max(0, Math.min(255, Math.round(pulseFactor * 255)));
+        // If no recent hit or animation completed, return static color
+        if (LAST_THORNS == 0 || timeSinceLastHit > totalDuration) {
+            return Color.WHITE;
+        }
         
-        return new Color(255, colorValue, colorValue);
+        // Create a quick flash effect with duration based on speed setting
+        
+        // First phase: bright red
+        if (timeSinceLastHit < phase1Duration) {
+            return new Color(255, 0, 0);
+        } 
+        // Second phase: slightly dimmer
+        else if (timeSinceLastHit < phase2Duration) {
+            return new Color(255, 60, 60);
+        }
+        // Last phase: fading out
+        else {
+            return new Color(255, 150, 150);
+        }
     }
 
     private static Map<RegistryKey<Enchantment>, LevelData> getEnchantments(Iterable<ItemStack> equipment) {
