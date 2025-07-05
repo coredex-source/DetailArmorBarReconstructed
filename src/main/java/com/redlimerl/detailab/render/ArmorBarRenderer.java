@@ -121,12 +121,28 @@ public class ArmorBarRenderer {
     }
 
     private static Color getThornColor() {
-        long time = DetailArmorBar.getTicks() - LAST_THORNS;
         if (getConfig().getOptions().effectThorn == Animation.STATIC) return Color.WHITE;
-        if (time > 19) return Color.WHITE;
-
-        int cc = Math.round(MathHelper.lerp((time % 20) / 19f, 0f, 1f)*255);
-        return new Color(255, cc, cc);
+        
+        // Use the current game tick for continuous animation
+        long time = DetailArmorBar.getTicks() % 40;
+        
+        // Create a pulsing effect by interpolating between white and red
+        float pulseFactor;
+        if (time < 20) {
+            // Fade in (0.0 to 1.0)
+            pulseFactor = time / 19f;
+        } else {
+            // Fade out (1.0 to 0.0)
+            pulseFactor = (40 - time) / 19f;
+        }
+        
+        // Ensure pulseFactor is within valid range [0, 1]
+        pulseFactor = Math.max(0.0f, Math.min(1.0f, pulseFactor));
+        
+        // Calculate color value and ensure it's within valid range [0, 255]
+        int colorValue = Math.max(0, Math.min(255, Math.round(pulseFactor * 255)));
+        
+        return new Color(255, colorValue, colorValue);
     }
 
     private static Map<RegistryKey<Enchantment>, LevelData> getEnchantments(Iterable<ItemStack> equipment) {

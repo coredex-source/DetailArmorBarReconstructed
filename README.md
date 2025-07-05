@@ -13,7 +13,7 @@ Detail Armor Bar for 1.21.5+
 - Thorns overlay alignment - When using aligned mode, thorns overlay aligns with actual armor pieces.
 
 # To-Do (for version 4.2.5):
-- Fix Thorns animation.
+- ~~Fix Thorns animation.~~
 - ~~Fix Sort Special Items (Just disables items rn).~~ - Removed the option from the GUI.
 - ~~Fix Reversed slot (Nothing changes rn).~~
 - ~~Fix empty Armor bar (Does not show an armor bar if not wearing armor rn).~~
@@ -21,6 +21,7 @@ Detail Armor Bar for 1.21.5+
 
 # To-Do (for version 4.3.0):
 - Add Minimal Armor Bar option to only show worn armor points.
+- Add a sparkle over armor with mending enchant.
 
 # To-Do:
 - ~~API~~ - Should work with some changes to the mods which use the API .. will have to test by making my own mod for testing xD (Might push a PR to Detail Armor Bar Compat .. or if that feels like too much work might just make smth just for testing) FOR NOW I ASSUME THAT THE API IS FUNCTIONING HOW IT SHOULD BY DEFAULT.
