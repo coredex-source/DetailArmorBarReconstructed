@@ -19,16 +19,14 @@ Detail Armor Bar for 1.21.5+
 - ~~Fix empty Armor bar (Does not show an armor bar if not wearing armor rn).~~
 - ~~Fix English in en_us.json.~~
 
-# To-Do (for version 4.2.7.5):
-- Change compatibility mode to make it so that the armor bar always stays above the hearts no matter where the hearts are positioned. [bedrock-hotbar compatibility]
-
 # To-Do (for version 4.3.0):
-- Add Minimal Armor Bar option to only show worn armor points.
+- ~~Add Minimal Armor Bar option to only show worn armor points.~~
 - Add a sparkle over armor with mending enchant.
 - Add armor bar offset options.
 
 # To-Do:
-- ~~API~~ - Should work with some changes to the mods which use the API .. will have to test by making my own mod for testing xD (Might push a PR to Detail Armor Bar Compat .. or if that feels like too much work might just make smth just for testing) FOR NOW I ASSUME THAT THE API IS FUNCTIONING HOW IT SHOULD BY DEFAULT.
+- ~~API~~ - Should work with some changes to the mods which use the API.
+eg. GildedArmor [CurseForge](https://www.curseforge.com/minecraft/mc-mods/gildedarmor) [Modrinth](https://modrinth.com/mod/gildedarmor)
 
 # Downloads
 - For 1.21.4 and below use the official mod by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/detail-armor-bar)
@@ -36,7 +34,7 @@ Detail Armor Bar for 1.21.5+
 
 # Version Support
 
-- The mod will be supported for upto 3 versions, for example if 1.21.7 is the latest Minecraft release then support will be provided for 1.21.5, 1.21.6 and 1.21.7.
+- The mod will be supported for upto 3 versions, for example if 1.21.8 is the latest Minecraft release then support will be provided for 1.21.6, 1.21.7 and 1.21.8.
 - If a backport is to be requested, it can be requested be creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
 - Port to a specific mod loader like NeoForge (I will most likely not port to Forge, I will likely port to NeoForge if an issue is created.) may also be requested by creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
 

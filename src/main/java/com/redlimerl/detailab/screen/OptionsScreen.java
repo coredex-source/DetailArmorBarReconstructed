@@ -135,6 +135,15 @@ public class OptionsScreen extends Screen {
                     .build()
             );
             buttonCount++;
+
+            addDrawableChild(ButtonWidget.builder(getToggleName("minimal_armor_bar", getConfig().getOptions().toggleMinimalArmorBar), (button) -> {
+                        getConfig().getOptions().toggleMinimalArmorBar = !getConfig().getOptions().toggleMinimalArmorBar; getConfig().save();
+                        button.setMessage(getToggleName("minimal_armor_bar", getConfig().getOptions().toggleMinimalArmorBar));
+                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.minimal_armor_bar")))
+                    .build()
+            );
+            buttonCount++;
         }
 
         if (optionType == OptionType.ANIMATION) {
