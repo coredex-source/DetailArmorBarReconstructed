@@ -11,6 +11,7 @@ Detail Armor Bar for 1.21.5+
 - Added animation speed to aura mode.
 - Added none for enchantment overlay config options.
 - Thorns overlay alignment - When using aligned mode, thorns overlay aligns with actual armor pieces.
+- And many more..
 
 # To-Do (for version 4.2.5):
 - ~~Fix Thorns animation.~~

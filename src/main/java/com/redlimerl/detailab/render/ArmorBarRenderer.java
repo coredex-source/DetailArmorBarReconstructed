@@ -418,7 +418,7 @@ public class ArmorBarRenderer {
                         am1.getRight().draw(am1.getLeft(), context, xPos, yPos, true, false);
                     }
                     // Draw sparkle overlay for items with mending
-                    if (hasMendingEnchant(am1.getLeft()) || hasMendingEnchant(am2.getLeft())) {
+                    if (getConfig().getOptions().toggleMending && (hasMendingEnchant(am1.getLeft()) || hasMendingEnchant(am2.getLeft()))) {
                         drawSparkleOverlay(context, xPos, yPos);
                     }
                 }
@@ -429,7 +429,7 @@ public class ArmorBarRenderer {
                     Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
                     am.getRight().draw(am.getLeft(), context, xPos, yPos, true, false);
                     // Draw sparkle overlay for item with mending
-                    if (hasMendingEnchant(am.getLeft())) {
+                    if (getConfig().getOptions().toggleMending && hasMendingEnchant(am.getLeft())) {
                         drawSparkleOverlay(context, xPos, yPos);
                     }
                 }
@@ -800,24 +800,25 @@ public class ArmorBarRenderer {
 
     // Draws a sparkle overlay at the given position
     private void drawSparkleOverlay(DrawContext context, int x, int y) {
-        long time = System.currentTimeMillis();
+        long currentTicks = DetailArmorBar.getTicks();
+        double fastAnimationSpeed = getAnimationSpeed() / 2.5; // 2.5x faster than normal effects
         
         // Star 1: Top-left area, slower animation
-        int star1Frame = (int) ((time / 200) % 6);
-        if (star1Frame < 3) {
-            drawStar(context, x + 1, y + 1, star1Frame);
+        int star1Cycle = (int) ((currentTicks / fastAnimationSpeed) % 12);
+        if (star1Cycle < 6) {
+            drawStar(context, x + 1, y + 1, star1Cycle % 3);
         }
         
-        // Star 2: Center-right area, medium speed
-        int star2Frame = (int) ((time / 150) % 6);
-        if (star2Frame < 3) {
-            drawStar(context, x + 6, y + 3, star2Frame);
+        // Star 2: Center-right area, medium speed (offset by 4 ticks)
+        int star2Cycle = (int) (((currentTicks + 4) / (fastAnimationSpeed * 0.8)) % 12);
+        if (star2Cycle < 6) {
+            drawStar(context, x + 6, y + 3, star2Cycle % 3);
         }
         
-        // Star 3: Bottom-left area, faster animation
-        int star3Frame = (int) ((time / 100) % 6);
-        if (star3Frame < 3) {
-            drawStar(context, x + 2, y + 6, star3Frame);
+        // Star 3: Bottom-left area, faster animation (offset by 8 ticks)
+        int star3Cycle = (int) (((currentTicks + 8) / (fastAnimationSpeed * 0.6)) % 12);
+        if (star3Cycle < 6) {
+            drawStar(context, x + 2, y + 6, star3Cycle % 3);
         }
     }
     
