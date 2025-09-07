@@ -1,6 +1,7 @@
 {
   "option.detailarmorbar.title.features": "Features",
   "option.detailarmorbar.title.animation": "Animations",
+  "option.detailarmorbar.title.positioning": "Positioning",
   "option.detailarmorbar.title.etc": "etc..",
   "option.detailarmorbar.effects.effect_type": "Protection Effect",
   "context.detailarmorbar.effects.effect_type": "Changes the type of protection enchantment effect.",
@@ -75,5 +76,9 @@
   "option.detailarmorbar.effects.uniform_color.blue": "Blue",
   "context.detailarmorbar.effects.uniform_color.blue": "Choose the color for uniform enchantment display.",
   "option.detailarmorbar.effects.uniform_color.red": "Red",
-  "context.detailarmorbar.effects.uniform_color.red": "Choose the color for uniform enchantment display."
+  "context.detailarmorbar.effects.uniform_color.red": "Choose the color for uniform enchantment display.",
+  "option.detailarmorbar.positioning.reset": "Reset Position",
+  "context.detailarmorbar.positioning.reset": "Reset armor bar position to default (0, 0).",
+  "context.detailarmorbar.positioning.offset_x": "Click to enter a custom X offset value. Negative values move left, positive values move right.",
+  "context.detailarmorbar.positioning.offset_y": "Click to enter a custom Y offset value. Negative values move up, positive values move down."
 }

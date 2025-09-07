@@ -22,7 +22,7 @@ Detail Armor Bar for 1.21.5+
 # To-Do (for version 4.3.0):
 - ~~Add Minimal Armor Bar option to only show worn armor points.~~
 - Add a sparkle over armor with mending enchant.
-- Add armor bar offset options.
+- ~~Add armor bar offset options.~~
 
 # To-Do:
 - ~~API~~ - Should work with some changes to the mods which use the API.

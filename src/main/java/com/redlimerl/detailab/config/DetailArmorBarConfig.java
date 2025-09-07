@@ -75,6 +75,8 @@ public class DetailArmorBarConfig {
         public boolean toggleUniformColor = false; // New option for uniform enchantment color
         public boolean toggleMinimalArmorBar = false; // New option for minimal armor bar
         public UniformColor uniformColorType = UniformColor.AQUA; // Default color selection
+        public int armorBarOffsetX = 0; // X axis offset for armor bar position
+        public int armorBarOffsetY = 0; // Y axis offset for armor bar position
 
         boolean replaceInvalidOptions() {
             var invalid = false;
