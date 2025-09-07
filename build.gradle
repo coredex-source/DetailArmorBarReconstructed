@@ -43,6 +43,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
+    withSourcesJar()
 }
 
 jar {
