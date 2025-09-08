@@ -25,7 +25,7 @@ public class DetailArmorBarConfig {
 
     public Options getOptions() {
         return options;
-    }
+    }public boolean toggleMinimalArmorBar = false; // New option for minimal armor bar
 
     public void load() {
         if (file.exists()) {
@@ -73,6 +73,7 @@ public class DetailArmorBarConfig {
         public boolean toggleSortSpecialItem = true;
         public boolean toggleAlignEnchantments = true; // New option for enchantment alignment
         public boolean toggleUniformColor = false; // New option for uniform enchantment color
+        public boolean toggleMinimalArmorBar = false; // New option for minimal armor bar
         public UniformColor uniformColorType = UniformColor.AQUA; // Default color selection
 
         boolean replaceInvalidOptions() {

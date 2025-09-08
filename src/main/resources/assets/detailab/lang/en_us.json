@@ -56,6 +56,8 @@
   "context.detailarmorbar.toggle.align_enchantments": "Aligns enchantment effects with actual armor points instead of enchantment levels.",
   "option.detailarmorbar.toggle.uniform_color": "Uniform Enchantment Color",
   "context.detailarmorbar.toggle.uniform_color": "Shows a single color for all enchantment effects regardless of protection type.",
+  "option.detailarmorbar.toggle.minimal_armor_bar": "Minimal Armor Bar",
+  "context.detailarmorbar.toggle.minimal_armor_bar": "Only shows armor bar icons for worn armor points, hiding empty slots.",
   "option.detailarmorbar.effects.uniform_color": "Uniform Color Type",
   "context.detailarmorbar.effects.uniform_color": "Choose the color for uniform enchantment display.",
   "option.detailarmorbar.effects.uniform_color.aqua": "Aqua",
