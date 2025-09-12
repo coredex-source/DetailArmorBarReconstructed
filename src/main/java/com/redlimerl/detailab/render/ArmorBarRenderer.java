@@ -372,9 +372,9 @@ public class ArmorBarRenderer {
         var maxHealth = Math.max(player.getAttributeValue(EntityAttributes.MAX_HEALTH), playerHealth);
         var absorptionHealth = MathHelper.ceil(player.getAbsorptionAmount());
         var healthRow = getConfig().getOptions().toggleCompatibleHeartMod ? 1 : MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
-        var screenWidth = client.getWindow().getScaledWidth() / 2 - 91;
+        var screenWidth = client.getWindow().getScaledWidth() / 2 - 91 + getConfig().getOptions().armorBarOffsetX;
         var screenHeight = client.getWindow().getScaledHeight() - 39;
-        var yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10;
+        var yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10 + getConfig().getOptions().armorBarOffsetY;
 
         int stackCount = (totalArmorPoint - 1) / 20;
         int stackRow = stackCount * 20;
@@ -417,6 +417,10 @@ public class ArmorBarRenderer {
                         am2.getRight().draw(am2.getLeft(), context, xPos, yPos, true, true);
                         am1.getRight().draw(am1.getLeft(), context, xPos, yPos, true, false);
                     }
+                    // Draw sparkle overlay for items with mending
+                    if (getConfig().getOptions().toggleMending && (hasMendingEnchant(am1.getLeft()) || hasMendingEnchant(am2.getLeft()))) {
+                        drawSparkleOverlay(context, xPos, yPos);
+                    }
                 }
                 if (count * 2 + 1 + stackRow == totalArmorPoint) {
                     if (!getConfig().getOptions().toggleMinimalArmorBar) {
@@ -424,6 +428,10 @@ public class ArmorBarRenderer {
                     }
                     Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
                     am.getRight().draw(am.getLeft(), context, xPos, yPos, true, false);
+                    // Draw sparkle overlay for item with mending
+                    if (getConfig().getOptions().toggleMending && hasMendingEnchant(am.getLeft())) {
+                        drawSparkleOverlay(context, xPos, yPos);
+                    }
                 }
                 if (count * 2 + 1 + stackRow > totalArmorPoint) {
                     if (!getConfig().getOptions().toggleMinimalArmorBar) {
@@ -782,5 +790,54 @@ public class ArmorBarRenderer {
         } else return;
 
         InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, x, y, u, v, color, false);
+    }
+
+    // Returns true if the item has the mending enchantment
+    private boolean hasMendingEnchant(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        return getEnchantLevel(Collections.singleton(stack), Enchantments.MENDING).level > 0;
+    }
+
+    // Draws a sparkle overlay at the given position
+    private void drawSparkleOverlay(DrawContext context, int x, int y) {
+        long currentTicks = DetailArmorBar.getTicks();
+        double fastAnimationSpeed = getAnimationSpeed() / 2.5; // 2.5x faster than normal effects
+        
+        // Star 1: Top-left area, slower animation
+        int star1Cycle = (int) ((currentTicks / fastAnimationSpeed) % 12);
+        if (star1Cycle < 6) {
+            drawStar(context, x + 1, y + 1, star1Cycle % 3);
+        }
+        
+        // Star 2: Center-right area, medium speed (offset by 4 ticks)
+        int star2Cycle = (int) (((currentTicks + 4) / (fastAnimationSpeed * 0.8)) % 12);
+        if (star2Cycle < 6) {
+            drawStar(context, x + 6, y + 3, star2Cycle % 3);
+        }
+        
+        // Star 3: Bottom-left area, faster animation (offset by 8 ticks)
+        int star3Cycle = (int) (((currentTicks + 8) / (fastAnimationSpeed * 0.6)) % 12);
+        if (star3Cycle < 6) {
+            drawStar(context, x + 2, y + 6, star3Cycle % 3);
+        }
+    }
+    
+    private void drawStar(DrawContext context, int x, int y, int frame) {
+        int alpha = 255;
+        if (frame == 0) alpha = 100;
+        else if (frame == 1) alpha = 200;
+        else if (frame == 2) alpha = 255;
+        
+        int color = (alpha << 24) | 0xFFFFFF; // White with varying alpha
+        
+        // Draw a 5-pointed star pattern
+        // Center pixel
+        context.fill(x + 1, y + 1, x + 2, y + 2, color);
+        
+        // Cross pattern
+        context.fill(x + 1, y, x + 2, y + 1, color);     // Top
+        context.fill(x + 1, y + 2, x + 2, y + 3, color); // Bottom
+        context.fill(x, y + 1, x + 1, y + 2, color);     // Left
+        context.fill(x + 2, y + 1, x + 3, y + 2, color); // Right
     }
 }

@@ -22,7 +22,7 @@ public class OptionsScreen extends Screen {
     private final OptionType optionType;
 
     public enum OptionType {
-        FEATURES, ANIMATION, ETC
+        FEATURES, ANIMATION, POSITIONING, ETC
     }
 
     public OptionsScreen(Screen screen) {
@@ -188,6 +188,61 @@ public class OptionsScreen extends Screen {
             buttonCount++;
         }
 
+        if (optionType == OptionType.POSITIONING) {
+            // X Offset button - opens text input dialog
+            addDrawableChild(ButtonWidget.builder(Text.literal("X Offset: " + getConfig().getOptions().armorBarOffsetX), (button) -> {
+                if (client != null) {
+                    client.setScreen(new TextInputScreen(
+                        this,
+                        Text.literal("X Offset"),
+                        String.valueOf(getConfig().getOptions().armorBarOffsetX),
+                        (value) -> {
+                            getConfig().getOptions().armorBarOffsetX = value;
+                            getConfig().save();
+                        }
+                    ));
+                }
+            }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.positioning.offset_x")))
+                    .build()
+            );
+            buttonCount++;
+
+            // Y Offset button - opens text input dialog
+            addDrawableChild(ButtonWidget.builder(Text.literal("Y Offset: " + getConfig().getOptions().armorBarOffsetY), (button) -> {
+                if (client != null) {
+                    client.setScreen(new TextInputScreen(
+                        this,
+                        Text.literal("Y Offset"),
+                        String.valueOf(getConfig().getOptions().armorBarOffsetY),
+                        (value) -> {
+                            getConfig().getOptions().armorBarOffsetY = value;
+                            getConfig().save();
+                        }
+                    ));
+                }
+            }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.positioning.offset_y")))
+                    .build()
+            );
+            buttonCount++;
+
+            // Reset button
+            addDrawableChild(ButtonWidget.builder(Text.translatable("option.detailarmorbar.positioning.reset"), (button) -> {
+                getConfig().getOptions().armorBarOffsetX = 0;
+                getConfig().getOptions().armorBarOffsetY = 0;
+                getConfig().save();
+                // Force re-initialization to update button labels
+                if (client != null) {
+                    client.setScreen(new OptionsScreen(parent, OptionType.POSITIONING));
+                }
+            }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.positioning.reset")))
+                    .build()
+            );
+            buttonCount++;
+        }
+        
         if (optionType == OptionType.ETC) {
             addDrawableChild(ButtonWidget.builder(getToggleName("vanilla_texture", getConfig().getOptions().toggleVanillaTexture), (button) -> {
                         getConfig().getOptions().toggleVanillaTexture = !getConfig().getOptions().toggleVanillaTexture; getConfig().save();
@@ -222,7 +277,7 @@ public class OptionsScreen extends Screen {
             if (client != null) {
                 client.setScreen(new OptionsScreen(parent, OptionType.FEATURES));
             }
-        }).dimensions(width / 2 - 92, height / 6 + 140, 60, 20).build());
+        }).dimensions(width / 2 - 122, height / 6 + 140, 60, 20).build());
         features.active = optionType != OptionType.FEATURES;
 
         ButtonWidget animation = addDrawableChild(ButtonWidget.builder(
@@ -230,15 +285,23 @@ public class OptionsScreen extends Screen {
             if (client != null) {
                 client.setScreen(new OptionsScreen(parent, OptionType.ANIMATION));
             }
-        }).dimensions(width / 2 - 30, height / 6 + 140, 60, 20).build());
+        }).dimensions(width / 2 - 60, height / 6 + 140, 60, 20).build());
         animation.active = optionType != OptionType.ANIMATION;
 
+        ButtonWidget positioning = addDrawableChild(ButtonWidget.builder(
+                Text.translatable("option.detailarmorbar.title.positioning"), (matrixStack) -> {
+            if (client != null) {
+                client.setScreen(new OptionsScreen(parent, OptionType.POSITIONING));
+            }
+        }).dimensions(width / 2 + 2, height / 6 + 140, 60, 20).build());
+        positioning.active = optionType != OptionType.POSITIONING;
+        
         ButtonWidget etc = addDrawableChild(ButtonWidget.builder(
                 Text.translatable("option.detailarmorbar.title.etc"), (matrixStack) -> {
             if (client != null) {
                 client.setScreen(new OptionsScreen(parent, OptionType.ETC));
             }
-        }).dimensions(width / 2 + 32, height / 6 + 140, 60, 20).build());
+        }).dimensions(width / 2 + 64, height / 6 + 140, 60, 20).build());
         etc.active = optionType != OptionType.ETC;
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (matrixStack) -> {
