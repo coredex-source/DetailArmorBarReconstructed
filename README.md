@@ -13,17 +13,18 @@ Detail Armor Bar for 1.21.5+
 - Thorns overlay alignment - When using aligned mode, thorns overlay aligns with actual armor pieces.
 - And many more..
 
-# To-Do (for version 4.2.5):
-- ~~Fix Thorns animation.~~
-- ~~Fix Sort Special Items (Just disables items rn).~~ - Removed the option from the GUI.
-- ~~Fix Reversed slot (Nothing changes rn).~~
-- ~~Fix empty Armor bar (Does not show an armor bar if not wearing armor rn).~~
-- ~~Fix English in en_us.json.~~
+# To-Do (for version 4.x.x):
+- Update to 1.21.9.
+- Release beta neoforge builds.
 
-# To-Do (for version 4.3.0):
-- ~~Add Minimal Armor Bar option to only show worn armor points.~~
-- ~~Add a sparkle over armor with mending enchant.~~
-- ~~Add armor bar offset options.~~
+# To-Do (for version 5.0.0):
+- Reformat and optimize existing code.
+- Fix any bugs found.
+- Add a modern DABR API. (Will eventually replace the existing API)
+- Allow for more customization.
+- Reformat the config screen.
+- Rework the offset/positioning system.
+- Release a stable and non-beta neoforge build.
 
 # To-Do:
 - ~~API~~ - Should work with some changes to the mods which use the API.
