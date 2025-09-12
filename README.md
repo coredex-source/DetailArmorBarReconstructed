@@ -1,5 +1,5 @@
 # Detail Armor Bar Reconstructed
-[![](https://jitpack.io/v/RedLime/DetailArmorBar.svg)](https://jitpack.io/#RedLime/DetailArmorBar)
+[![](https://jitpack.io/v/coredex-source/DetailArmorBarReconstructed.svg)](https://jitpack.io/#coredex-source/DetailArmorBarReconstructed)
 
 Detail Armor Bar for 1.21.5+
 - Detail Armor Bar Reconstructed is a fork of a fork of the Detail Armor Bar mod created by [RedLime](https://github.com/RedLime). This fork will be maintained and will be worked upon constantly by [coredex-source](https://github.com/coredex-source).
