@@ -6,6 +6,8 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.client.MinecraftClient;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Consumer;
 
@@ -15,6 +17,10 @@ public class TextInputScreen extends Screen {
     private final String initialValue;
     private final Consumer<Integer> onValueChanged;
     private TextFieldWidget textField;
+    
+    // Key press tracking for debouncing
+    private boolean escapePressed = false;
+    private boolean enterPressed = false;
 
     public TextInputScreen(Screen parent, Text fieldLabel, String initialValue, Consumer<Integer> onValueChanged) {
         super(fieldLabel);
@@ -50,21 +56,7 @@ public class TextInputScreen extends Screen {
 
         // Done button
         this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-            String text = this.textField.getText();
-            if (text.isEmpty() || text.equals("-")) {
-                // Empty or just minus, treat as 0
-                this.onValueChanged.accept(0);
-                this.close();
-            } else {
-                try {
-                    int value = Integer.parseInt(text);
-                    this.onValueChanged.accept(value);
-                    this.close();
-                } catch (NumberFormatException e) {
-                    // This shouldn't happen with our text predicate, but just in case
-                    this.textField.setText(initialValue);
-                }
-            }
+            this.submitValue();
         }).dimensions(this.width / 2 - 102, this.height / 2 + 20, 100, 20).build());
 
         // Cancel button
@@ -77,6 +69,9 @@ public class TextInputScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         
+        // Check for keyboard input
+        this.handleKeyboardInput();
+        
         // Draw label
         context.drawCenteredTextWithShadow(this.textRenderer, this.fieldLabel, this.width / 2, this.height / 2 - 35, 16777215);
         
@@ -87,38 +82,43 @@ public class TextInputScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Enter a number (positive or negative)"), this.width / 2, this.height / 2 + 50, 11184810);
     }
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) { // ESC key
+    private void handleKeyboardInput() {
+        if (this.client == null) return;
+        
+        long window = this.client.getWindow().getHandle();
+        
+        // Check for ESC key with debouncing
+        boolean escapeCurrentlyPressed = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_ESCAPE) == GLFW.GLFW_PRESS;
+        if (escapeCurrentlyPressed && !escapePressed) {
             this.close();
-            return true;
         }
-        if (keyCode == 257 || keyCode == 335) { // ENTER or NUMPAD_ENTER
-            String text = this.textField.getText();
-            if (text.isEmpty() || text.equals("-")) {
-                // Empty or just minus, treat as 0
-                this.onValueChanged.accept(0);
-                this.close();
-                return true;
-            } else {
-                try {
-                    int value = Integer.parseInt(text);
-                    this.onValueChanged.accept(value);
-                    this.close();
-                    return true;
-                } catch (NumberFormatException e) {
-                    // This shouldn't happen with our text predicate, but just in case
-                    this.textField.setText(initialValue);
-                    return true;
-                }
-            }
+        escapePressed = escapeCurrentlyPressed;
+        
+        // Check for ENTER key with debouncing
+        boolean enterCurrentlyPressed = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_ENTER) == GLFW.GLFW_PRESS || 
+                                       GLFW.glfwGetKey(window, GLFW.GLFW_KEY_KP_ENTER) == GLFW.GLFW_PRESS;
+        if (enterCurrentlyPressed && !enterPressed) {
+            this.submitValue();
         }
-        return this.textField.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
+        enterPressed = enterCurrentlyPressed;
     }
 
-    @Override
-    public boolean charTyped(char chr, int modifiers) {
-        return this.textField.charTyped(chr, modifiers) || super.charTyped(chr, modifiers);
+    private void submitValue() {
+        String text = this.textField.getText();
+        if (text.isEmpty() || text.equals("-")) {
+            // Empty or just minus, treat as 0
+            this.onValueChanged.accept(0);
+            this.close();
+        } else {
+            try {
+                int value = Integer.parseInt(text);
+                this.onValueChanged.accept(value);
+                this.close();
+            } catch (NumberFormatException e) {
+                // This shouldn't happen with our text predicate, but just in case
+                this.textField.setText(initialValue);
+            }
+        }
     }
 
     @Override
