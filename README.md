@@ -43,6 +43,7 @@ eg. GildedArmor [CurseForge](https://www.curseforge.com/minecraft/mc-mods/gilded
 # Credits
 - [RedLime](https://github.com/RedLime) for creating the [mod](https://github.com/redlime/DetailArmorBar).
 - [rambert or ram6ert](https://github.com/ram6ert) for creating the [fork](https://github.com/ram6ert/DetailArmorBar) to 1.21.5.
+- [Icedude907](https://github.com/Icedude907) for contributing to the code by fixing a visual bug.
 
 # Orignal Mod and Docs
 - https://github.com/redlime/DetailArmorBar
