@@ -357,7 +357,7 @@ public class ArmorBarRenderer {
         return true;
     }
 
-    public void render(DrawContext context, PlayerEntity player) {
+    public void render(DrawContext context, PlayerEntity player, int y_base) {
         var generic = getEnchantLevel(getArmorItems(player), Enchantments.PROTECTION);
         var projectile = getEnchantLevel(getArmorItems(player), Enchantments.PROJECTILE_PROTECTION);
         var explosive = getEnchantLevel(getArmorItems(player), Enchantments.BLAST_PROTECTION);
@@ -366,15 +366,10 @@ public class ArmorBarRenderer {
         var armorPoints = getArmorPoints(player);
         var thorns = getEnchantLevel(getArmorItems(player), Enchantments.THORNS);
 
-        var playerHealth = MathHelper.ceil(player.getHealth());
         var totalArmorPoint = armorPoints.size();
         var totalEnchants = Arrays.stream(protectArr).sum();
-        var maxHealth = Math.max(player.getAttributeValue(EntityAttributes.MAX_HEALTH), playerHealth);
-        var absorptionHealth = MathHelper.ceil(player.getAbsorptionAmount());
-        var healthRow = getConfig().getOptions().toggleCompatibleHeartMod ? 1 : MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
         var screenWidth = client.getWindow().getScaledWidth() / 2 - 91 + getConfig().getOptions().armorBarOffsetX;
-        var screenHeight = client.getWindow().getScaledHeight() - 39;
-        var yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10 + getConfig().getOptions().armorBarOffsetY;
+        var yPos = y_base + getConfig().getOptions().armorBarOffsetY;
 
         int stackCount = (totalArmorPoint - 1) / 20;
         int stackRow = stackCount * 20;
