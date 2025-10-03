@@ -53,52 +53,58 @@ public class DetailArmorBar implements ClientModInitializer {
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.NETHERITE_CHESTPLATE, Items.NETHERITE_HELMET, Items.NETHERITE_LEGGINGS, Items.NETHERITE_BOOTS)
                 .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
+            new ArmorBarRenderManager(GUI_ARMOR_BAR, 146, 128,
                     new TextureOffset(9, 9 + isVanillaTexture()), new TextureOffset(0, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.DIAMOND_HELMET, Items.DIAMOND_LEGGINGS, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_BOOTS)
                 .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
+            new ArmorBarRenderManager(GUI_ARMOR_BAR, 146, 128,
                     new TextureOffset(27, 9 + isVanillaTexture()), new TextureOffset(18, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.TURTLE_HELMET)
                 .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
+            new ArmorBarRenderManager(GUI_ARMOR_BAR, 146, 128,
                     new TextureOffset(45, 9 + isVanillaTexture()), new TextureOffset(36, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
+        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.COPPER_HELMET, Items.COPPER_LEGGINGS, Items.COPPER_CHESTPLATE, Items.COPPER_BOOTS)
+                .render((ItemStack itemStack) ->
+                        new ArmorBarRenderManager(GUI_ARMOR_BAR, 146, 128,
+                                new TextureOffset(63, 9 + isVanillaTexture()), new TextureOffset(54, 9 + isVanillaTexture()), outline, outlineHalf)
+                ).register();
+
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.IRON_HELMET, Items.IRON_LEGGINGS, Items.IRON_CHESTPLATE, Items.IRON_BOOTS)
                 .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-                    new TextureOffset(63, 9 + isVanillaTexture()), new TextureOffset(54, 9 + isVanillaTexture()), outline, outlineHalf)
+            new ArmorBarRenderManager(GUI_ARMOR_BAR, 146, 128,
+                    new TextureOffset(81, 9 + isVanillaTexture()), new TextureOffset(72, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.CHAINMAIL_HELMET, Items.CHAINMAIL_LEGGINGS, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_BOOTS)
                 .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-                    new TextureOffset(81, 9 + isVanillaTexture()), new TextureOffset(72, 9 + isVanillaTexture()), outline, outlineHalf)
+            new ArmorBarRenderManager(GUI_ARMOR_BAR, 146, 128,
+                    new TextureOffset(99, 9 + isVanillaTexture()), new TextureOffset(90, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.GOLDEN_HELMET, Items.GOLDEN_LEGGINGS, Items.GOLDEN_CHESTPLATE, Items.GOLDEN_BOOTS)
                 .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-                    new TextureOffset(99, 9 + isVanillaTexture()), new TextureOffset(90, 9 + isVanillaTexture()), outline, outlineHalf)
+            new ArmorBarRenderManager(GUI_ARMOR_BAR, 146, 128,
+                    new TextureOffset(117, 9 + isVanillaTexture()), new TextureOffset(108, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.LEATHER_HELMET, Items.LEATHER_LEGGINGS, Items.LEATHER_CHESTPLATE, Items.LEATHER_BOOTS)
                 .render((ItemStack itemStack) -> {
                     var leatherArmor = DyedColorComponent.getColor(itemStack, -6265536);
                     var color = new Color(leatherArmor);
-                    return new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-                                    new TextureOffset(117, 9 + isVanillaTexture()), new TextureOffset(108, 9 + isVanillaTexture()), outline, outlineHalf, color);
+                    return new ArmorBarRenderManager(GUI_ARMOR_BAR, 146, 128,
+                                    new TextureOffset(135, 9 + isVanillaTexture()), new TextureOffset(126, 9 + isVanillaTexture()), outline, outlineHalf, color);
                 }
         ).register();
 
         DetailArmorBarAPI.customItemBarBuilder().item(Items.ELYTRA)
                 .render((ItemStack itemStack) ->
-            new ItemBarRenderManager(GUI_ARMOR_BAR, 128, 128,
+            new ItemBarRenderManager(GUI_ARMOR_BAR, 146, 128,
                     new TextureOffset(36, 0), new TextureOffset(54, 0), true)
         ).register();
 
