@@ -215,9 +215,10 @@ public class ArmorBarRenderer {
             ItemStack itemStack = player.getEquippedStack(equipmentSlot);
             EquippableComponent equippableComponent = itemStack.get(DataComponentTypes.EQUIPPABLE);
             
-            // Check if item has equippable component OR if it's a special item like elytra
+            // Check if item has equippable component OR if it's a special item like elytra that's actually equipped
             boolean isEquippable = equippableComponent != null && equippableComponent.slot() == equipmentSlot;
-            boolean isSpecialItem = !itemStack.isEmpty() && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem());
+            boolean isSpecialItem = !itemStack.isEmpty() && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem()) &&
+                                  (equippableComponent == null || equippableComponent.slot() == equipmentSlot);
             
             if (isEquippable || isSpecialItem) {
                 if (getConfig().getOptions().toggleInverseSlot) {
