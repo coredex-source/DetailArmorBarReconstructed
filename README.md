@@ -13,10 +13,6 @@ Detail Armor Bar for 1.21.5+
 - Thorns overlay alignment - When using aligned mode, thorns overlay aligns with actual armor pieces.
 - And many more..
 
-# To-Do (for version 4.x.x):
-- Update to 1.21.9.
-- Release beta neoforge builds.
-
 # To-Do (for version 5.0.0):
 - Reformat and optimize existing code.
 - Fix any bugs found.
@@ -24,7 +20,6 @@ Detail Armor Bar for 1.21.5+
 - Allow for more customization.
 - Reformat the config screen.
 - Rework the offset/positioning system.
-- Release a stable and non-beta neoforge build.
 
 # To-Do:
 - ~~API~~ - Should work with some changes to the mods which use the API.
@@ -44,6 +39,7 @@ eg. GildedArmor [CurseForge](https://www.curseforge.com/minecraft/mc-mods/gilded
 - [RedLime](https://github.com/RedLime) for creating the [mod](https://github.com/redlime/DetailArmorBar).
 - [rambert or ram6ert](https://github.com/ram6ert) for creating the [fork](https://github.com/ram6ert/DetailArmorBar) to 1.21.5.
 - [Icedude907](https://github.com/Icedude907) for contributing to the code by fixing a visual bug.
+- [axtrough](https://github.com/axtrough) for adding copper armor textures.
 
 # Orignal Mod and Docs
 - https://github.com/redlime/DetailArmorBar
