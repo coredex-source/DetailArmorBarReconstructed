@@ -60,7 +60,6 @@ public class DetailArmorBarConfig {
         public Animation effectThorn = Animation.ANIMATION;
 
         public boolean toggleEnchants = true;
-//        public boolean toggleNetherites = true;
         public boolean toggleArmorTypes = true;
         public boolean toggleThorns = true;
         public boolean toggleDurability = true;
@@ -70,7 +69,7 @@ public class DetailArmorBarConfig {
         public boolean toggleVanillaTexture = true;
         public boolean toggleCompatibleHeartMod = false;
         public boolean toggleInverseSlot = false;
-        public boolean toggleSortSpecialItem = true;
+        public boolean toggleSortSpecialItem = true; // This doesn't have an option in the menu?
         public boolean toggleAlignEnchantments = true; // New option for enchantment alignment
         public boolean toggleUniformColor = false; // New option for uniform enchantment color
         public boolean toggleMinimalArmorBar = false; // New option for minimal armor bar

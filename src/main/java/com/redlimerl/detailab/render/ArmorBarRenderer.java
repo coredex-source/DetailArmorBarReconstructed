@@ -1,6 +1,5 @@
 package com.redlimerl.detailab.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
@@ -16,10 +15,10 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.MathHelper;
@@ -208,90 +207,69 @@ public class ArmorBarRenderer {
     }
 
     private static List<Pair<ItemStack, CustomArmorBar>> getArmorPoints(PlayerEntity player) {
-        ArrayList<Pair<ItemStack, CustomArmorBar>> armorItem = new ArrayList<>();
-        Stack<Pair<EquipmentSlot, ItemStack>> equipment = new Stack<>();
+        ArrayList<Pair<ItemStack, CustomArmorBar>> armorPoints = new ArrayList<>();
+        ArrayList<Pair<ItemStack, CustomArmorBar>> itemPoints = new ArrayList<>();
+        int sumArmor = 0;
 
-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-            ItemStack itemStack = player.getEquippedStack(equipmentSlot);
-            EquippableComponent equippableComponent = itemStack.get(DataComponentTypes.EQUIPPABLE);
-            
-            // Check if item has equippable component OR if it's a special item like elytra that's actually equipped
-            boolean isEquippable = equippableComponent != null && equippableComponent.slot() == equipmentSlot;
-            boolean isSpecialItem = !itemStack.isEmpty() && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem()) &&
-                                  (equippableComponent == null || equippableComponent.slot() == equipmentSlot);
-            
-            if (isEquippable || isSpecialItem) {
-                if (getConfig().getOptions().toggleInverseSlot) {
-                    equipment.push(new Pair<>(equipmentSlot, itemStack));
-                } else {
-                    equipment.add(new Pair<>(equipmentSlot, itemStack));
+        // Stats from equipment
+        for (var slot : EquipmentSlot.VALUES) {
+            var itemStack = player.getEquippedStack(slot);
+            if(itemStack.isEmpty()){
+                continue;
+            }
+
+            var component = itemStack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+            if (component != null) {
+                // Handle regular armor items (assign a type based on their material)
+                CustomArmorBar barData = getConfig().getOptions().toggleArmorTypes
+                    ? DetailArmorBarAPI.getArmorBarList().getOrDefault(itemStack.getItem(), CustomArmorBar.DEFAULT)
+                    : CustomArmorBar.DEFAULT;
+
+                var defense = getDefense(itemStack, slot);
+                sumArmor += defense;
+                for (int i = 0; i < defense; i++) {
+                    armorPoints.add(new Pair<>(itemStack, barData));
+                }
+            }
+
+            // Special items (equippable with effects not described by the attribute system).
+            if (getConfig().getOptions().toggleItemBar && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
+                // Only show items on the bar if they are unequippable or equipped to the correct slot.
+                var equippableComponent = itemStack.get(DataComponentTypes.EQUIPPABLE);
+                if(!(equippableComponent == null || equippableComponent.slot() == slot)){ continue; }
+
+                var barData = DetailArmorBarAPI.getItemBarList().get(itemStack.getItem());
+                var pair = new Pair<>(itemStack, barData);
+                if(getConfig().getOptions().toggleSortSpecialItem){ // add later
+                    itemPoints.add(pair); // left half
+                    itemPoints.add(pair); // right half
+                }else{ // add now
+                    if (armorPoints.size() % 2 == 1) armorPoints.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
+                    armorPoints.add(pair); // left half
+                    armorPoints.add(pair); // right half
                 }
             }
         }
 
-        EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.ARMOR);
-        if (attribute != null) {
-            double d = attribute.getBaseValue();
-            for (int i = 0; i < d; i++) {
-                armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
-            }
+        // Base stats
+        var baseArmor = player.getAttributeBaseValue(EntityAttributes.ARMOR);
+        sumArmor += baseArmor;
+        for (int i = 0; i < baseArmor; i++) {
+            armorPoints.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
         }
 
-        for (Pair<EquipmentSlot, ItemStack> pair : equipment) {
-            ItemStack itemStack = pair.getRight();
-            EquipmentSlot slot = pair.getLeft();
-            if (!itemStack.isEmpty()) {
-                var component = itemStack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-                if (component != null) {
-                    // Handle regular armor items
-                    CustomArmorBar barData;
-                    if (getConfig().getOptions().toggleArmorTypes) {
-                        barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(itemStack.getItem(), CustomArmorBar.DEFAULT);
-                    }
-//                    else if (getConfig().getOptions().toggleNetherites) {
-//                        barData = DetailArmorBarAPI.getArmorBarList().getOrDefault(armor, CustomArmorBar.DEFAULT);
-//                    }
-                    else {
-                        barData = CustomArmorBar.DEFAULT;
-                    }
-
-                    for (int i = 0; i < getDefense(itemStack, slot); i++) {
-                        armorItem.add(new Pair<>(itemStack, barData));
-                    }
-                } else if (getConfig().getOptions().toggleItemBar && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
-                    // Handle special items like elytra
-                    if (!getConfig().getOptions().toggleSortSpecialItem) {
-                        if (armorItem.size() % 2 == 1)
-                            armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
-
-                        var barData = DetailArmorBarAPI.getItemBarList().get(itemStack.getItem());
-                        armorItem.add(new Pair<>(itemStack, barData));
-                        armorItem.add(new Pair<>(itemStack, barData));
-                    }
-                }
-            }
+        // Add items on second if that was the set option
+        if(getConfig().getOptions().toggleSortSpecialItem){
+            if (armorPoints.size() % 2 == 1) armorPoints.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
+            armorPoints.addAll(itemPoints);
         }
 
-        if (getConfig().getOptions().toggleItemBar && getConfig().getOptions().toggleSortSpecialItem) {
-            for (Pair<EquipmentSlot, ItemStack> pair : equipment) {
-                ItemStack itemStack = pair.getRight();
-                EquipmentSlot slot = pair.getLeft();
-                if (!itemStack.isEmpty() && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
-                    if (armorItem.size() % 2 == 1)
-                        armorItem.add(new Pair<>(ItemStack.EMPTY, CustomArmorBar.EMPTY));
-
-                    var barData = DetailArmorBarAPI.getItemBarList().get(itemStack.getItem());
-                    armorItem.add(new Pair<>(itemStack, barData));
-                    armorItem.add(new Pair<>(itemStack, barData));
-                }
-            }
-        }
-        return armorItem;
+        return armorPoints;
     }
 
     private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
-        AttributeModifiersComponent modifier = itemStack.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
-        for (AttributeModifiersComponent.Entry entry : modifier.modifiers()) {
+        var modifier = itemStack.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT);
+        for (var entry : modifier.modifiers()) {
             if (entry.slot().matches(slot) && entry.attribute().equals(EntityAttributes.ARMOR)) {
                 return (int) entry.modifier().value();
             }
