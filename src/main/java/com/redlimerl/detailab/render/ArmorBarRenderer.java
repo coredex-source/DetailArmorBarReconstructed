@@ -215,9 +215,10 @@ public class ArmorBarRenderer {
             ItemStack itemStack = player.getEquippedStack(equipmentSlot);
             EquippableComponent equippableComponent = itemStack.get(DataComponentTypes.EQUIPPABLE);
             
-            // Check if item has equippable component OR if it's a special item like elytra
+            // Check if item has equippable component OR if it's a special item like elytra that's actually equipped
             boolean isEquippable = equippableComponent != null && equippableComponent.slot() == equipmentSlot;
-            boolean isSpecialItem = !itemStack.isEmpty() && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem());
+            boolean isSpecialItem = !itemStack.isEmpty() && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem()) &&
+                                  (equippableComponent == null || equippableComponent.slot() == equipmentSlot);
             
             if (isEquippable || isSpecialItem) {
                 if (getConfig().getOptions().toggleInverseSlot) {
@@ -357,7 +358,7 @@ public class ArmorBarRenderer {
         return true;
     }
 
-    public void render(DrawContext context, PlayerEntity player) {
+    public void render(DrawContext context, PlayerEntity player, int y_base) {
         var generic = getEnchantLevel(getArmorItems(player), Enchantments.PROTECTION);
         var projectile = getEnchantLevel(getArmorItems(player), Enchantments.PROJECTILE_PROTECTION);
         var explosive = getEnchantLevel(getArmorItems(player), Enchantments.BLAST_PROTECTION);
@@ -366,15 +367,10 @@ public class ArmorBarRenderer {
         var armorPoints = getArmorPoints(player);
         var thorns = getEnchantLevel(getArmorItems(player), Enchantments.THORNS);
 
-        var playerHealth = MathHelper.ceil(player.getHealth());
         var totalArmorPoint = armorPoints.size();
         var totalEnchants = Arrays.stream(protectArr).sum();
-        var maxHealth = Math.max(player.getAttributeValue(EntityAttributes.MAX_HEALTH), playerHealth);
-        var absorptionHealth = MathHelper.ceil(player.getAbsorptionAmount());
-        var healthRow = getConfig().getOptions().toggleCompatibleHeartMod ? 1 : MathHelper.ceil((maxHealth + absorptionHealth) / 20.0f);
         var screenWidth = client.getWindow().getScaledWidth() / 2 - 91 + getConfig().getOptions().armorBarOffsetX;
-        var screenHeight = client.getWindow().getScaledHeight() - 39;
-        var yPos = screenHeight - (healthRow - 1) * Math.max(10 - (healthRow - 2), 3) - 10 + getConfig().getOptions().armorBarOffsetY;
+        var yPos = y_base + getConfig().getOptions().armorBarOffsetY;
 
         int stackCount = (totalArmorPoint - 1) / 20;
         int stackRow = stackCount * 20;
@@ -391,7 +387,7 @@ public class ArmorBarRenderer {
                 CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
             }
         }
-
+        
         //Default
         if (totalArmorPoint > 0) {
             int maxSlots = getConfig().getOptions().toggleMinimalArmorBar ? 
@@ -638,7 +634,7 @@ public class ArmorBarRenderer {
                 // Original behavior - based on enchantment levels
                 int maxSlots = getConfig().getOptions().toggleMinimalArmorBar ? 
                     Math.min(10, Math.max((int)Math.ceil(totalEnchants / 2.0), (int)Math.ceil(totalArmorPoint / 2.0))) : 10;
-                
+                    
                 for (int count = 0; count * 2 + 1 <= totalEnchants; count++) {
                     if (count >= maxSlots) break;
 
