@@ -11,8 +11,8 @@ import java.awt.Color;
 
 public class ArmorBarRenderManager implements BarRenderManager {
 
-    private static final Texture DEFAULT_OUTLINE = new Texture(DetailArmorBar.GUI_ARMOR_BAR, 128, 128, new TextureOffset(9, 0));
-    private static final Texture DEFAULT_OUTLINE_HALF = new Texture(DetailArmorBar.GUI_ARMOR_BAR, 128, 128, new TextureOffset(27, 0));
+    private static final Texture DEFAULT_OUTLINE = new Texture(DetailArmorBar.GUI_ARMOR_BAR, 146, 128, new TextureOffset(9, 0));
+    private static final Texture DEFAULT_OUTLINE_HALF = new Texture(DetailArmorBar.GUI_ARMOR_BAR, 146, 128, new TextureOffset(27, 0));
 
 
     public static final Codec<ArmorBarRenderManager> CODEC = RecordCodecBuilder.create(instance -> instance.group(
