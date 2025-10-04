@@ -9,13 +9,13 @@
   "render": {
     "full": {
       "texture": "detailab:textures/armor_bar.png",
-      "texture_width": 128,
+      "texture_width": 146,
       "texture_height": 128,
       "offset": [ 27, 9 ]
     },
     "half": {
       "texture": "detailab:textures/armor_bar.png",
-      "texture_width": 128,
+      "texture_width": 146,
       "texture_height": 128,
       "offset": [ 18, 9 ]
     }
