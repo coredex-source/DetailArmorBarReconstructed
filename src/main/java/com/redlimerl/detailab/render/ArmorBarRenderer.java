@@ -354,7 +354,7 @@ public class ArmorBarRenderer {
         int stackRow = stackCount * 20;
 
         // Render empty armor bar if no armor is worn but toggleEmptyBar is true
-        if (totalArmorPoint == 0 && getConfig().getOptions().toggleEmptyBar && !getConfig().getOptions().toggleMinimalArmorBar) {
+        if (totalArmorPoint == 0 && getConfig().getOptions().toggleEmptyBar) {
             for (int count = 0; count < 10; count++) {
                 int xPos;
                 if (getConfig().getOptions().toggleInverseSlot) {
@@ -368,8 +368,7 @@ public class ArmorBarRenderer {
         
         //Default
         if (totalArmorPoint > 0) {
-            int maxSlots = getConfig().getOptions().toggleMinimalArmorBar ? 
-                Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0)) : 10;
+            int maxSlots = 10;
 
             for (int count = 0; count < maxSlots; count++) {
                 // Calculate xPos based on inverse slot setting
@@ -397,9 +396,7 @@ public class ArmorBarRenderer {
                     }
                 }
                 if (count * 2 + 1 + stackRow == totalArmorPoint) {
-                    if (!getConfig().getOptions().toggleMinimalArmorBar) {
-                        CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
-                    }
+                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
                     Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
                     am.getRight().draw(am.getLeft(), context, xPos, yPos, true, false);
                     // Draw sparkle overlay for item with mending
@@ -408,9 +405,7 @@ public class ArmorBarRenderer {
                     }
                 }
                 if (count * 2 + 1 + stackRow > totalArmorPoint) {
-                    if (!getConfig().getOptions().toggleMinimalArmorBar) {
-                        CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
-                    }
+                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
                 }
             }
 
@@ -477,8 +472,7 @@ public class ArmorBarRenderer {
             var mendingSpeed = 3;
 
             if (mendingTime < (mendingSpeed * 4)) {
-                int maxSlots = getConfig().getOptions().toggleMinimalArmorBar ? 
-                    Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0)) : 10;
+                int maxSlots = 10;
                     
                 for (int count = 0; count < maxSlots; count++) {
                     if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
@@ -491,7 +485,7 @@ public class ArmorBarRenderer {
                         }
 
                         if (armorPoints.size() <= count * 2 + stackRow) {
-                            if (getConfig().getOptions().toggleEmptyBar && !getConfig().getOptions().toggleMinimalArmorBar)
+                            if (getConfig().getOptions().toggleEmptyBar)
                                 CustomArmorBar.DEFAULT.drawOutLine(ItemStack.EMPTY, context, xPos, yPos, false, false, Color.WHITE);
                         } else {
                             Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
@@ -610,8 +604,7 @@ public class ArmorBarRenderer {
                 }
             } else {
                 // Original behavior - based on enchantment levels
-                int maxSlots = getConfig().getOptions().toggleMinimalArmorBar ? 
-                    Math.min(10, Math.max((int)Math.ceil(totalEnchants / 2.0), (int)Math.ceil(totalArmorPoint / 2.0))) : 10;
+                int maxSlots = 10;
                     
                 for (int count = 0; count * 2 + 1 <= totalEnchants; count++) {
                     if (count >= maxSlots) break;
@@ -711,8 +704,7 @@ public class ArmorBarRenderer {
                 }
             } else {
                 // Original behavior - based on total thorns level
-                int maxSlots = getConfig().getOptions().toggleMinimalArmorBar ? 
-                    Math.min(10, Math.max((int)Math.ceil(thorns.level / 2.0), (int)Math.ceil(totalArmorPoint / 2.0))) : 10;
+                int maxSlots = 10;
                     
                 for (int count = 0; count < maxSlots; count++) {
                     if (count * 2 + 1 > thorns.level) break;

@@ -11,7 +11,7 @@ import java.awt.*;
 @SuppressWarnings({"SuspiciousNameCombination", "SameParameterValue"})
 public class InGameDrawer {
     public static void drawTexture(Identifier identifier, DrawContext context, int x, int y, int u, int v, Color color, boolean mirror) {
-        drawTexture(identifier, context, x, y, u, v, 146, 128, color, mirror);
+        drawTexture(identifier, context, x, y, u, v, 128, 128, color, mirror);
     }
 
     public static void drawTexture(Identifier identifier, DrawContext context, int x, int y, int u, int v, int width, int height, Color color, boolean mirror) {
