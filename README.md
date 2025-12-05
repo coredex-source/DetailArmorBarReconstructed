@@ -13,13 +13,26 @@ Detail Armor Bar for 1.21.5+
 - Thorns overlay alignment - When using aligned mode, thorns overlay aligns with actual armor pieces.
 - And many more..
 
-# To-Do (for version 5.0.0):
+# To-Do (for version 5.x.x):
+- ~~Add durability notifications.~~
+- ~~Add armor trim overlay.~~
+- Add a durability overlay (will not be on the bar itself but somewhat like other armor hud mods unless I can pack it in there without making the bar too bloated).
+- Add a config for modern armor bar (Shows respective textures instead of all chestplates).
 - Reformat and optimize existing code.
-- Fix any bugs found.
 - Add a modern DABR API. (Will eventually replace the existing API)
 - Allow for more customization.
-- Reformat the config screen.
+- Reformat the config screen (Possible inheretence from sodium).
 - Rework the offset/positioning system.
+- Add inventory overlay for displaying armor protection type.
+- Add resource reload listener to refresh texture caches when resource packs change.
+
+# To-Do (for version 6.0.0):
+- Add render support to the mod and the API that can dynamically fetch textures and colors to form a armor texture for modded and/or vanilla sets.
+- Keep the png based texture loading system to maintain compatibility with existing resource packs and for the polished vanilla textures as dynamic loading will extract grayscale textures and repaint them which may or may not look unpolished.
+- Load trim palettes dynamically from `textures/trims/color_palettes/<material>.png` for automatic mod compatibility.
+- Extract armor material colors from `textures/models/armor/<material>_layer_1.png` for modded armor support.
+- Hybrid approach: Use polished vanilla textures from armor_bar.png, fallback to dynamic extraction for unknown/modded armors.
+- Add more in-built texture options for the armor bar.
 
 # To-Do:
 - ~~API~~ - Should work with some changes to the mods which use the API.

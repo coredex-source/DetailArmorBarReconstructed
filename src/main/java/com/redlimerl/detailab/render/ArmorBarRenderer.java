@@ -484,38 +484,38 @@ public class ArmorBarRenderer {
                 boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
                 
                 if (hasFirstPoint || hasSecondPoint) {
-                    Color firstTrimColor = null;
-                    Color secondTrimColor = null;
+                    ArmorTrimHandler.TrimMaterial firstTrimMaterial = null;
+                    ArmorTrimHandler.TrimMaterial secondTrimMaterial = null;
                     
                     // Check if first armor point has a trim
                     if (hasFirstPoint) {
                         ItemStack armorItem = armorPoints.get(armorIndex).getLeft();
-                        firstTrimColor = ArmorTrimHandler.getTrimColor(armorItem);
+                        firstTrimMaterial = ArmorTrimHandler.getTrimMaterial(armorItem);
                     }
                     
                     // Check if second armor point has a trim
                     if (hasSecondPoint) {
                         ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getLeft();
-                        secondTrimColor = ArmorTrimHandler.getTrimColor(nextArmorItem);
+                        secondTrimMaterial = ArmorTrimHandler.getTrimMaterial(nextArmorItem);
                     }
                     
                     // Draw trim overlay based on which armor points have trims
-                    if (firstTrimColor != null && secondTrimColor != null) {
+                    if (firstTrimMaterial != null && secondTrimMaterial != null) {
                         // Both points have trims
-                        if (firstTrimColor.equals(secondTrimColor)) {
-                            // Same trim color - draw full overlay
-                            drawTrimOverlay(context, xPos, yPos, firstTrimColor, false, false);
+                        if (firstTrimMaterial == secondTrimMaterial) {
+                            // Same trim material - draw full overlay
+                            drawTrimOverlay(context, xPos, yPos, firstTrimMaterial, false, false);
                         } else {
-                            // Different trim colors - draw half overlays
-                            drawTrimOverlay(context, xPos, yPos, firstTrimColor, true, false);
-                            drawTrimOverlay(context, xPos, yPos, secondTrimColor, true, true);
+                            // Different trim materials - draw half overlays
+                            drawTrimOverlay(context, xPos, yPos, firstTrimMaterial, true, false);
+                            drawTrimOverlay(context, xPos, yPos, secondTrimMaterial, true, true);
                         }
-                    } else if (firstTrimColor != null) {
+                    } else if (firstTrimMaterial != null) {
                         // Only first point has trim - draw left half
-                        drawTrimOverlay(context, xPos, yPos, firstTrimColor, true, false);
-                    } else if (secondTrimColor != null) {
+                        drawTrimOverlay(context, xPos, yPos, firstTrimMaterial, true, false);
+                    } else if (secondTrimMaterial != null) {
                         // Only second point has trim - draw right half (mirrored)
-                        drawTrimOverlay(context, xPos, yPos, secondTrimColor, true, true);
+                        drawTrimOverlay(context, xPos, yPos, secondTrimMaterial, true, true);
                     }
                 }
             }
@@ -947,14 +947,14 @@ public class ArmorBarRenderer {
      * @param context The draw context
      * @param x X position
      * @param y Y position
-     * @param color The trim material color to tint the overlay
+     * @param material The trim material (used to get colored texture)
      * @param isHalf Whether to draw half overlay
      * @param isMirror Whether to mirror the overlay (for right half)
      */
-
-    private void drawTrimOverlay(DrawContext context, int x, int y, Color color, boolean isHalf, boolean isMirror) {
+    private void drawTrimOverlay(DrawContext context, int x, int y, ArmorTrimHandler.TrimMaterial material, boolean isHalf, boolean isMirror) {
         int u = isHalf ? 9 : 0;
         int v = 0;
-        InGameDrawer.drawTexture(ArmorTrimHandler.TRIM_OVERLAY_TEXTURE, context, x, y, u, v, 18, 18, color, isMirror);
+        Identifier textureId = ArmorTrimHandler.getColoredTexture(material);
+        InGameDrawer.drawTexture(textureId, context, x, y, u, v, 18, 18, Color.WHITE, isMirror);
     }
 }
