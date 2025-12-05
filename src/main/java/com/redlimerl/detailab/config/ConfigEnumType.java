@@ -36,4 +36,31 @@ public class ConfigEnumType {
             return color;
         }
     }
+    
+    public enum DurabilityThreshold {
+        HALF(50, new Color(255, 255, 0)),
+        QUARTER(25, new Color(255, 165, 0)),
+        LOW(10, new Color(255, 100, 0)),
+        CRITICAL(5, new Color(255, 0, 0));
+        
+        private final int percentage;
+        private final Color color;
+        
+        DurabilityThreshold(int percentage, Color color) {
+            this.percentage = percentage;
+            this.color = color;
+        }
+        
+        public int getPercentage() {
+            return percentage;
+        }
+        
+        public Color getColor() {
+            return color;
+        }
+        
+        public Color getColorWithAlpha(int alpha) {
+            return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+        }
+    }
 }

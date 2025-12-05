@@ -111,6 +111,9 @@ public class DetailArmorBar implements ClientModInitializer {
 
         // Register damage event handler for thorns animation
         com.redlimerl.detailab.events.DamageEventHandler.register();
+        
+        // Register durability notification handler
+        com.redlimerl.detailab.events.DurabilityNotificationHandler.register();
 
         for (String compatibilityMod : compatibilityMods) {
             if (FabricLoader.getInstance().getModContainer(compatibilityMod).isPresent()) {

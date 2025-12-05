@@ -1,6 +1,8 @@
 {
   "option.detailarmorbar.title.features": "Функцыі",
   "option.detailarmorbar.title.animation": "Анімацыі",
+  "option.detailarmorbar.title.positioning": "Пазіцыя",
+  "option.detailarmorbar.title.durability": "Трываласць",
   "option.detailarmorbar.title.etc": "інш..",
   "option.detailarmorbar.effects.effect_type": "Эфект аховы",
   "context.detailarmorbar.effects.effect_type": "Змяняе тып/анімацыі эфекту аховы.",
@@ -49,5 +51,31 @@
   "option.detailarmorbar.toggle.inverse_slot": "Адваротныя слаты",
   "context.detailarmorbar.toggle.inverse_slot": "Змяняе парадак слатоў брані на процілеглы.",
   "option.detailarmorbar.toggle.sort_special_item": "Сартаваць спецыяльныя прадметы",
-  "context.detailarmorbar.toggle.sort_special_item": "Сартаваць спецыяльныя прадметы (як элітры) справа ад радка брані."
+  "context.detailarmorbar.toggle.sort_special_item": "Сартаваць спецыяльныя прадметы (як элітры) справа ад радка брані.",
+
+  "__comment": "AI translated stuff ... I'd prefer if someone can help me with better translations",
+
+  "option.detailarmorbar.toggle.durability_notifications": "Апавяшчэнні аб трываласці",
+  "context.detailarmorbar.toggle.durability_notifications": "Уключае апавяшчэнні, калі трываласць брані апускаецца ніжэй пэўных парогаў.",
+  "option.detailarmorbar.toggle.repeated_notifications": "Паўтараць апавяшчэнні",
+  "context.detailarmorbar.toggle.repeated_notifications": "Паўтараць апавяшчэнні аб нізкай трываласці замест аднаразовага апавяшчэння на парог.",
+  "option.detailarmorbar.toggle.sound_notification": "Гукавыя апавяшчэнні",
+  "context.detailarmorbar.toggle.sound_notification": "Прайграваць гук, калі трываласць брані апускаецца ніжэй парога.",
+  "option.detailarmorbar.toggle.toast_notification": "Усплыўныя апавяшчэнні",
+  "context.detailarmorbar.toggle.toast_notification": "Паказваць усплыўнае паведамленне, калі трываласць брані апускаецца ніжэй парога.",
+  "option.detailarmorbar.toggle.visual_effect": "Візуальны эфект",
+  "context.detailarmorbar.toggle.visual_effect": "Паказваць візуальны эфект на радку брані пры нізкай трываласці.",
+  "option.detailarmorbar.toggle.threshold_50": "Папярэджанне 50%",
+  "context.detailarmorbar.toggle.threshold_50": "Апавяшчаць, калі трываласць брані апускаецца да 50% ці ніжэй.",
+  "option.detailarmorbar.toggle.threshold_25": "Папярэджанне 25%",
+  "context.detailarmorbar.toggle.threshold_25": "Апавяшчаць, калі трываласць брані апускаецца да 25% ці ніжэй.",
+  "option.detailarmorbar.toggle.threshold_10": "Папярэджанне 10%",
+  "context.detailarmorbar.toggle.threshold_10": "Апавяшчаць, калі трываласць брані апускаецца да 10% ці ніжэй.",
+  "option.detailarmorbar.toggle.threshold_5": "Крытычна 5%",
+  "context.detailarmorbar.toggle.threshold_5": "Апавяшчаць, калі трываласць брані апускаецца да 5% ці ніжэй (крытычна).",
+  "notification.detailarmorbar.durability.critical.title": "§c⚠ КРЫТЫЧНАЯ ТРЫВАЛАСЦЬ!",
+  "notification.detailarmorbar.durability.low.title": "§6⚠ Нізкая трываласць",
+  "notification.detailarmorbar.durability.quarter.title": "§e⚠ Папярэджанне аб трываласці",
+  "notification.detailarmorbar.durability.half.title": "§e⚠ Заўвага аб трываласці",
+  "notification.detailarmorbar.durability.description": "%s мае %d%% трываласці"
 }

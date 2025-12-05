@@ -69,12 +69,22 @@ public class DetailArmorBarConfig {
         public boolean toggleVanillaTexture = true;
         public boolean toggleCompatibleHeartMod = false;
         public boolean toggleInverseSlot = false;
-        public boolean toggleSortSpecialItem = true; // This doesn't have an option in the menu?
-        public boolean toggleAlignEnchantments = true; // New option for enchantment alignment
-        public boolean toggleUniformColor = false; // New option for uniform enchantment color
-        public UniformColor uniformColorType = UniformColor.AQUA; // Default color selection
-        public int armorBarOffsetX = 0; // X axis offset for armor bar position
-        public int armorBarOffsetY = 0; // Y axis offset for armor bar position
+        public boolean toggleSortSpecialItem = true;
+        public boolean toggleAlignEnchantments = true;
+        public boolean toggleUniformColor = false;
+        public UniformColor uniformColorType = UniformColor.AQUA;
+        public int armorBarOffsetX = 0;
+        public int armorBarOffsetY = 0;
+        
+        public boolean toggleDurabilityNotifications = true;
+        public boolean toggleRepeatedDurabilityNotifications = false;
+        public boolean toggleDurabilitySoundNotification = true;
+        public boolean toggleDurabilityToastNotification = true;
+        public boolean toggleDurabilityVisualEffect = true;
+        public boolean toggleThreshold50 = false;
+        public boolean toggleThreshold25 = true;
+        public boolean toggleThreshold10 = true;
+        public boolean toggleThreshold5 = true;
 
         boolean replaceInvalidOptions() {
             var invalid = false;

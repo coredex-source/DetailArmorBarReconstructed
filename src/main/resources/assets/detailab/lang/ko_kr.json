@@ -1,6 +1,8 @@
 {
   "option.detailarmorbar.title.features": "기능",
   "option.detailarmorbar.title.animation": "애니메이션",
+  "option.detailarmorbar.title.positioning": "위치",
+  "option.detailarmorbar.title.durability": "내구도",
   "option.detailarmorbar.title.etc": "기타..",
   "option.detailarmorbar.effects.effect_type": "보호 효과 종류",
   "context.detailarmorbar.effects.effect_type": "보호 인챈트 효과를 종류를 변경합니다.",
@@ -49,5 +51,31 @@
   "option.detailarmorbar.toggle.inverse_slot": "슬롯 반전",
   "context.detailarmorbar.toggle.inverse_slot": "아머바의 슬롯 순서를 반전합니다.",
   "option.detailarmorbar.toggle.sort_special_item": "특수 아이템 정렬",
-  "context.detailarmorbar.toggle.sort_special_item": "특수 아이템(Elytra 같은)을 오른쪽에 정렬합니다."
+  "context.detailarmorbar.toggle.sort_special_item": "특수 아이템(Elytra 같은)을 오른쪽에 정렬합니다.",
+
+  "__comment": "AI translated stuff ... I'd prefer if someone can help me with better translations",
+  
+  "option.detailarmorbar.toggle.durability_notifications": "내구도 알림",
+  "context.detailarmorbar.toggle.durability_notifications": "갑옷 내구도가 특정 임계값 이하로 떨어지면 알림을 활성화합니다.",
+  "option.detailarmorbar.toggle.repeated_notifications": "반복 알림",
+  "context.detailarmorbar.toggle.repeated_notifications": "임계값당 한 번만 알리지 않고 낮은 내구도에 대해 반복적으로 알립니다.",
+  "option.detailarmorbar.toggle.sound_notification": "소리 알림",
+  "context.detailarmorbar.toggle.sound_notification": "갑옷 내구도가 임계값 아래로 떨어지면 소리를 재생합니다.",
+  "option.detailarmorbar.toggle.toast_notification": "토스트 알림",
+  "context.detailarmorbar.toggle.toast_notification": "갑옷 내구도가 임계값 아래로 떨어지면 토스트 알림을 표시합니다.",
+  "option.detailarmorbar.toggle.visual_effect": "시각 효과",
+  "context.detailarmorbar.toggle.visual_effect": "내구도가 낮을 때 갑옷바에 시각 효과를 표시합니다.",
+  "option.detailarmorbar.toggle.threshold_50": "50% 경고",
+  "context.detailarmorbar.toggle.threshold_50": "갑옷 내구도가 50% 이하로 떨어지면 알립니다.",
+  "option.detailarmorbar.toggle.threshold_25": "25% 경고",
+  "context.detailarmorbar.toggle.threshold_25": "갑옷 내구도가 25% 이하로 떨어지면 알립니다.",
+  "option.detailarmorbar.toggle.threshold_10": "10% 경고",
+  "context.detailarmorbar.toggle.threshold_10": "갑옷 내구도가 10% 이하로 떨어지면 알립니다.",
+  "option.detailarmorbar.toggle.threshold_5": "5% 위험",
+  "context.detailarmorbar.toggle.threshold_5": "갑옷 내구도가 5% 이하로 떨어지면 알립니다 (위험).",
+  "notification.detailarmorbar.durability.critical.title": "§c⚠ 내구도 위험!",
+  "notification.detailarmorbar.durability.low.title": "§6⚠ 낮은 내구도 경고",
+  "notification.detailarmorbar.durability.quarter.title": "§e⚠ 내구도 경고",
+  "notification.detailarmorbar.durability.half.title": "§e⚠ 내구도 알림",
+  "notification.detailarmorbar.durability.description": "%s의 내구도가 %d%%입니다"
 }

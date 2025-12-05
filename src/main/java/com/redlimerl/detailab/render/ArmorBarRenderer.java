@@ -119,21 +119,70 @@ public class ArmorBarRenderer {
         return new Color(255, 25, 25, alpha);
     }
 
+    private static Color getDurabilityNotificationColor() {
+        if (!getConfig().getOptions().toggleDurabilityVisualEffect || 
+            !getConfig().getOptions().toggleDurabilityNotifications) {
+            return null;
+        }
+        
+        var handler = com.redlimerl.detailab.events.DurabilityNotificationHandler.class;
+        var currentLevel = com.redlimerl.detailab.events.DurabilityNotificationHandler.CURRENT_WARNING_LEVEL;
+        
+        if (currentLevel == null) {
+            return null;
+        }
+        
+        long currentTick = DetailArmorBar.getTicks();
+        long lastWarning = switch (currentLevel) {
+            case HALF -> com.redlimerl.detailab.events.DurabilityNotificationHandler.LAST_WARNING_50;
+            case QUARTER -> com.redlimerl.detailab.events.DurabilityNotificationHandler.LAST_WARNING_25;
+            case LOW -> com.redlimerl.detailab.events.DurabilityNotificationHandler.LAST_WARNING_10;
+            case CRITICAL -> com.redlimerl.detailab.events.DurabilityNotificationHandler.LAST_WARNING_5;
+        };
+        
+        long timeSinceWarning = currentTick - lastWarning;
+        
+        int effectDuration = switch (currentLevel) {
+            case CRITICAL -> 50;
+            case LOW -> 40;
+            case QUARTER -> 30;
+            case HALF -> 20;
+        };
+        
+        if (timeSinceWarning > effectDuration) {
+            com.redlimerl.detailab.events.DurabilityNotificationHandler.CURRENT_WARNING_LEVEL = null;
+            return null;
+        }
+        
+        int speed = getAnimationSpeed() / 2;
+        if (currentLevel == com.redlimerl.detailab.config.ConfigEnumType.DurabilityThreshold.CRITICAL) {
+            speed = speed / 2;
+        }
+        
+        long time = currentTick;
+        int alpha;
+        if (time % (speed * 2L) < speed) {
+            alpha = Math.round(MathHelper.lerp((time % speed) / (speed - 1f), 0f, 0.85f) * 255);
+        } else {
+            alpha = Math.round(MathHelper.lerp((time % speed) / (speed - 1f), 0.85f, 0f) * 255);
+        }
+        
+        return currentLevel.getColorWithAlpha(alpha);
+    }
+
     private static Color getThornColor() {
         if (getConfig().getOptions().effectThorn == Animation.STATIC) return Color.WHITE;
         
-        // Check if player was recently hit
         long currentTime = DetailArmorBar.getTicks();
         long timeSinceLastHit = currentTime - LAST_THORNS;
-        
-        // Set total duration based on animation speed setting
         int totalDuration;
+
         switch (getConfig().getOptions().effectSpeed) {
             case VERY_SLOW -> totalDuration = 20;
             case SLOW -> totalDuration = 16;
             case FAST -> totalDuration = 8;
             case VERY_FAST -> totalDuration = 4;
-            default -> totalDuration = 12; // NORMAL speed
+            default -> totalDuration = 12;
         }
         
         // Calculate phase durations proportionally
@@ -491,6 +540,29 @@ public class ArmorBarRenderer {
                             Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
                             am.getRight().drawOutLine(am.getLeft(), context, xPos, yPos, false, false, Color.WHITE);
                         }
+                    }
+                }
+            }
+        }
+        
+        if (getConfig().getOptions().toggleDurabilityNotifications && 
+            getConfig().getOptions().toggleDurabilityVisualEffect && totalArmorPoint != 0) {
+            Color notificationColor = getDurabilityNotificationColor();
+            
+            if (notificationColor != null && notificationColor.getAlpha() > 0) {
+                int maxSlots = Math.min(10, (int) Math.ceil(totalArmorPoint / 2.0));
+                
+                for (int count = 0; count < maxSlots; count++) {
+                    int xPos;
+                    if (getConfig().getOptions().toggleInverseSlot) {
+                        xPos = screenWidth + (9 - count) * 8;
+                    } else {
+                        xPos = screenWidth + count * 8;
+                    }
+                    
+                    if (count * 2 + stackRow < armorPoints.size()) {
+                        Pair<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
+                        am.getRight().drawOutLine(am.getLeft(), context, xPos, yPos, false, false, notificationColor);
                     }
                 }
             }
