@@ -125,6 +125,15 @@ public class OptionsScreen extends Screen {
                     .build()
             );
             buttonCount++;
+
+            addDrawableChild(ButtonWidget.builder(getToggleName("armor_trims", getConfig().getOptions().toggleArmorTrims), (button) -> {
+                        getConfig().getOptions().toggleArmorTrims = !getConfig().getOptions().toggleArmorTrims; getConfig().save();
+                        button.setMessage(getToggleName("armor_trims", getConfig().getOptions().toggleArmorTrims));
+                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.armor_trims")))
+                    .build()
+            );
+            buttonCount++;
         }
 
         if (optionType == OptionType.ANIMATION) {

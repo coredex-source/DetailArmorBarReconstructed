@@ -52,9 +52,11 @@
   "context.detailarmorbar.toggle.inverse_slot": "아머바의 슬롯 순서를 반전합니다.",
   "option.detailarmorbar.toggle.sort_special_item": "특수 아이템 정렬",
   "context.detailarmorbar.toggle.sort_special_item": "특수 아이템(Elytra 같은)을 오른쪽에 정렬합니다.",
+  "option.detailarmorbar.toggle.armor_trims": "갑옷 장식 표시",
+  "context.detailarmorbar.toggle.armor_trims": "장식된 갑옷을 착용할 때 갑옷바에 장식 색상을 오버레이로 표시합니다.",
 
   "__comment": "AI translated stuff ... I'd prefer if someone can help me with better translations",
-  
+
   "option.detailarmorbar.toggle.durability_notifications": "내구도 알림",
   "context.detailarmorbar.toggle.durability_notifications": "갑옷 내구도가 특정 임계값 이하로 떨어지면 알림을 활성화합니다.",
   "option.detailarmorbar.toggle.repeated_notifications": "반복 알림",

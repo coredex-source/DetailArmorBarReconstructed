@@ -75,7 +75,7 @@ public class DetailArmorBarConfig {
         public UniformColor uniformColorType = UniformColor.AQUA;
         public int armorBarOffsetX = 0;
         public int armorBarOffsetY = 0;
-        
+        public boolean toggleArmorTrims = true;
         public boolean toggleDurabilityNotifications = true;
         public boolean toggleRepeatedDurabilityNotifications = false;
         public boolean toggleDurabilitySoundNotification = true;

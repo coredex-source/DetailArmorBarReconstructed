@@ -4,6 +4,7 @@ import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.Animation;
+import net.minecraft.util.Identifier;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -465,6 +466,61 @@ public class ArmorBarRenderer {
             }
         }
 
+        // Armor Trim Overlay
+        if (getConfig().getOptions().toggleArmorTrims && totalArmorPoint > 0) {
+            int maxSlots = 10;
+            
+            for (int count = 0; count < maxSlots; count++) {
+                int xPos;
+                if (getConfig().getOptions().toggleInverseSlot) {
+                    xPos = screenWidth + (9 - count) * 8;
+                } else {
+                    xPos = screenWidth + count * 8;
+                }
+                
+                int armorIndex = count * 2 + stackRow;
+                int nextArmorIndex = armorIndex + 1;
+                boolean hasFirstPoint = armorIndex < totalArmorPoint;
+                boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
+                
+                if (hasFirstPoint || hasSecondPoint) {
+                    Color firstTrimColor = null;
+                    Color secondTrimColor = null;
+                    
+                    // Check if first armor point has a trim
+                    if (hasFirstPoint) {
+                        ItemStack armorItem = armorPoints.get(armorIndex).getLeft();
+                        firstTrimColor = ArmorTrimHandler.getTrimColor(armorItem);
+                    }
+                    
+                    // Check if second armor point has a trim
+                    if (hasSecondPoint) {
+                        ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getLeft();
+                        secondTrimColor = ArmorTrimHandler.getTrimColor(nextArmorItem);
+                    }
+                    
+                    // Draw trim overlay based on which armor points have trims
+                    if (firstTrimColor != null && secondTrimColor != null) {
+                        // Both points have trims
+                        if (firstTrimColor.equals(secondTrimColor)) {
+                            // Same trim color - draw full overlay
+                            drawTrimOverlay(context, xPos, yPos, firstTrimColor, false, false);
+                        } else {
+                            // Different trim colors - draw half overlays
+                            drawTrimOverlay(context, xPos, yPos, firstTrimColor, true, false);
+                            drawTrimOverlay(context, xPos, yPos, secondTrimColor, true, true);
+                        }
+                    } else if (firstTrimColor != null) {
+                        // Only first point has trim - draw left half
+                        drawTrimOverlay(context, xPos, yPos, firstTrimColor, true, false);
+                    } else if (secondTrimColor != null) {
+                        // Only second point has trim - draw right half (mirrored)
+                        drawTrimOverlay(context, xPos, yPos, secondTrimColor, true, true);
+                    }
+                }
+            }
+        }
+
         //Durability Color
         if (getConfig().getOptions().toggleDurability) {
             List<Pair<EquipmentSlot, ItemStack>> equipment = new ArrayList<>();
@@ -877,5 +933,28 @@ public class ArmorBarRenderer {
         context.fill(x + 1, y + 2, x + 2, y + 3, color); // Bottom
         context.fill(x, y + 1, x + 1, y + 2, color);     // Left
         context.fill(x + 2, y + 1, x + 3, y + 2, color); // Right
+    }
+    
+    /**
+     * A description for my or anyone else's future reference as I tend to forget details over time(sooner rather than later).
+     * Draws the armor trim overlay on an armor bar icon.
+     * The overlay texture (armor_trim.png) is 18x18 with 4 parts:
+     * - (0,0): Full armor overlay (9x9)
+     * - (9,0): Half armor overlay (9x9)
+     * - (0,9): Elytra/special overlay (9x9)
+     * - (9,9): Reserved/unused (9x9)
+     *
+     * @param context The draw context
+     * @param x X position
+     * @param y Y position
+     * @param color The trim material color to tint the overlay
+     * @param isHalf Whether to draw half overlay
+     * @param isMirror Whether to mirror the overlay (for right half)
+     */
+
+    private void drawTrimOverlay(DrawContext context, int x, int y, Color color, boolean isHalf, boolean isMirror) {
+        int u = isHalf ? 9 : 0;
+        int v = 0;
+        InGameDrawer.drawTexture(ArmorTrimHandler.TRIM_OVERLAY_TEXTURE, context, x, y, u, v, 18, 18, color, isMirror);
     }
 }
