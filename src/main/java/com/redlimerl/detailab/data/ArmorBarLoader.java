@@ -8,6 +8,7 @@ import com.mojang.serialization.*;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
+import com.redlimerl.detailab.render.ArmorTrimHandler;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -133,6 +134,9 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
         });
         armorList = armorBuilder.buildKeepingLast();
         itemList = itemBarBuilder.buildKeepingLast();
+        
+        ArmorTrimHandler.clearCache();
+        DetailArmorBar.LOGGER.info("Resource pack reloaded - cleared armor trim texture cache");
     }
 
     private boolean filterAndLogArmor(ItemStack stack) {

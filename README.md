@@ -24,7 +24,7 @@ Detail Armor Bar for 1.21.5+
 - Reformat the config screen (Possible inheretence from sodium).
 - Rework the offset/positioning system.
 - Add inventory overlay for displaying armor protection type.
-- Add resource reload listener to refresh texture caches when resource packs change.
+- ~~Add resource reload listener to refresh texture caches when resource packs change.~~
 
 # To-Do (for version 6.0.0):
 - Add render support to the mod and the API that can dynamically fetch textures and colors to form a armor texture for modded and/or vanilla sets.
@@ -34,16 +34,19 @@ Detail Armor Bar for 1.21.5+
 - Hybrid approach: Use polished vanilla textures from armor_bar.png, fallback to dynamic extraction for unknown/modded armors.
 - Add more in-built texture options for the armor bar.
 
-# To-Do:
-- ~~API~~ - Should work with some changes to the mods which use the API.
+# API:
+- Should work with some changes to the mods which use the API.
 eg. GildedArmor [CurseForge](https://www.curseforge.com/minecraft/mc-mods/gildedarmor) [Modrinth](https://modrinth.com/mod/gildedarmor)
+
+# Modded armor set support:
+- Will I add it sometime in the future? Yes, preferably a dynamic version.
+- It already exists and is implemented in a brilliant way in [Detail Armor Bar Compat](https://modrinth.com/mod/detailab-compat)
 
 # Downloads
 - For 1.21.4 and below use the official mod by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/detail-armor-bar)
 - For 1.21.5 and above by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar-reconstructed) or [CurseForge](https://curseforge.com/minecraft/mc-mods/detail-armor-bar-reconstructed) or [Github-Releases](https://github.com/coredex-source/DetailArmorBarReconstructed/releases/latest)
 
 # Version Support
-
 - The mod will be supported for upto 3 versions, for example if 1.21.8 is the latest Minecraft release then support will be provided for 1.21.6, 1.21.7 and 1.21.8.
 - If a backport is to be requested, it can be requested be creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
 - Port to a specific mod loader like NeoForge (I will most likely not port to Forge, I will likely port to NeoForge if an issue is created.) may also be requested by creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
