@@ -16,15 +16,15 @@ Detail Armor Bar for 1.21.5+
 # To-Do (for version 5.x.x):
 - ~~Add durability notifications.~~
 - ~~Add armor trim overlay.~~
+- ~~Add resource reload listener to refresh texture caches when resource packs change.~~
+- Reformat the config screen (Possible inheretence from sodium).
+- Rework the offset/positioning system.
+- Add inventory overlay for displaying armor protection type.
 - Add a durability overlay (will not be on the bar itself but somewhat like other armor hud mods unless I can pack it in there without making the bar too bloated).
 - Add a config for modern armor bar (Shows respective textures instead of all chestplates).
 - Reformat and optimize existing code.
 - Add a modern DABR API. (Will eventually replace the existing API)
 - Allow for more customization.
-- Reformat the config screen (Possible inheretence from sodium).
-- Rework the offset/positioning system.
-- Add inventory overlay for displaying armor protection type.
-- ~~Add resource reload listener to refresh texture caches when resource packs change.~~
 
 # To-Do (for version 6.0.0):
 - Add render support to the mod and the API that can dynamically fetch textures and colors to form a armor texture for modded and/or vanilla sets.
