@@ -56,7 +56,6 @@ eg. GildedArmor [CurseForge](https://www.curseforge.com/minecraft/mc-mods/gilded
 # Version Support
 - The mod will be supported for upto 3 versions, for example if 1.21.8 is the latest Minecraft release then support will be provided for 1.21.6, 1.21.7 and 1.21.8.
 - If a backport is to be requested, it can be requested be creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
-- Port to a specific mod loader like NeoForge (I will most likely not port to Forge, I will likely port to NeoForge if an issue is created.) may also be requested by creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
 
 # Credits
 - [RedLime](https://github.com/RedLime) for creating the [mod](https://github.com/redlime/DetailArmorBar).
