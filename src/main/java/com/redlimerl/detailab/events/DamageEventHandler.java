@@ -3,16 +3,16 @@ package com.redlimerl.detailab.events;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.render.ArmorBarRenderer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Holder;
+import net.minecraft.tags.TagKey;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class DamageEventHandler {
     public static void register() {
         // Monitor player health changes each tick to detect damage
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            PlayerEntity player = client.player;
+            Player player = client.player;
             if (player != null) {
                 float currentHealth = player.getHealth();
                 
@@ -49,16 +49,16 @@ public class DamageEventHandler {
     /**
      * Check if player has any armor with thorns enchantment
      */
-    private static boolean hasThorns(PlayerEntity player) {
+    private static boolean hasThorns(Player player) {
         List<ItemStack> armor = getArmorItems(player);
         for (ItemStack item : armor) {
             if (!item.isEmpty()) {
                 // Use EnchantmentHelper to check for thorns enchantment
-                var enchantments = EnchantmentHelper.getEnchantments(item);
+                var enchantments = EnchantmentHelper.getEnchantmentsForCrafting(item);
                 if (enchantments != null && !enchantments.isEmpty()) {
-                    var entries = enchantments.getEnchantmentEntries();
+                    var entries = enchantments.entrySet();
                     for (var entry : entries) {
-                        if (entry.getKey().getKey().orElse(null) == Enchantments.THORNS) {
+                        if (entry.getKey().unwrapKey().orElse(null) == Enchantments.THORNS) {
                             return true;
                         }
                     }
@@ -71,12 +71,12 @@ public class DamageEventHandler {
     /**
      * Get all armor items worn by the player
      */
-    private static List<ItemStack> getArmorItems(PlayerEntity player) {
+    private static List<ItemStack> getArmorItems(Player player) {
         List<ItemStack> list = new ArrayList<>();
-        list.add(player.getEquippedStack(EquipmentSlot.HEAD));
-        list.add(player.getEquippedStack(EquipmentSlot.CHEST));
-        list.add(player.getEquippedStack(EquipmentSlot.LEGS));
-        list.add(player.getEquippedStack(EquipmentSlot.FEET));
+        list.add(player.getItemBySlot(EquipmentSlot.HEAD));
+        list.add(player.getItemBySlot(EquipmentSlot.CHEST));
+        list.add(player.getItemBySlot(EquipmentSlot.LEGS));
+        list.add(player.getItemBySlot(EquipmentSlot.FEET));
         return list;
     }
 }

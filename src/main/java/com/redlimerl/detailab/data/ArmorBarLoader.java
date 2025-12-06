@@ -12,20 +12,20 @@ import com.redlimerl.detailab.render.ArmorTrimHandler;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.resource.JsonDataLoader;
-import net.minecraft.resource.ResourceFinder;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
 import java.util.Optional;
 
-public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements IdentifiableResourceReloadListener {
+public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement> implements IdentifiableResourceReloadListener {
 
     private static final Codec<JsonElement> JSON_CODEC = Codec.PASSTHROUGH.xmap(
             dynamic -> dynamic.convert(JsonOps.INSTANCE).getValue(),
@@ -36,7 +36,7 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
     private Map<Item, CustomArmorBar> itemList;
 
     public ArmorBarLoader() {
-        super(JSON_CODEC, ResourceFinder.json("armor_bar"));
+        super(JSON_CODEC, FileToIdConverter.json("armor_bar"));
     }
 
     public Map<Item, CustomArmorBar> getArmorList() {
@@ -53,11 +53,11 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
 
     @Override
     public Identifier getFabricId() {
-        return Identifier.of(DetailArmorBar.MOD_ID, "armor");
+        return Identifier.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "armor");
     }
 
     @Override
-    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, Profiler profiler) {
+    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         ImmutableMap.Builder<Item, CustomArmorBar> armorBuilder =
                 ImmutableMap.<Item, CustomArmorBar>builder().putAll(DetailArmorBarAPI.getStaticArmorBarList());
 
@@ -84,7 +84,7 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in armor definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
-                                    .map(itemId -> new ItemStack(Registries.ITEM.get(itemId)))
+                                    .map(itemId -> new ItemStack(BuiltInRegistries.ITEM.getValue(itemId)))
                                     .filter(this::filterAndLogArmor)
                                     .toArray(Item[]::new));
 
@@ -107,7 +107,7 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in item definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
-                                    .map(Registries.ITEM::get)
+                                    .map(BuiltInRegistries.ITEM::getValue)
                                     .toArray(Item[]::new));
 
                     Optional<ItemBarRenderManager> renderer = ItemBarRenderManager.CODEC.decode(JsonOps.INSTANCE, rendererJson)
@@ -140,7 +140,7 @@ public class ArmorBarLoader extends JsonDataLoader<JsonElement> implements Ident
     }
 
     private boolean filterAndLogArmor(ItemStack stack) {
-        ComponentMap eqComp = stack.getComponents();
+        DataComponentMap eqComp = stack.getComponents();
         if (eqComp != null) {
             // DEBUG: print the component data
             DetailArmorBar.LOGGER.info("Equippable component for {}: {}", stack, eqComp);

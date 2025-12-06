@@ -2,7 +2,7 @@ package com.redlimerl.detailab.api;
 
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.data.ArmorBarLoader;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 import java.util.HashMap;
 import java.util.Map;
 

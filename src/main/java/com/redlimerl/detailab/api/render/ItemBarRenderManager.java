@@ -3,7 +3,7 @@ package com.redlimerl.detailab.api.render;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.redlimerl.detailab.data.ArmorBarCodecs;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -23,12 +23,12 @@ public class ItemBarRenderManager implements BarRenderManager {
     private final boolean isShown;
 
     public ItemBarRenderManager(Identifier texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull,
-                                 TextureOffset textureOffsetOutline, boolean isShown) {
+                                TextureOffset textureOffsetOutline, boolean isShown) {
         this(texture, textureWidth, textureHeight, textureOffsetFull, textureOffsetOutline, isShown, Color.WHITE);
     }
 
     public ItemBarRenderManager(Identifier texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull,
-                                 TextureOffset textureOffsetOutline, boolean isShown, Color color) {
+                                TextureOffset textureOffsetOutline, boolean isShown, Color color) {
         this(new Texture(texture, textureWidth, textureHeight, textureOffsetFull), new Texture(texture, textureWidth, textureHeight, textureOffsetOutline),
                 isShown, color);
     }

@@ -8,11 +8,11 @@ import com.redlimerl.detailab.config.DetailArmorBarConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.component.type.DyedColorComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +24,7 @@ public class DetailArmorBar implements ClientModInitializer {
 
     public static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
     public static String MOD_ID = "detailab";
-    public static Identifier GUI_ARMOR_BAR = Identifier.of(MOD_ID, "textures/armor_bar.png");
+    public static Identifier GUI_ARMOR_BAR = Identifier.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
     private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;
@@ -46,7 +46,7 @@ public class DetailArmorBar implements ClientModInitializer {
     }
 
     public void onInitializeClient() {
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(DetailArmorBarAPI.LOADER);
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(DetailArmorBarAPI.LOADER);
 
         TextureOffset outline = new TextureOffset(9, 0);
         TextureOffset outlineHalf = new TextureOffset(27, 0);
@@ -96,7 +96,7 @@ public class DetailArmorBar implements ClientModInitializer {
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.LEATHER_HELMET, Items.LEATHER_LEGGINGS, Items.LEATHER_CHESTPLATE, Items.LEATHER_BOOTS)
                 .render((ItemStack itemStack) -> {
-                    var leatherArmor = DyedColorComponent.getColor(itemStack, -6265536);
+                    var leatherArmor = DyedItemColor.getOrDefault(itemStack, -6265536);
                     var color = new Color(leatherArmor);
                     return new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                                     new TextureOffset(117, 9 + isVanillaTexture()), new TextureOffset(108, 9 + isVanillaTexture()), outline, outlineHalf, color);

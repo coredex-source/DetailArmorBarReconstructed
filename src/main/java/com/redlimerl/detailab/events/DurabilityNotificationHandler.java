@@ -4,14 +4,14 @@ import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.DurabilityThreshold;
 import com.redlimerl.detailab.render.ArmorBarRenderer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.Component;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class DurabilityNotificationHandler {
                 return;
             }
             
-            PlayerEntity player = client.player;
+            Player player = client.player;
             if (player == null) {
                 return;
             }
@@ -52,14 +52,14 @@ public class DurabilityNotificationHandler {
         });
     }
 
-    private static void checkArmorDurability(PlayerEntity player, MinecraftClient client) {
+    private static void checkArmorDurability(Player player, Minecraft client) {
         EquipmentSlot[] armorSlots = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
         
         for (EquipmentSlot slot : armorSlots) {
-            ItemStack currentItem = player.getEquippedStack(slot);
+            ItemStack currentItem = player.getItemBySlot(slot);
             ItemStack lastItem = lastKnownItems.get(slot);
 
-            if (!ItemStack.areItemsEqual(currentItem, lastItem) || 
+            if (!ItemStack.isSameItem(currentItem, lastItem) ||
                 (currentItem.isEmpty() != lastItem.isEmpty())) {
                 resetThresholdsForSlot(slot);
                 lastKnownItems.put(slot, currentItem.copy());
@@ -69,7 +69,7 @@ public class DurabilityNotificationHandler {
                 continue;
             }
             
-            float durabilityPercent = 1.0f - ((float) currentItem.getDamage() / (float) currentItem.getMaxDamage());
+            float durabilityPercent = 1.0f - ((float) currentItem.getDamageValue() / (float) currentItem.getMaxDamage());
             durabilityPercent *= 100;
             checkThreshold(slot, currentItem, durabilityPercent, DurabilityThreshold.HALF, 50, client);
             checkThreshold(slot, currentItem, durabilityPercent, DurabilityThreshold.QUARTER, 25, client);
@@ -78,8 +78,8 @@ public class DurabilityNotificationHandler {
         }
     }
     
-    private static void checkThreshold(EquipmentSlot slot, ItemStack item, float durabilityPercent, 
-                                        DurabilityThreshold threshold, float thresholdValue, MinecraftClient client) {
+    private static void checkThreshold(EquipmentSlot slot, ItemStack item, float durabilityPercent,
+                                       DurabilityThreshold threshold, float thresholdValue, Minecraft client) {
         if (!isThresholdEnabled(threshold)) {
             return;
         }
@@ -122,8 +122,8 @@ public class DurabilityNotificationHandler {
         };
     }
     
-    private static void triggerNotification(EquipmentSlot slot, ItemStack item, DurabilityThreshold threshold, 
-                                            float durabilityPercent, MinecraftClient client) {
+    private static void triggerNotification(EquipmentSlot slot, ItemStack item, DurabilityThreshold threshold,
+                                            float durabilityPercent, Minecraft client) {
         long currentTick = DetailArmorBar.getTicks();
         switch (threshold) {
             case HALF -> LAST_WARNING_50 = currentTick;
@@ -135,10 +135,10 @@ public class DurabilityNotificationHandler {
         
         if (getConfig().getOptions().toggleDurabilitySoundNotification && client.player != null) {
             var sound = switch (threshold) {
-                case CRITICAL -> SoundEvents.BLOCK_ANVIL_LAND;
-                case LOW -> SoundEvents.BLOCK_NOTE_BLOCK_BASS.value();
-                case QUARTER -> SoundEvents.BLOCK_NOTE_BLOCK_PLING.value();
-                case HALF -> SoundEvents.BLOCK_NOTE_BLOCK_HAT.value();
+                case CRITICAL -> SoundEvents.ANVIL_LAND;
+                case LOW -> SoundEvents.NOTE_BLOCK_BASS.value();
+                case QUARTER -> SoundEvents.NOTE_BLOCK_PLING.value();
+                case HALF -> SoundEvents.NOTE_BLOCK_HAT.value();
             };
             
             float volume = switch (threshold) {
@@ -148,12 +148,12 @@ public class DurabilityNotificationHandler {
                 case HALF -> 0.2f;
             };
             
-            if (client.world != null) {
-                client.world.playSound(
+            if (client.level != null) {
+                client.level.playSound(
                     client.player,
-                    client.player.getBlockPos(),
+                    client.player.blockPosition(),
                     sound,
-                    SoundCategory.PLAYERS,
+                    SoundSource.PLAYERS,
                     volume,
                     1.0f
                 );
@@ -161,21 +161,21 @@ public class DurabilityNotificationHandler {
         }
         
         if (getConfig().getOptions().toggleDurabilityToastNotification) {
-            String itemName = item.getName().getString();
+            String itemName = item.getHoverName().getString();
             int durabilityRemaining = (int) durabilityPercent;
             
-            Text title = switch (threshold) {
-                case CRITICAL -> Text.translatable("notification.detailarmorbar.durability.critical.title");
-                case LOW -> Text.translatable("notification.detailarmorbar.durability.low.title");
-                case QUARTER -> Text.translatable("notification.detailarmorbar.durability.quarter.title");
-                case HALF -> Text.translatable("notification.detailarmorbar.durability.half.title");
+            Component title = switch (threshold) {
+                case CRITICAL -> Component.translatable("notification.detailarmorbar.durability.critical.title");
+                case LOW -> Component.translatable("notification.detailarmorbar.durability.low.title");
+                case QUARTER -> Component.translatable("notification.detailarmorbar.durability.quarter.title");
+                case HALF -> Component.translatable("notification.detailarmorbar.durability.half.title");
             };
             
-            Text description = Text.translatable("notification.detailarmorbar.durability.description", itemName, durabilityRemaining);
+            Component description = Component.translatable("notification.detailarmorbar.durability.description", itemName, durabilityRemaining);
             
-            SystemToast.show(
+            SystemToast.addOrUpdate(
                 client.getToastManager(),
-                SystemToast.Type.PERIODIC_NOTIFICATION,
+                SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
                 title,
                 description
             );

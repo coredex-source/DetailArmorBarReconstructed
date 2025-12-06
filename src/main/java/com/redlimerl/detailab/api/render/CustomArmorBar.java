@@ -2,8 +2,8 @@ package com.redlimerl.detailab.api.render;
 
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.render.InGameDrawer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.item.ItemStack;
 import java.awt.*;
 import java.util.function.Function;
 
@@ -29,7 +29,7 @@ public class CustomArmorBar {
         this.predicate = predicate;
     }
 
-    public void draw(ItemStack itemStack, DrawContext context, int xPos, int yPos, boolean isHalf, boolean isMirror) {
+    public void draw(ItemStack itemStack, GuiGraphics context, int xPos, int yPos, boolean isHalf, boolean isMirror) {
         BarRenderManager renderInfo = predicate.apply(itemStack);
         if (renderInfo.isHidden()) return;
 
@@ -44,7 +44,7 @@ public class CustomArmorBar {
         }
     }
 
-    public void drawOutLine(ItemStack itemStack, DrawContext context, int xPos, int yPos, boolean isHalf, boolean isMirror, Color color) {
+    public void drawOutLine(ItemStack itemStack, GuiGraphics context, int xPos, int yPos, boolean isHalf, boolean isMirror, Color color) {
         BarRenderManager renderInfo = predicate.apply(itemStack);
         if (renderInfo.isHidden()) return;
 

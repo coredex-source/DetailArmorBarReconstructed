@@ -1,14 +1,14 @@
 package com.redlimerl.detailab.screen;
 
 import com.redlimerl.detailab.config.ConfigEnumType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -30,7 +30,7 @@ public class OptionsScreen extends Screen {
     }
 
     public OptionsScreen(Screen parent, OptionType optionType) {
-        super(Text.translatable("options.title"));
+        super(Component.translatable("options.title"));
         this.parent = parent;
         this.optionType = optionType;
     }
@@ -42,137 +42,137 @@ public class OptionsScreen extends Screen {
         super.init();
 
         if (optionType == OptionType.FEATURES) {
-            addDrawableChild(
-                    ButtonWidget
+            addRenderableWidget(
+                    Button
                         .builder(getToggleName("enchantments", getConfig().getOptions().toggleEnchants), (button) -> {
                             getConfig().getOptions().toggleEnchants = !getConfig().getOptions().toggleEnchants; getConfig().save();
                             button.setMessage(getToggleName("enchantments", getConfig().getOptions().toggleEnchants));
                         })
-                        .dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                        .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.enchantments")))
+                        .bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                        .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.enchantments")))
                         .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("thorns", getConfig().getOptions().toggleThorns), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("thorns", getConfig().getOptions().toggleThorns), (button) -> {
                         getConfig().getOptions().toggleThorns = !getConfig().getOptions().toggleThorns; getConfig().save();
                         button.setMessage(getToggleName("thorns", getConfig().getOptions().toggleThorns));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.thorns")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.thorns")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("durability", getConfig().getOptions().toggleDurability), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("durability", getConfig().getOptions().toggleDurability), (button) -> {
                         getConfig().getOptions().toggleDurability = !getConfig().getOptions().toggleDurability; getConfig().save();
                         button.setMessage(getToggleName("durability", getConfig().getOptions().toggleDurability));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.durability")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.durability")))
                             .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("mending", getConfig().getOptions().toggleMending), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("mending", getConfig().getOptions().toggleMending), (button) -> {
                         getConfig().getOptions().toggleMending = !getConfig().getOptions().toggleMending; getConfig().save();
                         button.setMessage(getToggleName("mending", getConfig().getOptions().toggleMending));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.mending")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.mending")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("armor_types", getConfig().getOptions().toggleArmorTypes), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("armor_types", getConfig().getOptions().toggleArmorTypes), (button) -> {
                         getConfig().getOptions().toggleArmorTypes = !getConfig().getOptions().toggleArmorTypes; getConfig().save();
                         button.setMessage(getToggleName("armor_types", getConfig().getOptions().toggleArmorTypes));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.armor_types")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.armor_types")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("item_types", getConfig().getOptions().toggleItemBar), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("item_types", getConfig().getOptions().toggleItemBar), (button) -> {
                         getConfig().getOptions().toggleItemBar = !getConfig().getOptions().toggleItemBar; getConfig().save();
                         button.setMessage(getToggleName("item_types", getConfig().getOptions().toggleItemBar));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.item_types")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.item_types")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("empty_bar", getConfig().getOptions().toggleEmptyBar), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("empty_bar", getConfig().getOptions().toggleEmptyBar), (button) -> {
                         getConfig().getOptions().toggleEmptyBar = !getConfig().getOptions().toggleEmptyBar; getConfig().save();
                         button.setMessage(getToggleName("empty_bar", getConfig().getOptions().toggleEmptyBar));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.empty_bar")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.empty_bar")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("align_enchantments", getConfig().getOptions().toggleAlignEnchantments), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("align_enchantments", getConfig().getOptions().toggleAlignEnchantments), (button) -> {
                         getConfig().getOptions().toggleAlignEnchantments = !getConfig().getOptions().toggleAlignEnchantments; getConfig().save();
                         button.setMessage(getToggleName("align_enchantments", getConfig().getOptions().toggleAlignEnchantments));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.align_enchantments")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.align_enchantments")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("uniform_color", getConfig().getOptions().toggleUniformColor), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("uniform_color", getConfig().getOptions().toggleUniformColor), (button) -> {
                         getConfig().getOptions().toggleUniformColor = !getConfig().getOptions().toggleUniformColor; getConfig().save();
                         button.setMessage(getToggleName("uniform_color", getConfig().getOptions().toggleUniformColor));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.uniform_color")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.uniform_color")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("armor_trims", getConfig().getOptions().toggleArmorTrims), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("armor_trims", getConfig().getOptions().toggleArmorTrims), (button) -> {
                         getConfig().getOptions().toggleArmorTrims = !getConfig().getOptions().toggleArmorTrims; getConfig().save();
                         button.setMessage(getToggleName("armor_trims", getConfig().getOptions().toggleArmorTrims));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.armor_trims")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.armor_trims")))
                     .build()
             );
             buttonCount++;
         }
 
         if (optionType == OptionType.ANIMATION) {
-            addDrawableChild(ButtonWidget.builder(getEnumName("effect_type", getConfig().getOptions().effectType), (button) -> {
+            addRenderableWidget(Button.builder(getEnumName("effect_type", getConfig().getOptions().effectType), (button) -> {
                         getConfig().getOptions().effectType = getEnumNext(getConfig().getOptions().effectType);
                         getConfig().save();
                         button.setMessage(getEnumName("effect_type", getConfig().getOptions().effectType));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.literal(getEnumDescription("effect_type", getConfig().getOptions().effectType))))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.literal(getEnumDescription("effect_type", getConfig().getOptions().effectType))))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getEnumName("effect_speed", getConfig().getOptions().effectSpeed), (button) -> {
+            addRenderableWidget(Button.builder(getEnumName("effect_speed", getConfig().getOptions().effectSpeed), (button) -> {
                         getConfig().getOptions().effectSpeed = getEnumNext(getConfig().getOptions().effectSpeed);
                         getConfig().save();
                         button.setMessage(getEnumName("effect_speed", getConfig().getOptions().effectSpeed));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.literal(getEnumDescription("effect_speed", getConfig().getOptions().effectSpeed))))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.literal(getEnumDescription("effect_speed", getConfig().getOptions().effectSpeed))))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getEnumName("thorn", getConfig().getOptions().effectThorn), (button) -> {
+            addRenderableWidget(Button.builder(getEnumName("thorn", getConfig().getOptions().effectThorn), (button) -> {
                         getConfig().getOptions().effectThorn = getEnumNext(getConfig().getOptions().effectThorn);
                         getConfig().save();
                         button.setMessage(getEnumName("thorn", getConfig().getOptions().effectThorn));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.literal(getEnumDescription("thorn", getConfig().getOptions().effectThorn))))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.literal(getEnumDescription("thorn", getConfig().getOptions().effectThorn))))
                             .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getUniformColorName("uniform_color", getConfig().getOptions().uniformColorType), (button) -> {
+            addRenderableWidget(Button.builder(getUniformColorName("uniform_color", getConfig().getOptions().uniformColorType), (button) -> {
                     getConfig().getOptions().uniformColorType = getUniformColorNext(getConfig().getOptions().uniformColorType);
                     getConfig().save();
                     button.setMessage(getUniformColorName("uniform_color", getConfig().getOptions().uniformColorType));
-                }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                        .tooltip(Tooltip.of(Text.literal(getUniformColorDescription("uniform_color", getConfig().getOptions().uniformColorType))))
+                }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                        .tooltip(Tooltip.create(Component.literal(getUniformColorDescription("uniform_color", getConfig().getOptions().uniformColorType))))
                 .build()
             );
             buttonCount++;
@@ -180,11 +180,11 @@ public class OptionsScreen extends Screen {
 
         if (optionType == OptionType.POSITIONING) {
             // X Offset button - opens text input dialog
-            addDrawableChild(ButtonWidget.builder(Text.literal("X Offset: " + getConfig().getOptions().armorBarOffsetX), (button) -> {
-                if (client != null) {
-                    client.setScreen(new TextInputScreen(
+            addRenderableWidget(Button.builder(Component.literal("X Offset: " + getConfig().getOptions().armorBarOffsetX), (button) -> {
+                if (minecraft != null) {
+                    minecraft.setScreen(new TextInputScreen(
                         this,
-                        Text.literal("X Offset"),
+                        Component.literal("X Offset"),
                         String.valueOf(getConfig().getOptions().armorBarOffsetX),
                         (value) -> {
                             getConfig().getOptions().armorBarOffsetX = value;
@@ -192,18 +192,18 @@ public class OptionsScreen extends Screen {
                         }
                     ));
                 }
-            }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                    .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.positioning.offset_x")))
+            }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.positioning.offset_x")))
                     .build()
             );
             buttonCount++;
 
             // Y Offset button - opens text input dialog
-            addDrawableChild(ButtonWidget.builder(Text.literal("Y Offset: " + getConfig().getOptions().armorBarOffsetY), (button) -> {
-                if (client != null) {
-                    client.setScreen(new TextInputScreen(
+            addRenderableWidget(Button.builder(Component.literal("Y Offset: " + getConfig().getOptions().armorBarOffsetY), (button) -> {
+                if (minecraft != null) {
+                    minecraft.setScreen(new TextInputScreen(
                         this,
-                        Text.literal("Y Offset"),
+                        Component.literal("Y Offset"),
                         String.valueOf(getConfig().getOptions().armorBarOffsetY),
                         (value) -> {
                             getConfig().getOptions().armorBarOffsetY = value;
@@ -211,198 +211,198 @@ public class OptionsScreen extends Screen {
                         }
                     ));
                 }
-            }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                    .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.positioning.offset_y")))
+            }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.positioning.offset_y")))
                     .build()
             );
             buttonCount++;
 
             // Reset button
-            addDrawableChild(ButtonWidget.builder(Text.translatable("option.detailarmorbar.positioning.reset"), (button) -> {
+            addRenderableWidget(Button.builder(Component.translatable("option.detailarmorbar.positioning.reset"), (button) -> {
                 getConfig().getOptions().armorBarOffsetX = 0;
                 getConfig().getOptions().armorBarOffsetY = 0;
                 getConfig().save();
                 // Force re-initialization to update button labels
-                if (client != null) {
-                    client.setScreen(new OptionsScreen(parent, OptionType.POSITIONING));
+                if (minecraft != null) {
+                    minecraft.setScreen(new OptionsScreen(parent, OptionType.POSITIONING));
                 }
-            }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                    .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.positioning.reset")))
+            }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.positioning.reset")))
                     .build()
             );
             buttonCount++;
         }
 
         if (optionType == OptionType.DURABILITY) {
-            addDrawableChild(ButtonWidget.builder(getToggleName("durability_notifications", getConfig().getOptions().toggleDurabilityNotifications), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("durability_notifications", getConfig().getOptions().toggleDurabilityNotifications), (button) -> {
                         getConfig().getOptions().toggleDurabilityNotifications = !getConfig().getOptions().toggleDurabilityNotifications; getConfig().save();
                         button.setMessage(getToggleName("durability_notifications", getConfig().getOptions().toggleDurabilityNotifications));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.durability_notifications")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.durability_notifications")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("repeated_notifications", getConfig().getOptions().toggleRepeatedDurabilityNotifications), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("repeated_notifications", getConfig().getOptions().toggleRepeatedDurabilityNotifications), (button) -> {
                         getConfig().getOptions().toggleRepeatedDurabilityNotifications = !getConfig().getOptions().toggleRepeatedDurabilityNotifications; getConfig().save();
                         button.setMessage(getToggleName("repeated_notifications", getConfig().getOptions().toggleRepeatedDurabilityNotifications));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.repeated_notifications")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.repeated_notifications")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("sound_notification", getConfig().getOptions().toggleDurabilitySoundNotification), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("sound_notification", getConfig().getOptions().toggleDurabilitySoundNotification), (button) -> {
                         getConfig().getOptions().toggleDurabilitySoundNotification = !getConfig().getOptions().toggleDurabilitySoundNotification; getConfig().save();
                         button.setMessage(getToggleName("sound_notification", getConfig().getOptions().toggleDurabilitySoundNotification));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.sound_notification")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.sound_notification")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("toast_notification", getConfig().getOptions().toggleDurabilityToastNotification), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("toast_notification", getConfig().getOptions().toggleDurabilityToastNotification), (button) -> {
                         getConfig().getOptions().toggleDurabilityToastNotification = !getConfig().getOptions().toggleDurabilityToastNotification; getConfig().save();
                         button.setMessage(getToggleName("toast_notification", getConfig().getOptions().toggleDurabilityToastNotification));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.toast_notification")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.toast_notification")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("visual_effect", getConfig().getOptions().toggleDurabilityVisualEffect), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("visual_effect", getConfig().getOptions().toggleDurabilityVisualEffect), (button) -> {
                         getConfig().getOptions().toggleDurabilityVisualEffect = !getConfig().getOptions().toggleDurabilityVisualEffect; getConfig().save();
                         button.setMessage(getToggleName("visual_effect", getConfig().getOptions().toggleDurabilityVisualEffect));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.visual_effect")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.visual_effect")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("threshold_50", getConfig().getOptions().toggleThreshold50), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("threshold_50", getConfig().getOptions().toggleThreshold50), (button) -> {
                         getConfig().getOptions().toggleThreshold50 = !getConfig().getOptions().toggleThreshold50; getConfig().save();
                         button.setMessage(getToggleName("threshold_50", getConfig().getOptions().toggleThreshold50));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.threshold_50")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.threshold_50")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("threshold_25", getConfig().getOptions().toggleThreshold25), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("threshold_25", getConfig().getOptions().toggleThreshold25), (button) -> {
                         getConfig().getOptions().toggleThreshold25 = !getConfig().getOptions().toggleThreshold25; getConfig().save();
                         button.setMessage(getToggleName("threshold_25", getConfig().getOptions().toggleThreshold25));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.threshold_25")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.threshold_25")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("threshold_10", getConfig().getOptions().toggleThreshold10), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("threshold_10", getConfig().getOptions().toggleThreshold10), (button) -> {
                         getConfig().getOptions().toggleThreshold10 = !getConfig().getOptions().toggleThreshold10; getConfig().save();
                         button.setMessage(getToggleName("threshold_10", getConfig().getOptions().toggleThreshold10));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.threshold_10")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.threshold_10")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("threshold_5", getConfig().getOptions().toggleThreshold5), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("threshold_5", getConfig().getOptions().toggleThreshold5), (button) -> {
                         getConfig().getOptions().toggleThreshold5 = !getConfig().getOptions().toggleThreshold5; getConfig().save();
                         button.setMessage(getToggleName("threshold_5", getConfig().getOptions().toggleThreshold5));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.threshold_5")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.threshold_5")))
                     .build()
             );
             buttonCount++;
         }
 
         if (optionType == OptionType.ETC) {
-            addDrawableChild(ButtonWidget.builder(getToggleName("vanilla_texture", getConfig().getOptions().toggleVanillaTexture), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("vanilla_texture", getConfig().getOptions().toggleVanillaTexture), (button) -> {
                         getConfig().getOptions().toggleVanillaTexture = !getConfig().getOptions().toggleVanillaTexture; getConfig().save();
                         button.setMessage(getToggleName("vanilla_texture", getConfig().getOptions().toggleVanillaTexture));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.vanilla_texture")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.vanilla_texture")))
                     .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("compatible_heart_mod", getConfig().getOptions().toggleCompatibleHeartMod), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("compatible_heart_mod", getConfig().getOptions().toggleCompatibleHeartMod), (button) -> {
                         getConfig().getOptions().toggleCompatibleHeartMod = !getConfig().getOptions().toggleCompatibleHeartMod; getConfig().save();
                         button.setMessage(getToggleName("compatible_heart_mod", getConfig().getOptions().toggleCompatibleHeartMod));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.compatible_heart_mod")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.compatible_heart_mod")))
                             .build()
             );
             buttonCount++;
 
-            addDrawableChild(ButtonWidget.builder(getToggleName("inverse_slot", getConfig().getOptions().toggleInverseSlot), (button) -> {
+            addRenderableWidget(Button.builder(getToggleName("inverse_slot", getConfig().getOptions().toggleInverseSlot), (button) -> {
                         getConfig().getOptions().toggleInverseSlot = !getConfig().getOptions().toggleInverseSlot; getConfig().save();
                         button.setMessage(getToggleName("inverse_slot", getConfig().getOptions().toggleInverseSlot));
-                    }).dimensions(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
-                            .tooltip(Tooltip.of(Text.translatable("context.detailarmorbar.toggle.inverse_slot")))
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.inverse_slot")))
                             .build()
             );
             buttonCount++;
         }
 
-        ButtonWidget features = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("option.detailarmorbar.title.features"), (matrixStack) -> {
-            if (client != null) {
-                client.setScreen(new OptionsScreen(parent, OptionType.FEATURES));
+        Button features = addRenderableWidget(Button.builder(
+                Component.translatable("option.detailarmorbar.title.features"), (matrixStack) -> {
+            if (minecraft != null) {
+                minecraft.setScreen(new OptionsScreen(parent, OptionType.FEATURES));
             }
-        }).dimensions(width / 2 - 152, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 - 152, height / 6 + 140, 60, 20).build());
         features.active = optionType != OptionType.FEATURES;
 
-        ButtonWidget animation = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("option.detailarmorbar.title.animation"), (matrixStack) -> {
-            if (client != null) {
-                client.setScreen(new OptionsScreen(parent, OptionType.ANIMATION));
+        Button animation = addRenderableWidget(Button.builder(
+                Component.translatable("option.detailarmorbar.title.animation"), (matrixStack) -> {
+            if (minecraft != null) {
+                minecraft.setScreen(new OptionsScreen(parent, OptionType.ANIMATION));
             }
-        }).dimensions(width / 2 - 90, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 - 90, height / 6 + 140, 60, 20).build());
         animation.active = optionType != OptionType.ANIMATION;
 
-        ButtonWidget positioning = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("option.detailarmorbar.title.positioning"), (matrixStack) -> {
-            if (client != null) {
-                client.setScreen(new OptionsScreen(parent, OptionType.POSITIONING));
+        Button positioning = addRenderableWidget(Button.builder(
+                Component.translatable("option.detailarmorbar.title.positioning"), (matrixStack) -> {
+            if (minecraft != null) {
+                minecraft.setScreen(new OptionsScreen(parent, OptionType.POSITIONING));
             }
-        }).dimensions(width / 2 - 28, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 - 28, height / 6 + 140, 60, 20).build());
         positioning.active = optionType != OptionType.POSITIONING;
 
-        ButtonWidget durability = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("option.detailarmorbar.title.durability"), (matrixStack) -> {
-            if (client != null) {
-                client.setScreen(new OptionsScreen(parent, OptionType.DURABILITY));
+        Button durability = addRenderableWidget(Button.builder(
+                Component.translatable("option.detailarmorbar.title.durability"), (matrixStack) -> {
+            if (minecraft != null) {
+                minecraft.setScreen(new OptionsScreen(parent, OptionType.DURABILITY));
             }
-        }).dimensions(width / 2 + 34, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 + 34, height / 6 + 140, 60, 20).build());
         durability.active = optionType != OptionType.DURABILITY;
 
-        ButtonWidget etc = addDrawableChild(ButtonWidget.builder(
-                Text.translatable("option.detailarmorbar.title.etc"), (matrixStack) -> {
-            if (client != null) {
-                client.setScreen(new OptionsScreen(parent, OptionType.ETC));
+        Button etc = addRenderableWidget(Button.builder(
+                Component.translatable("option.detailarmorbar.title.etc"), (matrixStack) -> {
+            if (minecraft != null) {
+                minecraft.setScreen(new OptionsScreen(parent, OptionType.ETC));
             }
-        }).dimensions(width / 2 + 96, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 + 96, height / 6 + 140, 60, 20).build());
         etc.active = optionType != OptionType.ETC;
 
-        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (matrixStack) -> {
-            if (client != null) {
-                client.setScreen(parent);
+        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (matrixStack) -> {
+            if (minecraft != null) {
+                minecraft.setScreen(parent);
             }
-        }).dimensions(width / 2 - 100, height / 6 + 168, 200, 20).build());
+        }).bounds(width / 2 - 100, height / 6 + 168, 200, 20).build());
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         buttonCount = 0;
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 15, 16777215);
+        context.drawCenteredString(this.font, this.title, this.width / 2, 15, 16777215);
     }
 
     @Override
-    public void close() {
-        if (client != null) {
-            client.setScreen(parent);
+    public void onClose() {
+        if (minecraft != null) {
+            minecraft.setScreen(parent);
         }
     }
 
@@ -411,33 +411,33 @@ public class OptionsScreen extends Screen {
         return v.get((v.indexOf(target) + 1) % v.size());
     }
 
-    private <T extends Enum<T>> MutableText getEnumName(String type, T target) {
-        return Text.translatable("option.detailarmorbar.effects."+type)
+    private <T extends Enum<T>> MutableComponent getEnumName(String type, T target) {
+        return Component.translatable("option.detailarmorbar.effects."+type)
                 .append(": ")
-                .append(Text.translatable("option.detailarmorbar.effects."+type+"."+target.name().toLowerCase(Locale.ROOT)));
+                .append(Component.translatable("option.detailarmorbar.effects."+type+"."+target.name().toLowerCase(Locale.ROOT)));
     }
 
     private <T extends Enum<T>> String getEnumDescription(String type, T target) {
         ArrayList<String> list = new ArrayList<>();
-        for (String s : Text.translatable("context.detailarmorbar.effects." + type).getString().split("/"))
-            list.add(Text.literal("§e" + s).getString());
+        for (String s : Component.translatable("context.detailarmorbar.effects." + type).getString().split("/"))
+            list.add(Component.literal("§e" + s).getString());
 
         list.add("§f");
 
         List<T> v = EnumSet.allOf(target.getDeclaringClass()).stream().toList();
         for (T t : v) {
-            list.add(Text.literal(" ")
-                    .append(Text.translatable("option.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT)).formatted(Formatting.ITALIC))
+            list.add(Component.literal(" ")
+                    .append(Component.translatable("option.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.ITALIC))
                     .append(" - ")
-                    .append(Text.translatable("context.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT))).getString());
+                    .append(Component.translatable("context.detailarmorbar.effects."+type+"."+t.name().toLowerCase(Locale.ROOT))).getString());
         }
         return String.join("\n", list);
     }
 
-    private MutableText getToggleName(String type, boolean target) {
-        return Text.translatable("option.detailarmorbar.toggle."+type)
+    private MutableComponent getToggleName(String type, boolean target) {
+        return Component.translatable("option.detailarmorbar.toggle."+type)
                 .append(": ")
-                .append(target ? ScreenTexts.ON : ScreenTexts.OFF);
+                .append(target ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
     }
     
     // Add this helper method for uniform color enum
@@ -446,14 +446,14 @@ public class OptionsScreen extends Screen {
         return values[(value.ordinal() + 1) % values.length];
     }
     
-    private MutableText getUniformColorName(String key, ConfigEnumType.UniformColor value) {
-        return Text.translatable("option.detailarmorbar.effects." + key)
+    private MutableComponent getUniformColorName(String key, ConfigEnumType.UniformColor value) {
+        return Component.translatable("option.detailarmorbar.effects." + key)
                 .append(": ")
-                .append(Text.translatable("option.detailarmorbar.effects." + key + "." + value.name().toLowerCase(Locale.ROOT)));
+                .append(Component.translatable("option.detailarmorbar.effects." + key + "." + value.name().toLowerCase(Locale.ROOT)));
     }
     
     private String getUniformColorDescription(String key, ConfigEnumType.UniformColor value) {
-        return Text.translatable("context.detailarmorbar.effects." + key + "." + value.name().toLowerCase(Locale.ROOT)).getString();
+        return Component.translatable("context.detailarmorbar.effects." + key + "." + value.name().toLowerCase(Locale.ROOT)).getString();
     }
 
 }
