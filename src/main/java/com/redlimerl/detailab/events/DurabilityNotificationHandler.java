@@ -2,8 +2,6 @@ package com.redlimerl.detailab.events;
 
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.DurabilityThreshold;
-import com.redlimerl.detailab.render.ArmorBarRenderer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -14,7 +12,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
@@ -37,22 +34,7 @@ public class DurabilityNotificationHandler {
         }
     }
 
-    public static void register() {
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (!getConfig().getOptions().toggleDurabilityNotifications) {
-                return;
-            }
-            
-            Player player = client.player;
-            if (player == null) {
-                return;
-            }
-            
-            checkArmorDurability(player, client);
-        });
-    }
-
-    private static void checkArmorDurability(Player player, Minecraft client) {
+    public static void checkArmorDurability(Player player, Minecraft client) {
         EquipmentSlot[] armorSlots = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
         
         for (EquipmentSlot slot : armorSlots) {

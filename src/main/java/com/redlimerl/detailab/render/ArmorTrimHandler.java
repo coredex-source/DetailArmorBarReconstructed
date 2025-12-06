@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import net.minecraft.world.item.equipment.trim.MaterialAssetGroup;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -25,10 +25,10 @@ import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
 public class ArmorTrimHandler {
     
-    public static final Identifier TRIM_OVERLAY_TEXTURE = Identifier.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "textures/armor_trim.png");
+    public static final ResourceLocation TRIM_OVERLAY_TEXTURE = ResourceLocation.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "textures/armor_trim.png");
     
     // Cache for dynamically generated colored trim textures
-    private static final Map<TrimMaterial, Identifier> COLORED_TEXTURE_CACHE = new HashMap<>();
+    private static final Map<TrimMaterial, ResourceLocation> COLORED_TEXTURE_CACHE = new HashMap<>();
     private static boolean texturesGenerated = false;
     
     /**
@@ -163,7 +163,7 @@ public class ArmorTrimHandler {
             
             for (TrimMaterial material : TrimMaterial.values()) {
                 try {
-                    Identifier coloredTextureId = generateColoredTexture(client, baseImage, material);
+                    ResourceLocation coloredTextureId = generateColoredTexture(client, baseImage, material);
                     if (coloredTextureId != null) {
                         COLORED_TEXTURE_CACHE.put(material, coloredTextureId);
                     }
@@ -181,7 +181,7 @@ public class ArmorTrimHandler {
         }
     }
     
-    private static Identifier generateColoredTexture(Minecraft client, NativeImage baseImage, TrimMaterial material) {
+    private static ResourceLocation generateColoredTexture(Minecraft client, NativeImage baseImage, TrimMaterial material) {
         int width = baseImage.getWidth();
         int height = baseImage.getHeight();
         
@@ -194,7 +194,7 @@ public class ArmorTrimHandler {
             }
         }
 
-        Identifier textureId = Identifier.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "dynamic/trim_" + material.getName());
+        ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "dynamic/trim_" + material.getName());
         DynamicTexture dynamicTexture = new DynamicTexture(() -> "trim_" + material.getName(), coloredImage);
         client.getTextureManager().register(textureId, dynamicTexture);
         
@@ -240,12 +240,12 @@ public class ArmorTrimHandler {
         return (a << 24) | (paletteColor.getRed() << 16) | (paletteColor.getGreen() << 8) | paletteColor.getBlue();
     }
     
-    public static Identifier getColoredTexture(TrimMaterial material) {
+    public static ResourceLocation getColoredTexture(TrimMaterial material) {
         if (!texturesGenerated) {
             generateColoredTextures();
         }
         
-        Identifier coloredTexture = COLORED_TEXTURE_CACHE.get(material);
+        ResourceLocation coloredTexture = COLORED_TEXTURE_CACHE.get(material);
         return coloredTexture != null ? coloredTexture : TRIM_OVERLAY_TEXTURE;
     }
     

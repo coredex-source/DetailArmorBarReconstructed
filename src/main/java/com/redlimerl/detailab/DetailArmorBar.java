@@ -5,26 +5,27 @@ import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.resources.Identifier;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLPaths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
 
-public class DetailArmorBar implements ClientModInitializer {
+@Mod(DetailArmorBar.MOD_ID)
+public class DetailArmorBar {
 
-    public static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
-    public static String MOD_ID = "detailab";
-    public static Identifier GUI_ARMOR_BAR = Identifier.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
+    public static final Logger LOGGER = LoggerFactory.getLogger("DetailArmorBar");
+    public static final String MOD_ID = "detailab";
+    public static ResourceLocation GUI_ARMOR_BAR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
     private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;
@@ -39,15 +40,21 @@ public class DetailArmorBar implements ClientModInitializer {
     }
 
     private static void loadConfig() {
-        Path configPath = FabricLoader.getInstance().getConfigDir();
+        Path configPath = FMLPaths.CONFIGDIR.get();
         File configFile = new File(configPath.toFile(), "detailarmorbar.json");
         config = new DetailArmorBarConfig(configFile);
         config.load();
     }
 
-    public void onInitializeClient() {
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(DetailArmorBarAPI.LOADER);
+    public DetailArmorBar(IEventBus modEventBus, ModContainer modContainer) {
+        // Load config on construction
+        loadConfig();
+        
+        // Register built-in armor bar renders
+        registerBuiltInArmorBars();
+    }
 
+    private void registerBuiltInArmorBars() {
         TextureOffset outline = new TextureOffset(9, 0);
         TextureOffset outlineHalf = new TextureOffset(27, 0);
 
@@ -108,18 +115,6 @@ public class DetailArmorBar implements ClientModInitializer {
             new ItemBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(36, 0), new TextureOffset(54, 0), true)
         ).register();
-
-        // Register damage event handler for thorns animation
-        com.redlimerl.detailab.events.DamageEventHandler.register();
-        
-        // Register durability notification handler
-        com.redlimerl.detailab.events.DurabilityNotificationHandler.register();
-
-        for (String compatibilityMod : compatibilityMods) {
-            if (FabricLoader.getInstance().getModContainer(compatibilityMod).isPresent()) {
-                getConfig().getOptions().toggleCompatibleHeartMod = true;
-            }
-        }
     }
 
     public static int isVanillaTexture() {

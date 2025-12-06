@@ -4,7 +4,7 @@ import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.Animation;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -954,7 +954,7 @@ public class ArmorBarRenderer {
     private void drawTrimOverlay(GuiGraphics context, int x, int y, ArmorTrimHandler.TrimMaterial material, boolean isHalf, boolean isMirror) {
         int u = isHalf ? 9 : 0;
         int v = 0;
-        Identifier textureId = ArmorTrimHandler.getColoredTexture(material);
+        ResourceLocation textureId = ArmorTrimHandler.getColoredTexture(material);
         InGameDrawer.drawTexture(textureId, context, x, y, u, v, 18, 18, Color.WHITE, isMirror);
     }
 }

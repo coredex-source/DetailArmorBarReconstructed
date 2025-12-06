@@ -47,7 +47,7 @@ public class ArmorBarBuilder {
                 DetailArmorBarAPI.staticArmorList.put(armorItem, armorBar);
             }
             if (armor.length != 0) {
-                DetailArmorBar.LOGGER.log(Level.INFO, "Successfully registered '"+ BuiltInRegistries.ITEM.getKey(armor[0]) + (armor.length > 1 ? "' and "+(armor.length-1)+" more items" : "'") + "!");
+                DetailArmorBar.LOGGER.info("Successfully registered '"+ BuiltInRegistries.ITEM.getKey(armor[0]) + (armor.length > 1 ? "' and "+(armor.length-1)+" more items" : "'") + "!");
             }
         } catch (Exception e) {
             throw new IllegalStateException("Not all items have been initialized");

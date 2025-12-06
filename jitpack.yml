@@ -1,3 +1,6 @@
+jdk:
+  - openjdk21
+
 before_install:
-  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
-  - source install-jdk.sh --feature 16
+  - sdk install java 21.0.1-open
+  - sdk use java 21.0.1-open

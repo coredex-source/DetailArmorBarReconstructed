@@ -11,7 +11,6 @@ import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.render.ArmorTrimHandler;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,13 +18,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
 import java.util.Optional;
 
-public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement> implements IdentifiableResourceReloadListener {
+public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement> {
 
     private static final Codec<JsonElement> JSON_CODEC = Codec.PASSTHROUGH.xmap(
             dynamic -> dynamic.convert(JsonOps.INSTANCE).getValue(),
@@ -52,12 +51,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
     }
 
     @Override
-    public Identifier getFabricId() {
-        return Identifier.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "armor");
-    }
-
-    @Override
-    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
+    protected void apply(Map<ResourceLocation, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         ImmutableMap.Builder<Item, CustomArmorBar> armorBuilder =
                 ImmutableMap.<Item, CustomArmorBar>builder().putAll(DetailArmorBarAPI.getStaticArmorBarList());
 
@@ -80,7 +74,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
                 }
 
                 if(type.equals("armor")) {
-                    Optional<Item[]> items = Codec.list(Identifier.CODEC)
+                    Optional<Item[]> items = Codec.list(ResourceLocation.CODEC)
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in armor definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
@@ -103,7 +97,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
                             () -> DetailArmorBar.LOGGER.error("Invalid or empty item list in armor definition {}", id));
 
                 } else if (type.equals("item")) {
-                    Optional<Item[]> items = Codec.list(Identifier.CODEC)
+                    Optional<Item[]> items = Codec.list(ResourceLocation.CODEC)
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in item definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
