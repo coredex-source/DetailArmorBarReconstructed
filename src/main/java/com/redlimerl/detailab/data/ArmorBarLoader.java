@@ -1,6 +1,8 @@
 package com.redlimerl.detailab.data;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
@@ -16,7 +18,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
-import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -24,18 +25,15 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.Map;
 import java.util.Optional;
 
-public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement> {
+public class ArmorBarLoader extends SimpleJsonResourceReloadListener {
 
-    private static final Codec<JsonElement> JSON_CODEC = Codec.PASSTHROUGH.xmap(
-            dynamic -> dynamic.convert(JsonOps.INSTANCE).getValue(),
-            json -> new Dynamic<>(JsonOps.INSTANCE, json)
-    );
+    private static final Gson GSON = new GsonBuilder().create();
 
     private Map<Item, CustomArmorBar> armorList;
     private Map<Item, CustomArmorBar> itemList;
 
     public ArmorBarLoader() {
-        super(JSON_CODEC, FileToIdConverter.json("armor_bar"));
+        super(GSON, "armor_bar");
     }
 
     public Map<Item, CustomArmorBar> getArmorList() {
@@ -78,7 +76,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in armor definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
-                                    .map(itemId -> new ItemStack(BuiltInRegistries.ITEM.getValue(itemId)))
+                                    .map(itemId -> new ItemStack(BuiltInRegistries.ITEM.get(itemId)))
                                     .filter(this::filterAndLogArmor)
                                     .toArray(Item[]::new));
 
@@ -101,7 +99,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in item definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
-                                    .map(BuiltInRegistries.ITEM::getValue)
+                                    .map(BuiltInRegistries.ITEM::get)
                                     .toArray(Item[]::new));
 
                     Optional<ItemBarRenderManager> renderer = ItemBarRenderManager.CODEC.decode(JsonOps.INSTANCE, rendererJson)

@@ -5,13 +5,13 @@ import com.redlimerl.detailab.events.DamageEventHandler;
 import com.redlimerl.detailab.events.DurabilityNotificationHandler;
 import com.redlimerl.detailab.screen.OptionsScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
@@ -37,9 +37,9 @@ public class DetailArmorBarClient {
         DetailArmorBar.LOGGER.info("Detail Armor Bar Reconstructed client setup complete!");
     }
     
-    private void registerReloadListeners(AddClientReloadListenersEvent event) {
+    private void registerReloadListeners(RegisterClientReloadListenersEvent event) {
         // Register the armor bar loader as a resource reload listener
-        event.addListener(ResourceLocation.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "armor_bar_loader"), DetailArmorBarAPI.LOADER);
+        event.registerReloadListener(DetailArmorBarAPI.LOADER);
     }
     
     // Client tick counter for thorns and damage event tracking

@@ -94,13 +94,6 @@ public class DetailArmorBar {
                     new TextureOffset(99, 9 + isVanillaTexture()), new TextureOffset(90, 9 + isVanillaTexture()), outline, outlineHalf)
         ).register();
 
-        //Shifted it down to match the portion in armor_bar.png .. Just for my ease of development.
-        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.COPPER_HELMET, Items.COPPER_LEGGINGS, Items.COPPER_CHESTPLATE, Items.COPPER_BOOTS)
-                .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-                    new TextureOffset(9, 74 + isVanillaTexture()), new TextureOffset(0, 74 + isVanillaTexture()), outline, outlineHalf)
-        ).register();
-
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.LEATHER_HELMET, Items.LEATHER_LEGGINGS, Items.LEATHER_CHESTPLATE, Items.LEATHER_BOOTS)
                 .render((ItemStack itemStack) -> {
                     var leatherArmor = DyedItemColor.getOrDefault(itemStack, -6265536);

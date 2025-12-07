@@ -1,5 +1,6 @@
 package com.redlimerl.detailab.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
@@ -9,9 +10,10 @@ import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.equipment.Equippable;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -241,15 +243,12 @@ public class ArmorBarRenderer {
             EquipmentSlot slot = pair.getA();
             if (!itemStack.isEmpty()) {
                 if (itemStack.getMaxDamage() != 0 && ((itemStack.getDamageValue() * 100f) / (itemStack.getMaxDamage() * 100f)) >= 0.92f) {
-                    if(itemStack.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
-                        ItemAttributeModifiers component = itemStack.get(DataComponents.ATTRIBUTE_MODIFIERS);
-                        assert component != null;
-                        count += component.modifiers().stream()
-                                .filter((attr) -> attr.attribute().equals(Attributes.ARMOR) && attr.slot().slots().contains(slot))
-                                .findFirst()
-                                .map(x -> x.modifier().amount())
-                                .orElse(0.0);
-                    }
+                    var modifiers = itemStack.getAttributeModifiers();
+                    count += modifiers.modifiers().stream()
+                            .filter((attr) -> attr.attribute().is(Attributes.ARMOR) && attr.slot().test(slot))
+                            .findFirst()
+                            .map(x -> x.modifier().amount())
+                            .orElse(0.0);
                 }
             }
         }
@@ -262,20 +261,19 @@ public class ArmorBarRenderer {
         int sumArmor = 0;
 
         // Stats from equipment
-        for (var slot : EquipmentSlot.VALUES) {
+        for (var slot : EquipmentSlot.values()) {
             var itemStack = player.getItemBySlot(slot);
             if(itemStack.isEmpty()){
                 continue;
             }
 
-            var component = itemStack.get(DataComponents.ATTRIBUTE_MODIFIERS);
-            if (component != null) {
+            var modifiers = itemStack.getAttributeModifiers();
+            var defense = getDefense(itemStack, slot);
+            if (defense > 0) {
                 // Handle regular armor items (assign a type based on their material)
                 CustomArmorBar barData = getConfig().getOptions().toggleArmorTypes
                     ? DetailArmorBarAPI.getArmorBarList().getOrDefault(itemStack.getItem(), CustomArmorBar.DEFAULT)
                     : CustomArmorBar.DEFAULT;
-
-                var defense = getDefense(itemStack, slot);
                 sumArmor += defense;
                 for (int i = 0; i < defense; i++) {
                     armorPoints.add(new Tuple<>(itemStack, barData));
@@ -284,9 +282,11 @@ public class ArmorBarRenderer {
 
             // Special items (equippable with effects not described by the attribute system).
             if (getConfig().getOptions().toggleItemBar && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
-                // Only show items on the bar if they are unequippable or equipped to the correct slot.
-                var equippableComponent = itemStack.get(DataComponents.EQUIPPABLE);
-                if(!(equippableComponent == null || equippableComponent.slot() == slot)){ continue; }
+                if (itemStack.getItem() instanceof ArmorItem armorItem) {
+                    if (armorItem.getEquipmentSlot() != slot) continue;
+                } else if (itemStack.is(Items.ELYTRA) && slot != EquipmentSlot.CHEST) {
+                    continue;
+                }
 
                 var barData = DetailArmorBarAPI.getItemBarList().get(itemStack.getItem());
                 var pair = new Tuple<>(itemStack, barData);
@@ -318,9 +318,9 @@ public class ArmorBarRenderer {
     }
 
     private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
-        var modifier = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-        for (var entry : modifier.modifiers()) {
-            if (entry.slot().test(slot) && entry.attribute().equals(Attributes.ARMOR)) {
+        var modifiers = itemStack.getAttributeModifiers();
+        for (var entry : modifiers.modifiers()) {
+            if (entry.slot().test(slot) && entry.attribute().is(Attributes.ARMOR)) {
                 return (int) entry.modifier().amount();
             }
         }
@@ -436,6 +436,12 @@ public class ArmorBarRenderer {
                     Tuple<ItemStack, CustomArmorBar> am2 = armorPoints.get(count * 2 + 1 + stackRow);
                     if (am1.getB() == am2.getB()) {
                         am1.getB().draw(am1.getA(), context, xPos, yPos, false, false);
+                    } else if (am2.getB() == CustomArmorBar.EMPTY) {
+                        CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
+                        am1.getB().draw(am1.getA(), context, xPos, yPos, true, false);
+                    } else if (am1.getB() == CustomArmorBar.EMPTY) {
+                        CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
+                        am2.getB().draw(am2.getA(), context, xPos, yPos, true, true);
                     } else {
                         am2.getB().draw(am2.getA(), context, xPos, yPos, true, true);
                         am1.getB().draw(am1.getA(), context, xPos, yPos, true, false);
@@ -446,8 +452,8 @@ public class ArmorBarRenderer {
                     }
                 }
                 if (count * 2 + 1 + stackRow == totalArmorPoint) {
-                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
                     Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
+                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
                     am.getB().draw(am.getA(), context, xPos, yPos, true, false);
                     // Draw sparkle overlay for item with mending
                     if (getConfig().getOptions().toggleMending && hasMendingEnchant(am.getA())) {
@@ -525,10 +531,9 @@ public class ArmorBarRenderer {
         if (getConfig().getOptions().toggleDurability) {
             List<Tuple<EquipmentSlot, ItemStack>> equipment = new ArrayList<>();
 
-            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
+            for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
                 ItemStack itemStack = player.getItemBySlot(equipmentSlot);
-                Equippable equippableComponent = itemStack.get(DataComponents.EQUIPPABLE);
-                if (equippableComponent != null && equippableComponent.slot() == equipmentSlot) {
+                if (itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == equipmentSlot) {
                     equipment.add(new Tuple<>(equipmentSlot, itemStack));
                 }
             }
@@ -952,9 +957,22 @@ public class ArmorBarRenderer {
      * @param isMirror Whether to mirror the overlay (for right half)
      */
     private void drawTrimOverlay(GuiGraphics context, int x, int y, ArmorTrimHandler.TrimMaterial material, boolean isHalf, boolean isMirror) {
-        int u = isHalf ? 9 : 0;
-        int v = 0;
         ResourceLocation textureId = ArmorTrimHandler.getColoredTexture(material);
-        InGameDrawer.drawTexture(textureId, context, x, y, u, v, 18, 18, Color.WHITE, isMirror);
+        
+        if (!isHalf) {
+            InGameDrawer.drawTexture(textureId, context, x, y, 0, 0, 18, 18, Color.WHITE, false);
+        } else if (!isMirror) {
+            drawTextureRegion(textureId, context, x, y, 0, 0, 5, 9, 18, 18, Color.WHITE);
+        } else {
+            drawTextureRegion(textureId, context, x + 5, y, 5, 0, 4, 9, 18, 18, Color.WHITE);
+        }
+    }
+    private void drawTextureRegion(ResourceLocation identifier, GuiGraphics context, int x, int y, int u, int v, int width, int height, int textureWidth, int textureHeight, Color color) {
+        RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.enableBlend();
+        context.blit(identifier, x, y, (float) u, (float) v, width, height, textureWidth, textureHeight);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.disableBlend();
     }
 }
