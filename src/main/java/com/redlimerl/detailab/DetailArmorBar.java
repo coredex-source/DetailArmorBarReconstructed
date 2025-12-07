@@ -12,7 +12,7 @@ import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +24,7 @@ public class DetailArmorBar implements ClientModInitializer {
 
     public static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
     public static String MOD_ID = "detailab";
-    public static Identifier GUI_ARMOR_BAR = Identifier.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
+    public static ResourceLocation GUI_ARMOR_BAR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
     private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;
@@ -85,14 +85,7 @@ public class DetailArmorBar implements ClientModInitializer {
                 .render((ItemStack itemStack) ->
             new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(99, 9 + isVanillaTexture()), new TextureOffset(90, 9 + isVanillaTexture()), outline, outlineHalf)
-        ).register();
-
-        //Shifted it down to match the portion in armor_bar.png .. Just for my ease of development.
-        DetailArmorBarAPI.customArmorBarBuilder().armor(Items.COPPER_HELMET, Items.COPPER_LEGGINGS, Items.COPPER_CHESTPLATE, Items.COPPER_BOOTS)
-                .render((ItemStack itemStack) ->
-            new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
-                    new TextureOffset(9, 74 + isVanillaTexture()), new TextureOffset(0, 74 + isVanillaTexture()), outline, outlineHalf)
-        ).register();
+        ).register();    
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.LEATHER_HELMET, Items.LEATHER_LEGGINGS, Items.LEATHER_CHESTPLATE, Items.LEATHER_BOOTS)
                 .render((ItemStack itemStack) -> {

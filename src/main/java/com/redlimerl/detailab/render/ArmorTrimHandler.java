@@ -9,10 +9,11 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.equipment.trim.ArmorTrim;
-import net.minecraft.world.item.equipment.trim.MaterialAssetGroup;
+import net.minecraft.world.item.armortrim.ArmorTrim;
+import net.minecraft.world.item.armortrim.TrimMaterials;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -25,10 +26,10 @@ import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
 public class ArmorTrimHandler {
     
-    public static final Identifier TRIM_OVERLAY_TEXTURE = Identifier.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "textures/armor_trim.png");
+    public static final ResourceLocation TRIM_OVERLAY_TEXTURE = ResourceLocation.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "textures/armor_trim.png");
     
     // Cache for dynamically generated colored trim textures
-    private static final Map<TrimMaterial, Identifier> COLORED_TEXTURE_CACHE = new HashMap<>();
+    private static final Map<TrimMaterial, ResourceLocation> COLORED_TEXTURE_CACHE = new HashMap<>();
     private static boolean texturesGenerated = false;
     
     /**
@@ -118,20 +119,19 @@ public class ArmorTrimHandler {
             return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
 
-        public static TrimMaterial fromArmorTrimAssets(MaterialAssetGroup assets) {
-            if (assets == null) return null;
+        public static TrimMaterial fromTrimMaterialKey(ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> key) {
+            if (key == null) return null;
             
-            if (assets.equals(MaterialAssetGroup.AMETHYST)) return AMETHYST;
-            if (assets.equals(MaterialAssetGroup.COPPER)) return COPPER;
-            if (assets.equals(MaterialAssetGroup.DIAMOND)) return DIAMOND;
-            if (assets.equals(MaterialAssetGroup.EMERALD)) return EMERALD;
-            if (assets.equals(MaterialAssetGroup.GOLD)) return GOLD;
-            if (assets.equals(MaterialAssetGroup.IRON)) return IRON;
-            if (assets.equals(MaterialAssetGroup.LAPIS)) return LAPIS;
-            if (assets.equals(MaterialAssetGroup.NETHERITE)) return NETHERITE;
-            if (assets.equals(MaterialAssetGroup.QUARTZ)) return QUARTZ;
-            if (assets.equals(MaterialAssetGroup.REDSTONE)) return REDSTONE;
-            if (assets.equals(MaterialAssetGroup.RESIN)) return RESIN;
+            if (key.equals(TrimMaterials.AMETHYST)) return AMETHYST;
+            if (key.equals(TrimMaterials.COPPER)) return COPPER;
+            if (key.equals(TrimMaterials.DIAMOND)) return DIAMOND;
+            if (key.equals(TrimMaterials.EMERALD)) return EMERALD;
+            if (key.equals(TrimMaterials.GOLD)) return GOLD;
+            if (key.equals(TrimMaterials.IRON)) return IRON;
+            if (key.equals(TrimMaterials.LAPIS)) return LAPIS;
+            if (key.equals(TrimMaterials.NETHERITE)) return NETHERITE;
+            if (key.equals(TrimMaterials.QUARTZ)) return QUARTZ;
+            if (key.equals(TrimMaterials.REDSTONE)) return REDSTONE;
             
             return null;
         }
@@ -163,7 +163,7 @@ public class ArmorTrimHandler {
             
             for (TrimMaterial material : TrimMaterial.values()) {
                 try {
-                    Identifier coloredTextureId = generateColoredTexture(client, baseImage, material);
+                    ResourceLocation coloredTextureId = generateColoredTexture(client, baseImage, material);
                     if (coloredTextureId != null) {
                         COLORED_TEXTURE_CACHE.put(material, coloredTextureId);
                     }
@@ -181,21 +181,21 @@ public class ArmorTrimHandler {
         }
     }
     
-    private static Identifier generateColoredTexture(Minecraft client, NativeImage baseImage, TrimMaterial material) {
+    private static ResourceLocation generateColoredTexture(Minecraft client, NativeImage baseImage, TrimMaterial material) {
         int width = baseImage.getWidth();
         int height = baseImage.getHeight();
         
         NativeImage coloredImage = new NativeImage(width, height, false);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int pixel = baseImage.getPixel(x, y);
+                int pixel = baseImage.getPixelRGBA(x, y);
                 int newPixel = applyPaletteColor(pixel, material.getPalette());
-                coloredImage.setPixel(x, y, newPixel);
+                coloredImage.setPixelRGBA(x, y, newPixel);
             }
         }
 
-        Identifier textureId = Identifier.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "dynamic/trim_" + material.getName());
-        DynamicTexture dynamicTexture = new DynamicTexture(() -> "trim_" + material.getName(), coloredImage);
+        ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "dynamic/trim_" + material.getName());
+        DynamicTexture dynamicTexture = new DynamicTexture(coloredImage);
         client.getTextureManager().register(textureId, dynamicTexture);
         
         return textureId;
@@ -240,12 +240,12 @@ public class ArmorTrimHandler {
         return (a << 24) | (paletteColor.getRed() << 16) | (paletteColor.getGreen() << 8) | paletteColor.getBlue();
     }
     
-    public static Identifier getColoredTexture(TrimMaterial material) {
+    public static ResourceLocation getColoredTexture(TrimMaterial material) {
         if (!texturesGenerated) {
             generateColoredTextures();
         }
         
-        Identifier coloredTexture = COLORED_TEXTURE_CACHE.get(material);
+        ResourceLocation coloredTexture = COLORED_TEXTURE_CACHE.get(material);
         return coloredTexture != null ? coloredTexture : TRIM_OVERLAY_TEXTURE;
     }
     
@@ -269,8 +269,8 @@ public class ArmorTrimHandler {
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        MaterialAssetGroup assets = trim.material().value().assets();
-        TrimMaterial material = TrimMaterial.fromArmorTrimAssets(assets);
+        ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
+        TrimMaterial material = TrimMaterial.fromTrimMaterialKey(materialKey);
         
         if (material == null) return null;
 
@@ -305,8 +305,8 @@ public class ArmorTrimHandler {
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        MaterialAssetGroup assets = trim.material().value().assets();
-        TrimMaterial material = TrimMaterial.fromArmorTrimAssets(assets);
+        ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
+        TrimMaterial material = TrimMaterial.fromTrimMaterialKey(materialKey);
         
         return material != null ? material.getColor() : null;
     }
@@ -317,14 +317,19 @@ public class ArmorTrimHandler {
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        MaterialAssetGroup assets = trim.material().value().assets();
-        return TrimMaterial.fromArmorTrimAssets(assets);
+        ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
+        return TrimMaterial.fromTrimMaterialKey(materialKey);
     }
     
     private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
+        if (itemStack.getItem() instanceof net.minecraft.world.item.ArmorItem armorItem) {
+            if (armorItem.getEquipmentSlot() == slot) {
+                return armorItem.getDefense();
+            }
+        }
         var modifier = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
         for (var entry : modifier.modifiers()) {
-            if (entry.slot().test(slot) && entry.attribute().equals(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)) {
+            if (entry.slot().test(slot) && entry.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)) {
                 return (int) entry.modifier().amount();
             }
         }

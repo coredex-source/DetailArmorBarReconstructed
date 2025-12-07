@@ -138,7 +138,7 @@ public class DurabilityNotificationHandler {
                 case CRITICAL -> SoundEvents.ANVIL_LAND;
                 case LOW -> SoundEvents.NOTE_BLOCK_BASS.value();
                 case QUARTER -> SoundEvents.NOTE_BLOCK_PLING.value();
-                case HALF -> SoundEvents.NOTE_BLOCK_HAT.value();
+                case HALF -> SoundEvents.NOTE_BLOCK_CHIME.value();
             };
             
             float volume = switch (threshold) {
@@ -149,13 +149,13 @@ public class DurabilityNotificationHandler {
             };
             
             if (client.level != null) {
-                client.level.playSound(
-                    client.player,
+                client.level.playLocalSound(
                     client.player.blockPosition(),
                     sound,
                     SoundSource.PLAYERS,
                     volume,
-                    1.0f
+                    1.0f,
+                    false
                 );
             }
         }
@@ -174,7 +174,7 @@ public class DurabilityNotificationHandler {
             Component description = Component.translatable("notification.detailarmorbar.durability.description", itemName, durabilityRemaining);
             
             SystemToast.addOrUpdate(
-                client.getToastManager(),
+                client.getToasts(),
                 SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
                 title,
                 description

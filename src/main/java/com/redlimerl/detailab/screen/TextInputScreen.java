@@ -85,7 +85,7 @@ public class TextInputScreen extends Screen {
     private void handleKeyboardInput() {
         if (this.minecraft == null) return;
         
-        long window = this.minecraft.getWindow().handle();
+        long window = this.minecraft.getWindow().getWindow();
         
         // Check for ESC key with debouncing
         boolean escapeCurrentlyPressed = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_ESCAPE) == GLFW.GLFW_PRESS;
