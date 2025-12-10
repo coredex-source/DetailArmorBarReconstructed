@@ -5,7 +5,7 @@ import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -25,7 +25,7 @@ public class DetailArmorBar {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("DetailArmorBar");
     public static final String MOD_ID = "detailab";
-    public static ResourceLocation GUI_ARMOR_BAR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
+    public static Identifier GUI_ARMOR_BAR = Identifier.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
     private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;

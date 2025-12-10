@@ -18,7 +18,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Map;
@@ -51,7 +51,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
+    protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
         ImmutableMap.Builder<Item, CustomArmorBar> armorBuilder =
                 ImmutableMap.<Item, CustomArmorBar>builder().putAll(DetailArmorBarAPI.getStaticArmorBarList());
 
@@ -74,7 +74,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
                 }
 
                 if(type.equals("armor")) {
-                    Optional<Item[]> items = Codec.list(ResourceLocation.CODEC)
+                    Optional<Item[]> items = Codec.list(Identifier.CODEC)
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in armor definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
@@ -97,7 +97,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
                             () -> DetailArmorBar.LOGGER.error("Invalid or empty item list in armor definition {}", id));
 
                 } else if (type.equals("item")) {
-                    Optional<Item[]> items = Codec.list(ResourceLocation.CODEC)
+                    Optional<Item[]> items = Codec.list(Identifier.CODEC)
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in item definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()

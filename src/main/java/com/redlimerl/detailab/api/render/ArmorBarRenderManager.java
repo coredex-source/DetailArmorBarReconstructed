@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.data.ArmorBarCodecs;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
@@ -29,12 +29,12 @@ public class ArmorBarRenderManager implements BarRenderManager {
     private final Texture textureOutlineHalf;
     private final Color color;
 
-    public ArmorBarRenderManager(ResourceLocation texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull, TextureOffset textureOffsetHalf,
+    public ArmorBarRenderManager(Identifier texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull, TextureOffset textureOffsetHalf,
                                  TextureOffset textureOffsetOutline, TextureOffset textureOffsetOutlineHalf) {
         this(texture, textureWidth, textureHeight, textureOffsetFull, textureOffsetHalf, textureOffsetOutline, textureOffsetOutlineHalf, Color.WHITE);
     }
 
-    public ArmorBarRenderManager(ResourceLocation texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull, TextureOffset textureOffsetHalf,
+    public ArmorBarRenderManager(Identifier texture, int textureWidth, int textureHeight, TextureOffset textureOffsetFull, TextureOffset textureOffsetHalf,
                                  TextureOffset textureOffsetOutline, TextureOffset textureOffsetOutlineHalf, Color color) {
         this(new Texture(texture, textureWidth, textureHeight, textureOffsetFull),
                 new Texture(texture, textureWidth, textureHeight ,textureOffsetHalf),
@@ -56,7 +56,7 @@ public class ArmorBarRenderManager implements BarRenderManager {
     }
 
     @Deprecated
-    public @NotNull ResourceLocation getTexture() {
+    public @NotNull Identifier getTexture() {
         return textureFull.location();
     }
 
