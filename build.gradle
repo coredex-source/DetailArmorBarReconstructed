@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version "${loomVersion}"
+    id 'net.fabricmc.fabric-loom' version "${loomVersion}"
     id 'maven-publish'
 }
 
@@ -22,11 +22,9 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraftVersion}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loaderVersion}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricVersion}"
-
-    modImplementation "com.terraformersmc:modmenu:$project.modMenuVersion"
+    implementation "net.fabricmc:fabric-loader:${project.loaderVersion}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabricVersion}"
+    implementation "com.terraformersmc:modmenu:$project.modMenuVersion"
 }
 
 processResources {
@@ -57,8 +55,8 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                builtBy remapJar
+            artifact(jar) {
+                builtBy jar
             }
         }
     }
