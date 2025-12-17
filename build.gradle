@@ -24,7 +24,17 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraftVersion}"
     implementation "net.fabricmc:fabric-loader:${project.loaderVersion}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabricVersion}"
-    implementation "com.terraformersmc:modmenu:$project.modMenuVersion"
+    // ModMenu is temporarily disabled until it updates for Minecraft 26.1
+    // implementation "com.terraformersmc:modmenu:$project.modMenuVersion"
+}
+
+// Exclude ModMenuConfigImpl from compilation until ModMenu updates for 26.1
+sourceSets {
+    main {
+        java {
+            exclude '**/ModMenuConfigImpl.java'
+        }
+    }
 }
 
 processResources {

@@ -39,18 +39,6 @@ public class TextInputScreen extends Screen {
         this.textField.setValue(initialValue);
         this.textField.setMaxLength(8); // Allow for larger numbers like -9999999
         
-        // Set text predicate to only allow numbers and minus sign
-        this.textField.setFilter(text -> {
-            if (text.isEmpty()) return true;
-            try {
-                Integer.parseInt(text);
-                return true;
-            } catch (NumberFormatException e) {
-                // Allow just a minus sign at the beginning
-                return text.equals("-");
-            }
-        });
-        
         this.addWidget(this.textField);
         this.setInitialFocus(this.textField);
 

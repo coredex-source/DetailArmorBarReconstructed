@@ -5,9 +5,14 @@ import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
+import com.redlimerl.detailab.screen.OptionsScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -15,6 +20,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.io.File;
@@ -28,6 +34,9 @@ public class DetailArmorBar implements ClientModInitializer {
     private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;
+    
+    // Keybind for opening config screen (unbound by default)
+    private static KeyMapping openConfigKey;
 
     public static DetailArmorBarConfig getConfig() {
         if (config == null) loadConfig();
@@ -47,6 +56,25 @@ public class DetailArmorBar implements ClientModInitializer {
 
     public void onInitializeClient() {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(DetailArmorBarAPI.LOADER);
+
+        // Register custom keybind category
+        KeyMapping.Category detailArmorBarCategory = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "keybinds"));
+        
+        // Register keybind for opening config screen (unbound by default)
+        openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.detailab.open_config",
+                GLFW.GLFW_KEY_UNKNOWN, // Unbound by default
+                detailArmorBarCategory
+        ));
+        
+        // Register client tick event to check for keybind press
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (openConfigKey.consumeClick()) {
+                if (client.screen == null) {
+                    client.setScreen(new OptionsScreen(null));
+                }
+            }
+        });
 
         TextureOffset outline = new TextureOffset(9, 0);
         TextureOffset outlineHalf = new TextureOffset(27, 0);

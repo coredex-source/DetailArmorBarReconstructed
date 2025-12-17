@@ -104,5 +104,7 @@
   "notification.detailarmorbar.durability.low.title": "§6⚠ Low Durability Warning",
   "notification.detailarmorbar.durability.quarter.title": "§e⚠ Durability Warning",
   "notification.detailarmorbar.durability.half.title": "§e⚠ Durability Notice",
-  "notification.detailarmorbar.durability.description": "%s is at %d%% durability"
+  "notification.detailarmorbar.durability.description": "%s is at %d%% durability",
+  "key.detailab.open_config": "Open Config Screen",
+  "key.category.detailab.keybinds": "Detail Armor Bar Reconstructed"
 }

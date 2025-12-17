@@ -26,9 +26,6 @@
         "adapter": "default",
         "value": "com.redlimerl.detailab.DetailArmorBar"
       }
-    ],
-    "modmenu": [
-      "com.redlimerl.detailab.config.ModMenuConfigImpl"
     ]
   },
   "mixins": [

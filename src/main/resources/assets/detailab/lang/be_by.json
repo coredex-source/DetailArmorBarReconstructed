@@ -79,5 +79,7 @@
   "notification.detailarmorbar.durability.low.title": "§6⚠ Нізкая трываласць",
   "notification.detailarmorbar.durability.quarter.title": "§e⚠ Папярэджанне аб трываласці",
   "notification.detailarmorbar.durability.half.title": "§e⚠ Заўвага аб трываласці",
-  "notification.detailarmorbar.durability.description": "%s мае %d%% трываласці"
+  "notification.detailarmorbar.durability.description": "%s мае %d%% трываласці",
+  "key.detailab.open_config": "Адкрыць наладкі",
+  "key.category.detailab.keybinds": "Detail Armor Bar Reconstructed"
 }
