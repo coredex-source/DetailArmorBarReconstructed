@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.121'
+    id 'net.neoforged.moddev' version '2.0.134'
     id 'idea'
 }
 
@@ -25,8 +25,8 @@ base {
     archivesName = "DetailArmorBarReconstructed-${mod_version}+${minecraft_version}-neoforge"
 }
 
-// Mojang ships Java 21 to end users in 1.21.10, so mods should target Java 21.
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// Mojang ships Java 25 to end users in 26.1, so mods should target Java 25.
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 // Enable sources jar generation
 java {
