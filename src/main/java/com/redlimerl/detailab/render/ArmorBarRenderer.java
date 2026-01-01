@@ -527,6 +527,11 @@ public class ArmorBarRenderer {
             }
         }
 
+        // Durability HUD - shows armor icons with durability percentages in bottom left corner
+        if (getConfig().getOptions().toggleDurabilityOverlay) {
+            renderDurabilityHUD(context, player);
+        }
+
         //Durability Color
         if (getConfig().getOptions().toggleDurability) {
             List<Tuple<EquipmentSlot, ItemStack>> equipment = new ArrayList<>();
@@ -962,5 +967,134 @@ public class ArmorBarRenderer {
         int v = 0;
         Identifier textureId = ArmorTrimHandler.getColoredTexture(material);
         InGameDrawer.drawTexture(textureId, context, x, y, u, v, 18, 18, Color.WHITE, isMirror);
+    }
+
+    /**
+     * Renders a durability HUD in the bottom left corner of the screen.
+     * Shows each equipped armor piece with its icon and durability percentage.
+     * Format:
+     * [helmet_icon] 100%
+     * [chestplate_icon] 100%
+     * [leggings_icon] 100%
+     * [boots_icon] 100%
+     *
+     * @param context The draw context
+     * @param player The player whose armor to display
+     */
+    private void renderDurabilityHUD(GuiGraphics context, Player player) {
+        int screenWidth = client.getWindow().getGuiScaledWidth();
+        int screenHeight = client.getWindow().getGuiScaledHeight();
+        float scale = getConfig().getOptions().durabilityHudScale;
+        var position = getConfig().getOptions().durabilityHudPosition;
+        
+        // Calculate base position based on preset
+        int baseX, baseY;
+        boolean renderUpward; // Whether to render items going upward or downward
+        
+        int padding = 5; // Padding from screen edges
+        int hudWidth = (int)(50 * scale); // Approximate width of icon + text
+        int hudHeight = (int)(18 * 4 * scale); // Max height for 4 armor pieces
+        
+        switch (position) {
+            case TOP_LEFT:
+                baseX = padding;
+                baseY = padding;
+                renderUpward = false;
+                break;
+            case TOP_RIGHT:
+                baseX = screenWidth - hudWidth - padding;
+                baseY = padding;
+                renderUpward = false;
+                break;
+            case BOTTOM_RIGHT:
+                baseX = screenWidth - hudWidth - padding;
+                baseY = screenHeight - padding;
+                renderUpward = true;
+                break;
+            case BOTTOM_LEFT:
+            default:
+                baseX = padding;
+                baseY = screenHeight - padding;
+                renderUpward = true;
+                break;
+        }
+        
+        // Apply user offsets
+        baseX += getConfig().getOptions().durabilityHudOffsetX;
+        baseY += getConfig().getOptions().durabilityHudOffsetY;
+        
+        int yOffset = 0; // Relative offset from base position
+        
+        // Equipment slots in order from bottom to top: boots, leggings, chestplate, helmet
+        EquipmentSlot[] armorSlots = { EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD };
+        
+        // Fixed spacing - icon is 16x16, add gap based on scale
+        int iconSize = 16;
+        int gap = (int)(4 * scale); // Gap between items scales with size
+        int spacing = iconSize + gap;
+        int textXOffset = iconSize + 4; // Text offset from icon
+        int textYOffset = 4; // Center text vertically with icon
+        
+        for (EquipmentSlot slot : armorSlots) {
+            ItemStack itemStack = player.getItemBySlot(slot);
+            
+            if (!itemStack.isEmpty() && itemStack.getMaxDamage() > 0) {
+                // Calculate durability percentage
+                float durabilityPercent = 1.0f - ((float)itemStack.getDamageValue() / itemStack.getMaxDamage());
+                int percentage = Math.round(durabilityPercent * 100);
+                
+                // Move for this item based on render direction
+                if (renderUpward) {
+                    yOffset -= spacing;
+                }
+                
+                // Calculate actual positions
+                int xPos = baseX;
+                int yPos = baseY + yOffset;
+                
+                // Draw the item icon (16x16)
+                context.renderItem(itemStack, xPos, yPos);
+                
+                // Calculate color based on durability
+                int textColor = getDurabilityColor(durabilityPercent);
+                
+                // Draw the percentage text next to the icon
+                String text = percentage + "%";
+                context.drawString(client.font, text, xPos + textXOffset, yPos + textYOffset, textColor, true);
+                
+                // Move down if rendering downward
+                if (!renderUpward) {
+                    yOffset += spacing;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Gets the color for durability text based on percentage.
+     * White (100%) -> Yellow (50%) -> Red (0%)
+     *
+     * @param durabilityPercent Durability percentage (0.0 to 1.0)
+     * @return ARGB color value
+     */
+    private int getDurabilityColor(float durabilityPercent) {
+        int red, green, blue;
+        
+        if (durabilityPercent > 0.5f) {
+            // White to Yellow transition (100% to 50%)
+            // White (255,255,255) -> Yellow (255,255,0)
+            float t = (durabilityPercent - 0.5f) * 2; // 1.0 at 100%, 0.0 at 50%
+            red = 255;
+            green = 255;
+            blue = (int)(255 * t);
+        } else {
+            // Yellow to Red transition (50% to 0%)
+            // Yellow (255,255,0) -> Red (255,0,0)
+            float t = durabilityPercent * 2; // 1.0 at 50%, 0.0 at 0%
+            red = 255;
+            green = (int)(255 * t);
+            blue = 0;
+        }
+        return (255 << 24) | (red << 16) | (green << 8) | blue; // ARGB format
     }
 }

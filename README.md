@@ -27,8 +27,7 @@ The following has been changed in the API that may affect mods:
 - Reformat the config screen (Possible inheretence from sodium).
 - Rework the offset/positioning system.
 - Add inventory overlay for displaying armor protection type.
-- Add a durability overlay (will not be on the bar itself but somewhat like other armor hud mods unless I can pack it in there without making the bar too bloated).
-- Add a config for modern armor bar (Shows respective textures instead of all chestplates).
+- ~~Add a durability overlay (will not be on the bar itself but somewhat like other armor hud mods unless I can pack it in there without making the bar too bloated).~~
 - Reformat and optimize existing code.
 - Add a modern DABR API. (Will eventually replace the existing API)
 - Allow for more customization.
