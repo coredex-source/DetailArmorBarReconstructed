@@ -397,6 +397,12 @@ public class ArmorBarRenderer {
 
         var totalArmorPoint = armorPoints.size();
         var totalEnchants = Arrays.stream(protectArr).sum();
+
+        // Hide armor bar completely when no armor is worn to maintain vanilla parity
+        if (totalArmorPoint == 0 && getConfig().getOptions().toggleHideBarWithoutArmor) {
+            return;
+        }
+
         var screenWidth = client.getWindow().getGuiScaledWidth() / 2 - 91 + getConfig().getOptions().armorBarOffsetX;
         var yPos = y_base + getConfig().getOptions().armorBarOffsetY;
 

@@ -66,6 +66,7 @@ public class DetailArmorBarConfig {
         public boolean toggleMending = true;
         public boolean toggleEmptyBar = true;
         public boolean toggleItemBar = true;
+        public boolean toggleHideBarWithoutArmor = true;
         public boolean toggleVanillaTexture = true;
         public boolean toggleCompatibleHeartMod = false;
         public boolean toggleInverseSlot = false;

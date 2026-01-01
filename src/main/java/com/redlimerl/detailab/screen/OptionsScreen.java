@@ -343,6 +343,15 @@ public class OptionsScreen extends Screen {
                             .build()
             );
             buttonCount++;
+
+            addRenderableWidget(Button.builder(getToggleName("hide_bar_without_armor", getConfig().getOptions().toggleHideBarWithoutArmor), (button) -> {
+                        getConfig().getOptions().toggleHideBarWithoutArmor = !getConfig().getOptions().toggleHideBarWithoutArmor; getConfig().save();
+                        button.setMessage(getToggleName("hide_bar_without_armor", getConfig().getOptions().toggleHideBarWithoutArmor));
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.hide_bar_without_armor")))
+                            .build()
+            );
+            buttonCount++;
         }
 
         Button features = addRenderableWidget(Button.builder(
