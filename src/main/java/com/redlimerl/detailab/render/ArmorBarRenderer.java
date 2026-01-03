@@ -234,6 +234,24 @@ public class ArmorBarRenderer {
         return getEnchantments(equipment).getOrDefault(type, new LevelData(0, 0));
     }
 
+    /**
+     * Efficiently gets all protection-related enchantment levels for a single item in one pass.
+     */
+    private static int[] getProtectionLevels(ItemStack itemStack) {
+        int[] levels = new int[5];
+        if (itemStack.isEmpty()) return levels;
+        
+        EnchantmentHelper.getEnchantmentsForCrafting(itemStack).entrySet().forEach(enchantment -> {
+            ResourceKey<Enchantment> type = enchantment.getKey().unwrapKey().orElse(null);
+            if (type == Enchantments.PROTECTION) levels[0] = enchantment.getIntValue();
+            else if (type == Enchantments.PROJECTILE_PROTECTION) levels[1] = enchantment.getIntValue();
+            else if (type == Enchantments.BLAST_PROTECTION) levels[2] = enchantment.getIntValue();
+            else if (type == Enchantments.FIRE_PROTECTION) levels[3] = enchantment.getIntValue();
+            else if (type == Enchantments.THORNS) levels[4] = enchantment.getIntValue();
+        });
+        return levels;
+    }
+
     private int getLowDurabilityItem(Iterable<Tuple<EquipmentSlot, ItemStack>> equipment) {
         var count = 0;
         for (Tuple<EquipmentSlot, ItemStack> pair : equipment) {
@@ -345,55 +363,39 @@ public class ArmorBarRenderer {
         return list;
     }
 
-    // Add this helper method to check if all armor pieces have the same protection enchantments
     private boolean hasSameProtectionEnchantments(Iterable<ItemStack> equipment) {
         if (!getConfig().getOptions().toggleUniformColor) {
             return false;
         }
         
-        List<ItemStack> armorPieces = new ArrayList<>();
-        equipment.forEach(item -> {
+        int[] firstLevels = null;
+        
+        for (ItemStack item : equipment) {
             if (!item.isEmpty()) {
-                armorPieces.add(item);
-            }
-        });
-        
-        if (armorPieces.isEmpty()) {
-            return false;
-        }
-        
-        // Get enchantments of first piece to compare with others
-        var firstGeneric = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.PROTECTION);
-        var firstProjectile = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.PROJECTILE_PROTECTION);
-        var firstExplosive = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.BLAST_PROTECTION);
-        var firstFire = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.FIRE_PROTECTION);
-        
-        // Check if all pieces have the same enchantments
-        for (int i = 1; i < armorPieces.size(); i++) {
-            var nextGeneric = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.PROTECTION);
-            var nextProjectile = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.PROJECTILE_PROTECTION);
-            var nextExplosive = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.BLAST_PROTECTION);
-            var nextFire = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.FIRE_PROTECTION);
-            
-            if (firstGeneric.level != nextGeneric.level || 
-                firstProjectile.level != nextProjectile.level ||
-                firstExplosive.level != nextExplosive.level ||
-                firstFire.level != nextFire.level) {
-                return false;
+                int[] levels = getProtectionLevels(item);
+                if (firstLevels == null) {
+                    firstLevels = levels;
+                } else {
+                    if (levels[0] != firstLevels[0] || levels[1] != firstLevels[1] ||
+                        levels[2] != firstLevels[2] || levels[3] != firstLevels[3]) {
+                        return false;
+                    }
+                }
             }
         }
         
-        return true;
+        return firstLevels != null;
     }
 
     public void render(GuiGraphics context, Player player, int y_base) {
-        var generic = getEnchantLevel(getArmorItems(player), Enchantments.PROTECTION);
-        var projectile = getEnchantLevel(getArmorItems(player), Enchantments.PROJECTILE_PROTECTION);
-        var explosive = getEnchantLevel(getArmorItems(player), Enchantments.BLAST_PROTECTION);
-        var fire = getEnchantLevel(getArmorItems(player), Enchantments.FIRE_PROTECTION);
+        var armorItems = getArmorItems(player);
+        var generic = getEnchantLevel(armorItems, Enchantments.PROTECTION);
+        var projectile = getEnchantLevel(armorItems, Enchantments.PROJECTILE_PROTECTION);
+        var explosive = getEnchantLevel(armorItems, Enchantments.BLAST_PROTECTION);
+        var fire = getEnchantLevel(armorItems, Enchantments.FIRE_PROTECTION);
         var protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
         var armorPoints = getArmorPoints(player);
-        var thorns = getEnchantLevel(getArmorItems(player), Enchantments.THORNS);
+        var thorns = getEnchantLevel(armorItems, Enchantments.THORNS);
 
         var totalArmorPoint = armorPoints.size();
         var totalEnchants = Arrays.stream(protectArr).sum();

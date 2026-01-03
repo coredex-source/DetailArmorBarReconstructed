@@ -38,15 +38,14 @@ public class InventoryArmorOverlayRenderer {
      * Gets the protection color for the item based on its enchantments.
      * Returns null if the item has no protection enchantments.
      */
-    private Color getProtectionColor(ItemStack itemStack) {
+    private Color getProtectionColor(ItemStack itemStack, int[] levels) {
         if (itemStack.isEmpty()) return null;
         
-        var generic = getEnchantLevel(itemStack, Enchantments.PROTECTION);
-        var projectile = getEnchantLevel(itemStack, Enchantments.PROJECTILE_PROTECTION);
-        var explosive = getEnchantLevel(itemStack, Enchantments.BLAST_PROTECTION);
-        var fire = getEnchantLevel(itemStack, Enchantments.FIRE_PROTECTION);
+        int generic = levels[0];
+        int projectile = levels[1];
+        int explosive = levels[2];
+        int fire = levels[3];
         
-        // Check if item has any protection enchantment
         if (generic == 0 && projectile == 0 && explosive == 0 && fire == 0) {
             return null;
         }
@@ -55,7 +54,7 @@ public class InventoryArmorOverlayRenderer {
         int alpha;
         
         if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
-            alpha = 120; // Slightly more visible in inventory
+            alpha = 120;
         } else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
             long time = DetailArmorBar.getTicks();
             if (time % (speed * 4L) < (speed * 2L)) alpha = 0;
@@ -63,30 +62,25 @@ public class InventoryArmorOverlayRenderer {
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.75f) * 255);
             else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.75f, 0f) * 255);
         } else {
-            return null; // No effect when set to NONE
+            return null;
         }
         
-        // Return color based on priority: Generic > Projectile > Blast > Fire
         if (getConfig().getOptions().toggleUniformColor) {
             var baseColor = getConfig().getOptions().uniformColorType.getColor();
             return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha);
         }
         
-        if (generic > 0) return new Color(153, 255, 255, alpha);  // Aqua - Protection
-        if (projectile > 0) return new Color(112, 51, 173, alpha); // Purple - Projectile Protection
-        if (explosive > 0) return new Color(255, 255, 0, alpha);   // Yellow - Blast Protection
-        if (fire > 0) return new Color(210, 56, 0, alpha);         // Orange - Fire Protection
-        
+        if (generic > 0) return new Color(153, 255, 255, alpha);
+        if (projectile > 0) return new Color(112, 51, 173, alpha);
+        if (explosive > 0) return new Color(255, 255, 0, alpha);
+        if (fire > 0) return new Color(210, 56, 0, alpha);
         return null;
     }
     
-    /**
-     * Gets the thorns color if the item has thorns enchantment.
-     */
-    private Color getThornsColor(ItemStack itemStack) {
+    private Color getThornsColor(ItemStack itemStack, int[] levels) {
         if (itemStack.isEmpty()) return null;
         
-        var thorns = getEnchantLevel(itemStack, Enchantments.THORNS);
+        int thorns = levels[4];
         if (thorns == 0) return null;
         
         int speed = getAnimationSpeed();
@@ -104,18 +98,22 @@ public class InventoryArmorOverlayRenderer {
             return null;
         }
         
-        return new Color(255, 255, 255, alpha); // White for thorns
+        return new Color(255, 255, 255, alpha);
     }
-    
-    private int getEnchantLevel(ItemStack itemStack, ResourceKey<Enchantment> type) {
-        final int[] level = {0};
+
+    private int[] getProtectionLevels(ItemStack itemStack) {
+        int[] levels = new int[5];
+        if (itemStack.isEmpty()) return levels;
+        
         EnchantmentHelper.getEnchantmentsForCrafting(itemStack).entrySet().forEach(enchantment -> {
-            ResourceKey<Enchantment> enchantType = enchantment.getKey().unwrapKey().orElse(null);
-            if (enchantType == type) {
-                level[0] = enchantment.getIntValue();
-            }
+            ResourceKey<Enchantment> type = enchantment.getKey().unwrapKey().orElse(null);
+            if (type == Enchantments.PROTECTION) levels[0] = enchantment.getIntValue();
+            else if (type == Enchantments.PROJECTILE_PROTECTION) levels[1] = enchantment.getIntValue();
+            else if (type == Enchantments.BLAST_PROTECTION) levels[2] = enchantment.getIntValue();
+            else if (type == Enchantments.FIRE_PROTECTION) levels[3] = enchantment.getIntValue();
+            else if (type == Enchantments.THORNS) levels[4] = enchantment.getIntValue();
         });
-        return level[0];
+        return levels;
     }
     
     /**
@@ -125,8 +123,8 @@ public class InventoryArmorOverlayRenderer {
         if (!getConfig().getOptions().toggleInventoryOverlay) return false;
         if (itemStack.isEmpty()) return false;
         
-        // Check if it's in the armor bar list or has protection/thorns enchants
-        return getProtectionColor(itemStack) != null || getThornsColor(itemStack) != null;
+        int[] levels = getProtectionLevels(itemStack);
+        return getProtectionColor(itemStack, levels) != null || getThornsColor(itemStack, levels) != null;
     }
     
     /**
@@ -141,18 +139,18 @@ public class InventoryArmorOverlayRenderer {
     public void renderOverlay(GuiGraphics context, ItemStack itemStack, int x, int y) {
         if (!getConfig().getOptions().toggleInventoryOverlay) return;
         if (itemStack.isEmpty()) return;
+    
+        int[] levels = getProtectionLevels(itemStack);
         
-        // Render protection overlay
         if (getConfig().getOptions().toggleEnchants) {
-            Color protectionColor = getProtectionColor(itemStack);
+            Color protectionColor = getProtectionColor(itemStack, levels);
             if (protectionColor != null && protectionColor.getAlpha() > 0) {
                 renderProtectionOverlay(context, x, y, protectionColor);
             }
         }
         
-        // Render thorns overlay
         if (getConfig().getOptions().toggleThorns) {
-            Color thornsColor = getThornsColor(itemStack);
+            Color thornsColor = getThornsColor(itemStack, levels);
             if (thornsColor != null && thornsColor.getAlpha() > 0) {
                 renderThornsOverlay(context, x, y, thornsColor);
             }
@@ -166,41 +164,25 @@ public class InventoryArmorOverlayRenderer {
         int alpha = color.getAlpha();
         int argb = (alpha << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
         
-        // Draw a subtle border around the item slot (16x16 slot)
-        // Top border
         context.fill(x, y, x + 16, y + 1, argb);
-        // Bottom border
         context.fill(x, y + 15, x + 16, y + 16, argb);
-        // Left border
         context.fill(x, y, x + 1, y + 16, argb);
-        // Right border
         context.fill(x + 15, y, x + 16, y + 16, argb);
         
-        // Additional inner highlight for aura effect
         if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
             int innerAlpha = alpha / 2;
             int innerArgb = (innerAlpha << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
             
-            // Inner top
             context.fill(x + 1, y + 1, x + 15, y + 2, innerArgb);
-            // Inner bottom
             context.fill(x + 1, y + 14, x + 15, y + 15, innerArgb);
-            // Inner left
             context.fill(x + 1, y + 1, x + 2, y + 15, innerArgb);
-            // Inner right
             context.fill(x + 14, y + 1, x + 15, y + 15, innerArgb);
         }
     }
-    
-    /**
-     * Renders a thorns indicator in the corner of the item slot.
-     */
+
     private void renderThornsOverlay(GuiGraphics context, int x, int y, Color color) {
         int alpha = color.getAlpha();
         int argb = (alpha << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
-        
-        // Draw a small thorns indicator in the top-right corner
-        // Creates a small triangle/spike pattern
         context.fill(x + 13, y + 1, x + 15, y + 2, argb);
         context.fill(x + 14, y + 2, x + 15, y + 3, argb);
     }
