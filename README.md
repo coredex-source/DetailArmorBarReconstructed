@@ -24,13 +24,12 @@ The following has been changed in the API that may affect mods:
 - ~~Add durability notifications.~~
 - ~~Add armor trim overlay.~~
 - ~~Add resource reload listener to refresh texture caches when resource packs change.~~
-- Reformat the config screen (Possible inheretence from sodium).
+- Reformat the config screen.
 - Rework the offset/positioning system.
 - ~~Add inventory overlay for displaying armor protection type.~~
 - ~~Add a durability overlay (will not be on the bar itself but somewhat like other armor hud mods unless I can pack it in there without making the bar too bloated).~~
-- Reformat and optimize existing code.
+- Reformat and optimize existing code. (In progress.)
 - Add a modern DABR API. (Will eventually replace the existing API)
-- Allow for more customization.
 
 # To-Do (for version 6.0.0):
 - Add render support to the mod and the API that can dynamically fetch textures and colors to form a armor texture for modded and/or vanilla sets.
