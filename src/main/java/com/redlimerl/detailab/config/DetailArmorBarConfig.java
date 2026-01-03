@@ -92,6 +92,7 @@ public class DetailArmorBarConfig {
         public boolean toggleThreshold25 = true;
         public boolean toggleThreshold10 = true;
         public boolean toggleThreshold5 = true;
+        public boolean toggleInventoryOverlay = false;
 
         boolean replaceInvalidOptions() {
             var invalid = false;

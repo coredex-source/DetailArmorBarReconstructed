@@ -143,6 +143,15 @@ public class OptionsScreen extends Screen {
                     .build()
             );
             buttonCount++;
+
+            addRenderableWidget(Button.builder(getToggleName("inventory_overlay", getConfig().getOptions().toggleInventoryOverlay), (button) -> {
+                        getConfig().getOptions().toggleInventoryOverlay = !getConfig().getOptions().toggleInventoryOverlay; getConfig().save();
+                        button.setMessage(getToggleName("inventory_overlay", getConfig().getOptions().toggleInventoryOverlay));
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.inventory_overlay")))
+                    .build()
+            );
+            buttonCount++;
         }
 
         if (optionType == OptionType.ANIMATION) {
