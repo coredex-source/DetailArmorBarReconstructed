@@ -234,6 +234,24 @@ public class ArmorBarRenderer {
         return getEnchantments(equipment).getOrDefault(type, new LevelData(0, 0));
     }
 
+    /**
+     * Efficiently gets all protection-related enchantment levels for a single item in one pass.
+     */
+    private static int[] getProtectionLevels(ItemStack itemStack) {
+        int[] levels = new int[5];
+        if (itemStack.isEmpty()) return levels;
+        
+        EnchantmentHelper.getEnchantmentsForCrafting(itemStack).entrySet().forEach(enchantment -> {
+            ResourceKey<Enchantment> type = enchantment.getKey().unwrapKey().orElse(null);
+            if (type == Enchantments.PROTECTION) levels[0] = enchantment.getIntValue();
+            else if (type == Enchantments.PROJECTILE_PROTECTION) levels[1] = enchantment.getIntValue();
+            else if (type == Enchantments.BLAST_PROTECTION) levels[2] = enchantment.getIntValue();
+            else if (type == Enchantments.FIRE_PROTECTION) levels[3] = enchantment.getIntValue();
+            else if (type == Enchantments.THORNS) levels[4] = enchantment.getIntValue();
+        });
+        return levels;
+    }
+
     private int getLowDurabilityItem(Iterable<Tuple<EquipmentSlot, ItemStack>> equipment) {
         var count = 0;
         for (Tuple<EquipmentSlot, ItemStack> pair : equipment) {
@@ -345,58 +363,47 @@ public class ArmorBarRenderer {
         return list;
     }
 
-    // Add this helper method to check if all armor pieces have the same protection enchantments
     private boolean hasSameProtectionEnchantments(Iterable<ItemStack> equipment) {
         if (!getConfig().getOptions().toggleUniformColor) {
             return false;
         }
-        
-        List<ItemStack> armorPieces = new ArrayList<>();
-        equipment.forEach(item -> {
+
+        int[] firstLevels = null;
+        for (ItemStack item : equipment) {
             if (!item.isEmpty()) {
-                armorPieces.add(item);
-            }
-        });
-        
-        if (armorPieces.isEmpty()) {
-            return false;
-        }
-        
-        // Get enchantments of first piece to compare with others
-        var firstGeneric = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.PROTECTION);
-        var firstProjectile = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.PROJECTILE_PROTECTION);
-        var firstExplosive = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.BLAST_PROTECTION);
-        var firstFire = getEnchantLevel(Collections.singleton(armorPieces.get(0)), Enchantments.FIRE_PROTECTION);
-        
-        // Check if all pieces have the same enchantments
-        for (int i = 1; i < armorPieces.size(); i++) {
-            var nextGeneric = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.PROTECTION);
-            var nextProjectile = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.PROJECTILE_PROTECTION);
-            var nextExplosive = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.BLAST_PROTECTION);
-            var nextFire = getEnchantLevel(Collections.singleton(armorPieces.get(i)), Enchantments.FIRE_PROTECTION);
-            
-            if (firstGeneric.level != nextGeneric.level || 
-                firstProjectile.level != nextProjectile.level ||
-                firstExplosive.level != nextExplosive.level ||
-                firstFire.level != nextFire.level) {
-                return false;
+                int[] levels = getProtectionLevels(item);
+                if (firstLevels == null) {
+                    firstLevels = levels;
+                } else {
+                    if (levels[0] != firstLevels[0] || levels[1] != firstLevels[1] ||
+                            levels[2] != firstLevels[2] || levels[3] != firstLevels[3]) {
+                        return false;
+                    }
+                }
             }
         }
-        
-        return true;
+
+        return firstLevels != null;
     }
 
     public void render(GuiGraphics context, Player player, int y_base) {
-        var generic = getEnchantLevel(getArmorItems(player), Enchantments.PROTECTION);
-        var projectile = getEnchantLevel(getArmorItems(player), Enchantments.PROJECTILE_PROTECTION);
-        var explosive = getEnchantLevel(getArmorItems(player), Enchantments.BLAST_PROTECTION);
-        var fire = getEnchantLevel(getArmorItems(player), Enchantments.FIRE_PROTECTION);
+        var armorItems = getArmorItems(player);
+        var generic = getEnchantLevel(armorItems, Enchantments.PROTECTION);
+        var projectile = getEnchantLevel(armorItems, Enchantments.PROJECTILE_PROTECTION);
+        var explosive = getEnchantLevel(armorItems, Enchantments.BLAST_PROTECTION);
+        var fire = getEnchantLevel(armorItems, Enchantments.FIRE_PROTECTION);
         var protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
         var armorPoints = getArmorPoints(player);
-        var thorns = getEnchantLevel(getArmorItems(player), Enchantments.THORNS);
+        var thorns = getEnchantLevel(armorItems, Enchantments.THORNS);
 
         var totalArmorPoint = armorPoints.size();
         var totalEnchants = Arrays.stream(protectArr).sum();
+
+        // Hide armor bar completely when no armor is worn to maintain vanilla parity
+        if (totalArmorPoint == 0 && getConfig().getOptions().toggleHideBarWithoutArmor) {
+            return;
+        }
+
         var screenWidth = client.getWindow().getGuiScaledWidth() / 2 - 91 + getConfig().getOptions().armorBarOffsetX;
         var yPos = y_base + getConfig().getOptions().armorBarOffsetY;
 
@@ -519,6 +526,11 @@ public class ArmorBarRenderer {
                     }
                 }
             }
+        }
+
+        // Durability HUD - shows armor icons with durability percentages in bottom left corner
+        if (getConfig().getOptions().toggleDurabilityOverlay) {
+            renderDurabilityHUD(context, player);
         }
 
         //Durability Color
@@ -956,5 +968,126 @@ public class ArmorBarRenderer {
         int v = 0;
         Identifier textureId = ArmorTrimHandler.getColoredTexture(material);
         InGameDrawer.drawTexture(textureId, context, x, y, u, v, 18, 18, Color.WHITE, isMirror);
+    }
+
+    /**
+     * Renders a durability HUD in the bottom left corner of the screen.
+     * Shows each equipped armor piece with its icon and durability percentage.
+     * Format:
+     * [helmet_icon] 100%
+     * [chestplate_icon] 100%
+     * [leggings_icon] 100%
+     * [boots_icon] 100%
+     *
+     * @param context The draw context
+     * @param player The player whose armor to display
+     */
+    private void renderDurabilityHUD(GuiGraphics context, Player player) {
+        int screenWidth = client.getWindow().getGuiScaledWidth();
+        int screenHeight = client.getWindow().getGuiScaledHeight();
+        float scale = getConfig().getOptions().durabilityHudScale;
+        var position = getConfig().getOptions().durabilityHudPosition;
+        
+        int baseX = 0;
+        int baseY = 0;
+        boolean renderUpward = false; // Whether to render items going upward or downward
+        
+        int padding = 5; // Padding from screen edges
+        int hudWidth = (int)(50 * scale); // Approximate width of icon + text
+        int hudHeight = (int)(18 * 4 * scale); // Max height for 4 armor pieces
+        
+        switch (position) {
+            case TOP_LEFT:
+                baseX = padding;
+                baseY = padding;
+                renderUpward = false;
+                break;
+            case TOP_RIGHT:
+                baseX = screenWidth - hudWidth - padding;
+                baseY = padding;
+                renderUpward = false;
+                break;
+            case BOTTOM_LEFT:
+                baseX = padding;
+                baseY = screenHeight - padding;
+                renderUpward = true;
+                break;
+            case BOTTOM_RIGHT:
+                baseX = screenWidth - hudWidth - padding;
+                baseY = screenHeight - padding;
+                renderUpward = true;
+                break;
+        }
+        
+        // Apply user offsets
+        baseX += getConfig().getOptions().durabilityHudOffsetX;
+        baseY += getConfig().getOptions().durabilityHudOffsetY;
+        
+        // Equipment slots in order from bottom to top: boots, leggings, chestplate, helmet
+        EquipmentSlot[] armorSlots = { EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD };
+        
+        // Fixed spacing - icon is 16x16, add gap based on scale
+        int iconSize = 16;
+        int gap = (int)(4 * scale); // Gap between items scales with size
+        int spacing = iconSize + gap;
+        int textXOffset = iconSize + 4; // Text offset from icon
+        
+        int yOffset = 0;
+        
+        for (EquipmentSlot slot : armorSlots) {
+            ItemStack itemStack = player.getItemBySlot(slot);
+            if (!itemStack.isEmpty() && itemStack.getMaxDamage() > 0) {
+                float durabilityPercent = 1.0f - ((float)itemStack.getDamageValue() / itemStack.getMaxDamage());
+                int percentage = Math.round(durabilityPercent * 100);
+                
+                // Move for this item based on render direction
+                if (renderUpward) {
+                    yOffset -= spacing;
+                }
+                
+                // Calculate actual positions
+                int xPos = baseX;
+                int yPos = baseY + yOffset;
+                
+                // Render the item icon
+                context.renderItem(itemStack, xPos, yPos);
+                
+                // Render durability percentage text
+                int textColor = getDurabilityColor(durabilityPercent);
+                int textYOffset = (iconSize - 8) / 2; // Center text vertically with icon (8 is font height)
+                context.drawString(client.font, percentage + "%", xPos + textXOffset, yPos + textYOffset, textColor, true);
+                
+                // Move down if rendering downward
+                if (!renderUpward) {
+                    yOffset += spacing;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Gets the color for durability text based on percentage.
+     * White (100%) -> Yellow (50%) -> Red (0%)
+     */
+    private int getDurabilityColor(float durabilityPercent) {
+        int red, green, blue;
+        
+        if (durabilityPercent >= 0.5f) {
+            // White to Yellow transition (100% to 50%)
+            // White (255,255,255) -> Yellow (255,255,0)
+            float t = (durabilityPercent - 0.5f) * 2; // 1.0 at 100%, 0.0 at 50%
+            red = 255;
+            green = 255;
+            blue = (int)(255 * t);
+        } else {
+            // Yellow to Red transition (50% to 0%)
+            // Yellow (255,255,0) -> Red (255,0,0)
+            float t = durabilityPercent * 2; // 1.0 at 50%, 0.0 at 0%
+            red = 255;
+            green = (int)(255 * t);
+            blue = 0;
+        }
+        
+        return (255 << 24) | (red << 16) | (green << 8) | blue;
     }
 }

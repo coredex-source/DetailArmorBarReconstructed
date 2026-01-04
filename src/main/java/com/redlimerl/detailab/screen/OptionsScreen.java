@@ -134,6 +134,24 @@ public class OptionsScreen extends Screen {
                     .build()
             );
             buttonCount++;
+
+            addRenderableWidget(Button.builder(getToggleName("durability_overlay", getConfig().getOptions().toggleDurabilityOverlay), (button) -> {
+                        getConfig().getOptions().toggleDurabilityOverlay = !getConfig().getOptions().toggleDurabilityOverlay; getConfig().save();
+                        button.setMessage(getToggleName("durability_overlay", getConfig().getOptions().toggleDurabilityOverlay));
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.durability_overlay")))
+                    .build()
+            );
+            buttonCount++;
+
+            addRenderableWidget(Button.builder(getToggleName("inventory_overlay", getConfig().getOptions().toggleInventoryOverlay), (button) -> {
+                        getConfig().getOptions().toggleInventoryOverlay = !getConfig().getOptions().toggleInventoryOverlay; getConfig().save();
+                        button.setMessage(getToggleName("inventory_overlay", getConfig().getOptions().toggleInventoryOverlay));
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.inventory_overlay")))
+                    .build()
+            );
+            buttonCount++;
         }
 
         if (optionType == OptionType.ANIMATION) {
@@ -314,6 +332,79 @@ public class OptionsScreen extends Screen {
                     .build()
             );
             buttonCount++;
+
+            // Durability HUD Position
+            addRenderableWidget(Button.builder(getHudPositionName(getConfig().getOptions().durabilityHudPosition), (button) -> {
+                var positions = ConfigEnumType.HudPosition.values();
+                int currentIndex = getConfig().getOptions().durabilityHudPosition.ordinal();
+                int nextIndex = (currentIndex + 1) % positions.length;
+                getConfig().getOptions().durabilityHudPosition = positions[nextIndex];
+                getConfig().save();
+                button.setMessage(getHudPositionName(getConfig().getOptions().durabilityHudPosition));
+            }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.durability_hud.position")))
+                    .build()
+            );
+            buttonCount++;
+
+            // Durability HUD X Offset
+            addRenderableWidget(Button.builder(Component.literal("HUD X Offset: " + getConfig().getOptions().durabilityHudOffsetX), (button) -> {
+                if (minecraft != null) {
+                    minecraft.setScreen(new TextInputScreen(
+                        this,
+                        Component.literal("HUD X Offset"),
+                        String.valueOf(getConfig().getOptions().durabilityHudOffsetX),
+                        (value) -> {
+                            getConfig().getOptions().durabilityHudOffsetX = value;
+                            getConfig().save();
+                        }
+                    ));
+                }
+            }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.durability_hud.offset_x")))
+                    .build()
+            );
+            buttonCount++;
+
+            // Durability HUD Y Offset
+            addRenderableWidget(Button.builder(Component.literal("HUD Y Offset: " + getConfig().getOptions().durabilityHudOffsetY), (button) -> {
+                if (minecraft != null) {
+                    minecraft.setScreen(new TextInputScreen(
+                        this,
+                        Component.literal("HUD Y Offset"),
+                        String.valueOf(getConfig().getOptions().durabilityHudOffsetY),
+                        (value) -> {
+                            getConfig().getOptions().durabilityHudOffsetY = value;
+                            getConfig().save();
+                        }
+                    ));
+                }
+            }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.durability_hud.offset_y")))
+                    .build()
+            );
+            buttonCount++;
+
+            // Durability HUD Scale
+            addRenderableWidget(Button.builder(Component.literal("HUD Scale: " + String.format("%.1f", getConfig().getOptions().durabilityHudScale)), (button) -> {
+                // Cycle through scale values: 0.5, 0.75, 1.0, 1.25, 1.5, 2.0
+                float currentScale = getConfig().getOptions().durabilityHudScale;
+                float[] scales = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f };
+                int nextIndex = 0;
+                for (int i = 0; i < scales.length; i++) {
+                    if (Math.abs(currentScale - scales[i]) < 0.01f) {
+                        nextIndex = (i + 1) % scales.length;
+                        break;
+                    }
+                }
+                getConfig().getOptions().durabilityHudScale = scales[nextIndex];
+                getConfig().save();
+                button.setMessage(Component.literal("HUD Scale: " + String.format("%.1f", getConfig().getOptions().durabilityHudScale)));
+            }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                    .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.durability_hud.scale")))
+                    .build()
+            );
+            buttonCount++;
         }
 
         if (optionType == OptionType.ETC) {
@@ -340,6 +431,15 @@ public class OptionsScreen extends Screen {
                         button.setMessage(getToggleName("inverse_slot", getConfig().getOptions().toggleInverseSlot));
                     }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
                             .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.inverse_slot")))
+                            .build()
+            );
+            buttonCount++;
+
+            addRenderableWidget(Button.builder(getToggleName("hide_bar_without_armor", getConfig().getOptions().toggleHideBarWithoutArmor), (button) -> {
+                        getConfig().getOptions().toggleHideBarWithoutArmor = !getConfig().getOptions().toggleHideBarWithoutArmor; getConfig().save();
+                        button.setMessage(getToggleName("hide_bar_without_armor", getConfig().getOptions().toggleHideBarWithoutArmor));
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.hide_bar_without_armor")))
                             .build()
             );
             buttonCount++;
@@ -454,6 +554,12 @@ public class OptionsScreen extends Screen {
     
     private String getUniformColorDescription(String key, ConfigEnumType.UniformColor value) {
         return Component.translatable("context.detailarmorbar.effects." + key + "." + value.name().toLowerCase(Locale.ROOT)).getString();
+    }
+
+    private MutableComponent getHudPositionName(ConfigEnumType.HudPosition value) {
+        return Component.translatable("option.detailarmorbar.durability_hud.position")
+                .append(": ")
+                .append(Component.translatable("option.detailarmorbar.durability_hud.position." + value.name().toLowerCase(Locale.ROOT)));
     }
 
 }

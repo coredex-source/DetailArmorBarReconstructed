@@ -63,4 +63,8 @@ public class ConfigEnumType {
             return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
     }
+
+    public enum HudPosition {
+        TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
+    }
 }

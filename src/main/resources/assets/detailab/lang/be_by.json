@@ -54,6 +54,8 @@
   "context.detailarmorbar.toggle.sort_special_item": "Сартаваць спецыяльныя прадметы (як элітры) справа ад радка брані.",
   "option.detailarmorbar.toggle.armor_trims": "Аздабленне брані",
   "context.detailarmorbar.toggle.armor_trims": "Паказвае колер аздаблення брані як накладку на радку брані пры нашэнні аздобленай брані.",
+  "option.detailarmorbar.toggle.inventory_overlay": "Накладка інвентара",
+  "context.detailarmorbar.toggle.inventory_overlay": "Паказвае накладкі тыпу аховы на прадметах брані ў інвентары. Паказвае такія ж эфекты зачаравання, як і на радку брані.",
 
   "__comment": "AI translated stuff ... I'd prefer if someone can help me with better translations",
 
