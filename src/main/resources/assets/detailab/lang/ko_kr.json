@@ -54,6 +54,8 @@
   "context.detailarmorbar.toggle.sort_special_item": "특수 아이템(Elytra 같은)을 오른쪽에 정렬합니다.",
   "option.detailarmorbar.toggle.armor_trims": "갑옷 장식 표시",
   "context.detailarmorbar.toggle.armor_trims": "장식된 갑옷을 착용할 때 갑옷바에 장식 색상을 오버레이로 표시합니다.",
+  "option.detailarmorbar.toggle.inventory_overlay": "인벤토리 오버레이",
+  "context.detailarmorbar.toggle.inventory_overlay": "인벤토리에서 갑옷 아이템에 보호 타입 오버레이를 표시합니다. 갑옷바와 동일한 인챈트 효과를 보여줍니다.",
 
   "__comment": "AI translated stuff ... I'd prefer if someone can help me with better translations",
 
@@ -79,7 +81,5 @@
   "notification.detailarmorbar.durability.low.title": "§6⚠ 낮은 내구도 경고",
   "notification.detailarmorbar.durability.quarter.title": "§e⚠ 내구도 경고",
   "notification.detailarmorbar.durability.half.title": "§e⚠ 내구도 알림",
-  "notification.detailarmorbar.durability.description": "%s의 내구도가 %d%%입니다",
-  "key.detailab.open_config": "설정 화면 열기",
-  "key.category.detailab.keybinds": "Detail Armor Bar Reconstructed"
+  "notification.detailarmorbar.durability.description": "%s의 내구도가 %d%%입니다"
 }

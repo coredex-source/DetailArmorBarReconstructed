@@ -54,6 +54,8 @@
   "context.detailarmorbar.toggle.sort_special_item": "Сартаваць спецыяльныя прадметы (як элітры) справа ад радка брані.",
   "option.detailarmorbar.toggle.armor_trims": "Аздабленне брані",
   "context.detailarmorbar.toggle.armor_trims": "Паказвае колер аздаблення брані як накладку на радку брані пры нашэнні аздобленай брані.",
+  "option.detailarmorbar.toggle.inventory_overlay": "Накладка інвентара",
+  "context.detailarmorbar.toggle.inventory_overlay": "Паказвае накладкі тыпу аховы на прадметах брані ў інвентары. Паказвае такія ж эфекты зачаравання, як і на радку брані.",
 
   "__comment": "AI translated stuff ... I'd prefer if someone can help me with better translations",
 
@@ -79,7 +81,5 @@
   "notification.detailarmorbar.durability.low.title": "§6⚠ Нізкая трываласць",
   "notification.detailarmorbar.durability.quarter.title": "§e⚠ Папярэджанне аб трываласці",
   "notification.detailarmorbar.durability.half.title": "§e⚠ Заўвага аб трываласці",
-  "notification.detailarmorbar.durability.description": "%s мае %d%% трываласці",
-  "key.detailab.open_config": "Адкрыць наладкі",
-  "key.category.detailab.keybinds": "Detail Armor Bar Reconstructed"
+  "notification.detailarmorbar.durability.description": "%s мае %d%% трываласці"
 }
