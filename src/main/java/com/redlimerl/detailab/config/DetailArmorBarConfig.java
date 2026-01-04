@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import static com.redlimerl.detailab.config.ConfigEnumType.*;
+import com.redlimerl.detailab.config.ConfigEnumType.HudPosition;
 
 public class DetailArmorBarConfig {
 
@@ -85,6 +86,13 @@ public class DetailArmorBarConfig {
         public boolean toggleThreshold25 = true;
         public boolean toggleThreshold10 = true;
         public boolean toggleThreshold5 = true;
+        public boolean toggleHideBarWithoutArmor = false;
+        public boolean toggleDurabilityOverlay = false;
+        public boolean toggleInventoryOverlay = false;
+        public HudPosition durabilityHudPosition = HudPosition.BOTTOM_LEFT;
+        public int durabilityHudOffsetX = 0;
+        public int durabilityHudOffsetY = 0;
+        public float durabilityHudScale = 1.0f;
 
         boolean replaceInvalidOptions() {
             var invalid = false;

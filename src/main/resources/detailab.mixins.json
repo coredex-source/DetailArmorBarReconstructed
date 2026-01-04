@@ -8,6 +8,7 @@
   },
   "client": [
     "ArmorBarMixin",
-    "EntityAttributeInstanceInvoker"
+    "EntityAttributeInstanceInvoker",
+    "ItemStackRenderMixin"
   ]
 }
