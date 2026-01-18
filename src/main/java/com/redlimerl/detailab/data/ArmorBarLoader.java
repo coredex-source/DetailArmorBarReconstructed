@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.redlimerl.detailab.DetailArmorBar;
@@ -18,15 +19,17 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-public class ArmorBarLoader extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
+public class ArmorBarLoader extends SimplePreparableReloadListener<Map<ResourceLocation, JsonElement>> implements IdentifiableResourceReloadListener {
 
     private static final Gson GSON = new GsonBuilder().create();
 
@@ -34,7 +37,7 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener implements 
     private Map<Item, CustomArmorBar> itemList;
 
     public ArmorBarLoader() {
-        super(GSON, "armor_bar");
+        super();
     }
 
     public Map<Item, CustomArmorBar> getArmorList() {
@@ -52,6 +55,31 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener implements 
     @Override
     public ResourceLocation getFabricId() {
         return ResourceLocation.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "armor");
+    }
+
+    @Override
+    protected Map<ResourceLocation, JsonElement> prepare(ResourceManager manager, ProfilerFiller profiler) {
+        Map<ResourceLocation, JsonElement> map = new java.util.HashMap<>();
+        String directory = "armor_bar";
+        int prefixLength = directory.length() + 1;
+        
+        for (Map.Entry<ResourceLocation, net.minecraft.server.packs.resources.Resource> entry : 
+                manager.listResources(directory, id -> id.getPath().endsWith(".json")).entrySet()) {
+            ResourceLocation fileId = entry.getKey();
+            String path = fileId.getPath();
+            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                fileId.getNamespace(),
+                path.substring(prefixLength, path.length() - 5)
+            );
+            
+            try (BufferedReader reader = entry.getValue().openAsReader()) {
+                JsonElement json = JsonParser.parseReader(reader);
+                map.put(id, json);
+            } catch (IOException e) {
+                DetailArmorBar.LOGGER.error("Failed to load armor bar definition {}: {}", id, e.getMessage());
+            }
+        }
+        return map;
     }
 
     @Override
@@ -82,8 +110,14 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener implements 
                             .decode(JsonOps.INSTANCE, itemsJson)
                             .resultOrPartial(err -> DetailArmorBar.LOGGER.error("Invalid items in armor definition [{}]: {}", id, err))
                             .map(pair -> pair.getFirst().stream()
-                                    .map(itemId -> new ItemStack(BuiltInRegistries.ITEM.get(itemId)))
-                                    .filter(this::filterAndLogArmor)
+                                    .map(itemId -> {
+                                        var itemRef = BuiltInRegistries.ITEM.get(itemId);
+                                        if (itemRef == null || itemRef.isEmpty()) return null;
+                                        Item item = itemRef.get().value();
+                                        ItemStack stack = new ItemStack(item);
+                                        return filterAndLogArmor(stack) ? item : null;
+                                    })
+                                    .filter(item -> item != null)
                                     .toArray(Item[]::new));
 
                     Optional<ArmorBarRenderManager> renderer = ArmorBarRenderManager.CODEC.decode(JsonOps.INSTANCE, rendererJson)

@@ -275,7 +275,8 @@ public class ArmorBarRenderer {
             // Special items (equippable with effects not described by the attribute system).
             if (getConfig().getOptions().toggleItemBar && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
                 if (itemStack.getItem() instanceof ArmorItem armorItem) {
-                    if (armorItem.getEquipmentSlot() != slot) { continue; }
+                    var equippable = itemStack.get(DataComponents.EQUIPPABLE);
+                    if (equippable == null || equippable.slot() != slot) { continue; }
                 } else if (itemStack.is(Items.ELYTRA) && slot != EquipmentSlot.CHEST) {
                     continue;
                 }
@@ -310,11 +311,6 @@ public class ArmorBarRenderer {
     }
 
     private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
-        if (itemStack.getItem() instanceof ArmorItem armorItem) {
-            if (armorItem.getEquipmentSlot() == slot) {
-                return armorItem.getDefense();
-            }
-        }
         var modifier = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
         for (var entry : modifier.modifiers()) {
             if (entry.slot().test(slot) && entry.attribute().is(Attributes.ARMOR)) {
@@ -524,8 +520,11 @@ public class ArmorBarRenderer {
 
             for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
                 ItemStack itemStack = player.getItemBySlot(equipmentSlot);
-                if (itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == equipmentSlot) {
-                    equipment.add(new Tuple<>(equipmentSlot, itemStack));
+                if (itemStack.getItem() instanceof ArmorItem armorItem) {
+                    var equippable = itemStack.get(DataComponents.EQUIPPABLE);
+                    if (equippable != null && equippable.slot() == equipmentSlot) {
+                        equipment.add(new Tuple<>(equipmentSlot, itemStack));
+                    }
                 }
             }
 

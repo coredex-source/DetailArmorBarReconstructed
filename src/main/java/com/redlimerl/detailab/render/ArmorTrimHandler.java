@@ -9,8 +9,6 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.armortrim.ArmorTrim;
-import net.minecraft.world.item.armortrim.TrimMaterials;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
@@ -119,21 +117,24 @@ public class ArmorTrimHandler {
             return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
 
-        public static TrimMaterial fromTrimMaterialKey(ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> key) {
+        public static TrimMaterial fromTrimMaterialKey(ResourceKey<?> key) {
             if (key == null) return null;
             
-            if (key.equals(TrimMaterials.AMETHYST)) return AMETHYST;
-            if (key.equals(TrimMaterials.COPPER)) return COPPER;
-            if (key.equals(TrimMaterials.DIAMOND)) return DIAMOND;
-            if (key.equals(TrimMaterials.EMERALD)) return EMERALD;
-            if (key.equals(TrimMaterials.GOLD)) return GOLD;
-            if (key.equals(TrimMaterials.IRON)) return IRON;
-            if (key.equals(TrimMaterials.LAPIS)) return LAPIS;
-            if (key.equals(TrimMaterials.NETHERITE)) return NETHERITE;
-            if (key.equals(TrimMaterials.QUARTZ)) return QUARTZ;
-            if (key.equals(TrimMaterials.REDSTONE)) return REDSTONE;
-            
-            return null;
+            String keyPath = key.location().getPath();
+            return switch (keyPath) {
+                case "amethyst" -> AMETHYST;
+                case "copper" -> COPPER;
+                case "diamond" -> DIAMOND;
+                case "emerald" -> EMERALD;
+                case "gold" -> GOLD;
+                case "iron" -> IRON;
+                case "lapis" -> LAPIS;
+                case "netherite" -> NETHERITE;
+                case "quartz" -> QUARTZ;
+                case "redstone" -> REDSTONE;
+                case "resin" -> RESIN;
+                default -> null;
+            };
         }
     }
     
@@ -188,9 +189,9 @@ public class ArmorTrimHandler {
         NativeImage coloredImage = new NativeImage(width, height, false);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int pixel = baseImage.getPixelRGBA(x, y);
+                int pixel = baseImage.getPixel(x, y);
                 int newPixel = applyPaletteColor(pixel, material.getPalette());
-                coloredImage.setPixelRGBA(x, y, newPixel);
+                coloredImage.setPixel(x, y, newPixel);
             }
         }
 
@@ -266,10 +267,10 @@ public class ArmorTrimHandler {
         ItemStack itemStack = player.getItemBySlot(slot);
         if (itemStack.isEmpty()) return null;
         
-        ArmorTrim trim = itemStack.get(DataComponents.TRIM);
+        net.minecraft.world.item.equipment.trim.ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
+        ResourceKey<?> materialKey = trim.material().unwrapKey().orElse(null);
         TrimMaterial material = TrimMaterial.fromTrimMaterialKey(materialKey);
         
         if (material == null) return null;
@@ -302,10 +303,10 @@ public class ArmorTrimHandler {
     public static Color getTrimColor(ItemStack itemStack) {
         if (itemStack.isEmpty()) return null;
         
-        ArmorTrim trim = itemStack.get(DataComponents.TRIM);
+        net.minecraft.world.item.equipment.trim.ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
+        ResourceKey<?> materialKey = trim.material().unwrapKey().orElse(null);
         TrimMaterial material = TrimMaterial.fromTrimMaterialKey(materialKey);
         
         return material != null ? material.getColor() : null;
@@ -314,19 +315,14 @@ public class ArmorTrimHandler {
     public static TrimMaterial getTrimMaterial(ItemStack itemStack) {
         if (itemStack.isEmpty()) return null;
         
-        ArmorTrim trim = itemStack.get(DataComponents.TRIM);
+        net.minecraft.world.item.equipment.trim.ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
+        ResourceKey<?> materialKey = trim.material().unwrapKey().orElse(null);
         return TrimMaterial.fromTrimMaterialKey(materialKey);
     }
     
     private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
-        if (itemStack.getItem() instanceof net.minecraft.world.item.ArmorItem armorItem) {
-            if (armorItem.getEquipmentSlot() == slot) {
-                return armorItem.getDefense();
-            }
-        }
         var modifier = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
         for (var entry : modifier.modifiers()) {
             if (entry.slot().test(slot) && entry.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)) {

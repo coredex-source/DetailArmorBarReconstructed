@@ -3,7 +3,7 @@ package com.redlimerl.detailab.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 
@@ -39,7 +39,7 @@ public class InGameDrawer {
 
     private static void drawTexturedQuad(ResourceLocation identifier, Matrix4f matrices, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1, boolean mirror) {
         RenderSystem.setShaderTexture(0, identifier);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(CoreShaders.POSITION_TEX);
         RenderSystem.enableBlend();
         BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         if (mirror) {
