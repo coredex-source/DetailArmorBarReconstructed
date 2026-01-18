@@ -10,6 +10,8 @@
   "context.detailarmorbar.effects.effect_type.aura": "갑옷바 위에 효과별 아우라를 표시합니다.",
   "option.detailarmorbar.effects.effect_type.outline": "테두리",
   "context.detailarmorbar.effects.effect_type.outline": "갑옷바 위에 효과별 테두리를 표시합니다.",
+  "option.detailarmorbar.effects.effect_type.static": "고정",
+  "context.detailarmorbar.effects.effect_type.static": "갑옷바 위에 고정된 테두리를 표시합니다 (깜박임 없는 테두리).",
   "option.detailarmorbar.effects.effect_speed": "애니메이션 속도",
   "context.detailarmorbar.effects.effect_speed": "보호 효과와 내구도 경고 효과의 속도를 조정합니다.",
   "option.detailarmorbar.effects.effect_speed.normal": "보통",

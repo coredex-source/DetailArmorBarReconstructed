@@ -66,6 +66,8 @@ public class ArmorBarRenderer {
             else if (time % (speed*2L) < speed)
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
             else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
         } else alpha = 0;
 
         if (g > 0) return new Color(153, 255, 255, alpha);
@@ -100,6 +102,8 @@ public class ArmorBarRenderer {
             } else {
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
             }
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
         } else {
             alpha = 0;
         }
@@ -894,6 +898,8 @@ public class ArmorBarRenderer {
             }
         } else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
             u = 9 + (half * 9);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            u = 9 + (half * 9); // Same texture position as outline
         } else return;
 
         InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, x, y, u, v, color, false);

@@ -11,6 +11,8 @@
   "context.detailarmorbar.effects.effect_type.aura": "Display an aura on the armor bar.",
   "option.detailarmorbar.effects.effect_type.outline": "Outline",
   "context.detailarmorbar.effects.effect_type.outline": "Display an outline on the armor bar.",
+  "option.detailarmorbar.effects.effect_type.static": "Static",
+  "context.detailarmorbar.effects.effect_type.static": "Display a static outline on the armor bar (outline without pulsing).",
   "option.detailarmorbar.effects.effect_speed": "Effect Speed",
   "context.detailarmorbar.effects.effect_speed": "Changes the effect speed for protection effect and low durability warn.",
   "option.detailarmorbar.effects.effect_speed.normal": "Normal",

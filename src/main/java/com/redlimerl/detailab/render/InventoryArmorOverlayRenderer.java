@@ -61,6 +61,8 @@ public class InventoryArmorOverlayRenderer {
             else if (time % (speed * 2L) < speed)
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.75f) * 255);
             else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.75f, 0f) * 255);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.75f * 255); // Static outline at constant 75% opacity
         } else {
             return null;
         }
@@ -94,6 +96,8 @@ public class InventoryArmorOverlayRenderer {
             else if (time % (speed * 2L) < speed)
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.75f) * 255);
             else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.75f, 0f) * 255);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.75f * 255); // Static outline at constant 75% opacity
         } else {
             return null;
         }
