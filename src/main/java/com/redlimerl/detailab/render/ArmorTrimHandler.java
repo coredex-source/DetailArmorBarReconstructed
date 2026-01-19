@@ -196,7 +196,7 @@ public class ArmorTrimHandler {
         }
 
         ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "dynamic/trim_" + material.getName());
-        DynamicTexture dynamicTexture = new DynamicTexture(coloredImage);
+        DynamicTexture dynamicTexture = new DynamicTexture(() -> "trim_" + material.getName(), coloredImage);
         client.getTextureManager().register(textureId, dynamicTexture);
         
         return textureId;

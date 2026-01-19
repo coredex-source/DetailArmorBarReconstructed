@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -274,9 +274,9 @@ public class ArmorBarRenderer {
 
             // Special items (equippable with effects not described by the attribute system).
             if (getConfig().getOptions().toggleItemBar && DetailArmorBarAPI.getItemBarList().containsKey(itemStack.getItem())) {
-                if (itemStack.getItem() instanceof ArmorItem armorItem) {
-                    var equippable = itemStack.get(DataComponents.EQUIPPABLE);
-                    if (equippable == null || equippable.slot() != slot) { continue; }
+                Equippable equippable = itemStack.get(DataComponents.EQUIPPABLE);
+                if (equippable != null) {
+                    if (equippable.slot() != slot) { continue; }
                 } else if (itemStack.is(Items.ELYTRA) && slot != EquipmentSlot.CHEST) {
                     continue;
                 }
@@ -520,11 +520,9 @@ public class ArmorBarRenderer {
 
             for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
                 ItemStack itemStack = player.getItemBySlot(equipmentSlot);
-                if (itemStack.getItem() instanceof ArmorItem armorItem) {
-                    var equippable = itemStack.get(DataComponents.EQUIPPABLE);
-                    if (equippable != null && equippable.slot() == equipmentSlot) {
-                        equipment.add(new Tuple<>(equipmentSlot, itemStack));
-                    }
+                Equippable equippable = itemStack.get(DataComponents.EQUIPPABLE);
+                if (equippable != null && equippable.slot() == equipmentSlot) {
+                    equipment.add(new Tuple<>(equipmentSlot, itemStack));
                 }
             }
 
