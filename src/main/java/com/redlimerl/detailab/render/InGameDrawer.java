@@ -1,11 +1,10 @@
 package com.redlimerl.detailab.render;
 
-import com.mojang.blaze3d.vertex.*;
+import com.redlimerl.detailab.mixins.GuiGraphicsInvoker;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
-import org.joml.Matrix4f;
 
 import java.awt.*;
 
@@ -24,10 +23,10 @@ public class InGameDrawer {
     }
 
     public static void drawTexture(ResourceLocation identifier, GuiGraphics context, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight, Color color, boolean mirror) {
-        drawTexture(identifier, context, x, x + width, y, y + height, 0, regionWidth, regionHeight, u, v, textureWidth, textureHeight, color, mirror);
+        drawTexture(identifier, context, x, x + width, y, y + height, regionWidth, regionHeight, u, v, textureWidth, textureHeight, color, mirror);
     }
 
-    private static void drawTexture(ResourceLocation identifier, GuiGraphics context, int x0, int y0, int x1, int y1, int z, int regionWidth, int regionHeight, float u, float v, int textureWidth, int textureHeight, Color color, boolean mirror) {
+    private static void drawTexture(ResourceLocation identifier, GuiGraphics context, int x0, int y0, int x1, int y1, int regionWidth, int regionHeight, float u, float v, int textureWidth, int textureHeight, Color color, boolean mirror) {
         // Convert color to ARGB int
         // Original code used alpha/100f for shader (0-100 range mapped to 0.0-1.0, values >100 clamped to 1.0)
         // So we need to handle both conventions: alpha 0-100 and alpha 0-255 (standard Java Color)
@@ -53,21 +52,13 @@ public class InGameDrawer {
             u1 = temp;
         }
         
-        drawTexturedQuad(identifier, context, x0, y0, x1, y1, z, u0, u1, v0, v1, argbColor);
-    }
-
-    private static void drawTexturedQuad(ResourceLocation identifier, GuiGraphics context, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1, int color) {
-        RenderType renderType = RenderType.guiTextured(identifier);
-        Matrix4f matrix = context.pose().last().pose();
-        
-        // Use drawSpecial to access the MultiBufferSource
-        context.drawSpecial(bufferSource -> {
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
-            
-            vertexConsumer.addVertex(matrix, (float)x0, (float)y0, (float)z).setUv(u0, v0).setColor(color);
-            vertexConsumer.addVertex(matrix, (float)x0, (float)y1, (float)z).setUv(u0, v1).setColor(color);
-            vertexConsumer.addVertex(matrix, (float)x1, (float)y1, (float)z).setUv(u1, v1).setColor(color);
-            vertexConsumer.addVertex(matrix, (float)x1, (float)y0, (float)z).setUv(u1, v0).setColor(color);
-        });
+        // Use mixin invoker to call private innerBlit method with color support
+        ((GuiGraphicsInvoker) context).invokeInnerBlit(
+            RenderPipelines.GUI_TEXTURED,
+            identifier,
+            x0, y0, x1, y1,
+            u0, u1, v0, v1,
+            argbColor
+        );
     }
 }
