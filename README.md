@@ -40,6 +40,7 @@ The following has been changed in the API that may affect mods:
 - Add more in-built texture options for the armor bar.
 
 # API:
+- Developer docs: https://github.com/coredex-source/DetailArmorBarReconstructed/wiki/For-Developer-(API-Document)
 - Should work with some changes to the mods which use the API.
 eg. GildedArmor [CurseForge](https://www.curseforge.com/minecraft/mc-mods/gildedarmor) [Modrinth](https://modrinth.com/mod/gildedarmor)
 
