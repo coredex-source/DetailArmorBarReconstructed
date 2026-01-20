@@ -32,7 +32,8 @@
     ]
   },
   "mixins": [
-    "detailab.mixins.json"
+    "detailab.mixins.json",
+    "detailab.overflowingbars.mixins.json"
   ],
   "depends": {
     "fabricloader": "*",
