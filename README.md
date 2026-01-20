@@ -49,11 +49,13 @@ eg. GildedArmor [CurseForge](https://www.curseforge.com/minecraft/mc-mods/gilded
 - It already exists and is implemented in a brilliant way in [Detail Armor Bar Compat](https://modrinth.com/mod/detailab-compat)
 
 # Downloads
-- For 1.21.4 and below use the official mod by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/detail-armor-bar)
-- For 1.21.5 and above by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar-reconstructed) or [CurseForge](https://curseforge.com/minecraft/mc-mods/detail-armor-bar-reconstructed) or [Github-Releases](https://github.com/coredex-source/DetailArmorBarReconstructed/releases/latest)
+- For 1.20.6 and below use the official mod by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar) or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/detail-armor-bar)
+- For 1.21 and above by clicking here: [Modrinth](https://modrinth.com/mod/detail-armor-bar-reconstructed) or [CurseForge](https://curseforge.com/minecraft/mc-mods/detail-armor-bar-reconstructed) or [Github-Releases](https://github.com/coredex-source/DetailArmorBarReconstructed/releases/latest)
 
 # Version Support
 - The mod will be supported for upto 3 versions, for example if 1.21.8 is the latest Minecraft release then support will be provided for 1.21.6, 1.21.7 and 1.21.8.
+- If there is a very major change then the 3 version support rule may not apply.
+- Version 5.0.0 is a special release which adds support for 1.21-1.21.8 which were not supposed to be updated/released for the version. This was done just to mark a "flagship" release for the mod.
 - If a backport is to be requested, it can be requested be creating an issue [here](https://github.com/coredex-source/DetailArmorBarReconstructed/issues).
 
 # Credits
