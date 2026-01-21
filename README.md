@@ -28,7 +28,7 @@ The following has been changed in the API that may affect mods:
 - Rework the offset/positioning system.
 - ~~Add inventory overlay for displaying armor protection type.~~
 - ~~Add a durability overlay (will not be on the bar itself but somewhat like other armor hud mods unless I can pack it in there without making the bar too bloated).~~
-- Reformat and optimize existing code. (In progress.)
+- ~~Reformat and optimize existing code.~~
 - Add a modern DABR API. (Will eventually replace the existing API)
 
 # To-Do (for version 6.0.0):
