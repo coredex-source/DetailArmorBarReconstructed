@@ -45,15 +45,36 @@ public class ArmorBarRenderer {
     public static long LAST_THORNS = 0L;
     public static long LAST_MENDING = 0L;
 
+    // Per-tick cache for animation calculations
+    private static long cachedTick = -1;
+    private static int cachedAnimationSpeed = 30;
+    private static Color cachedLowDurabilityColor = null;
+    
+    private static void updateAnimationCache() {
+        long currentTick = DetailArmorBar.getTicks();
+        if (currentTick != cachedTick) {
+            cachedTick = currentTick;
+            cachedAnimationSpeed = switch (getConfig().getOptions().effectSpeed) {
+                case VERY_SLOW -> 45;
+                case SLOW -> 37;
+                case FAST -> 23;
+                case VERY_FAST -> 15;
+                default -> 30;
+            };
+            int speed = cachedAnimationSpeed;
+            long time = currentTick;
+            int alpha;
+            if (time % (speed*4L) >= (speed*2L)) alpha = 0;
+            else if (time % (speed*2L) < speed)
+                alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
+            else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
+            cachedLowDurabilityColor = new Color(255, 25, 25, alpha);
+        }
+    }
 
     private static int getAnimationSpeed() {
-        return switch (getConfig().getOptions().effectSpeed) {
-            case VERY_SLOW -> 45;
-            case SLOW -> 37;
-            case FAST -> 23;
-            case VERY_FAST -> 15;
-            default -> 30;
-        };
+        updateAnimationCache();
+        return cachedAnimationSpeed;
     }
 
     private static Color getProtectColor(int g, int p, int e, int f, int a) {
@@ -66,6 +87,8 @@ public class ArmorBarRenderer {
             else if (time % (speed*2L) < speed)
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
             else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
         } else alpha = 0;
 
         if (g > 0) return new Color(153, 255, 255, alpha);
@@ -100,6 +123,8 @@ public class ArmorBarRenderer {
             } else {
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
             }
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
         } else {
             alpha = 0;
         }
@@ -109,15 +134,8 @@ public class ArmorBarRenderer {
     }
     
     private static Color getLowDurabilityColor() {
-        int speed = getAnimationSpeed();
-        long time = DetailArmorBar.getTicks();
-        int alpha;
-        if (time % (speed*4L) >= (speed*2L)) alpha = 0;
-        else if (time % (speed*2L) < speed)
-            alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
-        else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
-
-        return new Color(255, 25, 25, alpha);
+        updateAnimationCache();
+        return cachedLowDurabilityColor;
     }
 
     private static Color getDurabilityNotificationColor() {
@@ -262,11 +280,12 @@ public class ArmorBarRenderer {
                     if(itemStack.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
                         ItemAttributeModifiers component = itemStack.get(DataComponents.ATTRIBUTE_MODIFIERS);
                         assert component != null;
-                        count += component.modifiers().stream()
-                                .filter((attr) -> attr.attribute().equals(Attributes.ARMOR) && attr.slot().slots().contains(slot))
-                                .findFirst()
-                                .map(x -> x.modifier().amount())
-                                .orElse(0.0);
+                        for (var attr : component.modifiers()) {
+                            if (attr.attribute().equals(Attributes.ARMOR) && attr.slot().slots().contains(slot)) {
+                                count += (int) attr.modifier().amount();
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -293,7 +312,7 @@ public class ArmorBarRenderer {
                     ? DetailArmorBarAPI.getArmorBarList().getOrDefault(itemStack.getItem(), CustomArmorBar.DEFAULT)
                     : CustomArmorBar.DEFAULT;
 
-                var defense = getDefense(itemStack, slot);
+                var defense = ArmorBarUtils.getDefense(itemStack, slot);
                 sumArmor += defense;
                 for (int i = 0; i < defense; i++) {
                     armorPoints.add(new Tuple<>(itemStack, barData));
@@ -335,33 +354,8 @@ public class ArmorBarRenderer {
         return armorPoints;
     }
 
-    private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
-        var modifier = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-        for (var entry : modifier.modifiers()) {
-            if (entry.slot().test(slot) && entry.attribute().equals(Attributes.ARMOR)) {
-                return (int) entry.modifier().amount();
-            }
-        }
-        return 0;
-    }
-
-
-
     private final Minecraft client = Minecraft.getInstance();
     private final Gui hud = client.gui;
-
-    private Iterable<ItemStack> getArmorItems(Player player) {
-        var list = new ArrayList<ItemStack>();
-        Optional.ofNullable(player.getItemBySlot(EquipmentSlot.HEAD))
-                .ifPresent(list::add);
-        Optional.ofNullable(player.getItemBySlot(EquipmentSlot.CHEST))
-                .ifPresent(list::add);
-        Optional.ofNullable(player.getItemBySlot(EquipmentSlot.LEGS))
-                .ifPresent(list::add);
-        Optional.ofNullable(player.getItemBySlot(EquipmentSlot.FEET))
-                .ifPresent(list::add);
-        return list;
-    }
 
     private boolean hasSameProtectionEnchantments(Iterable<ItemStack> equipment) {
         if (!getConfig().getOptions().toggleUniformColor) {
@@ -388,7 +382,9 @@ public class ArmorBarRenderer {
     }
 
     public void render(GuiGraphics context, Player player, int y_base) {
-        var armorItems = getArmorItems(player);
+        var options = getConfig().getOptions();
+        
+        var armorItems = ArmorBarUtils.getArmorItems(player);
         var generic = getEnchantLevel(armorItems, Enchantments.PROTECTION);
         var projectile = getEnchantLevel(armorItems, Enchantments.PROJECTILE_PROTECTION);
         var explosive = getEnchantLevel(armorItems, Enchantments.BLAST_PROTECTION);
@@ -401,21 +397,21 @@ public class ArmorBarRenderer {
         var totalEnchants = Arrays.stream(protectArr).sum();
 
         // Hide armor bar completely when no armor is worn to maintain vanilla parity
-        if (totalArmorPoint == 0 && getConfig().getOptions().toggleHideBarWithoutArmor) {
+        if (totalArmorPoint == 0 && options.toggleHideBarWithoutArmor) {
             return;
         }
 
-        var screenWidth = client.getWindow().getGuiScaledWidth() / 2 - 91 + getConfig().getOptions().armorBarOffsetX;
-        var yPos = y_base + getConfig().getOptions().armorBarOffsetY;
+        var screenWidth = client.getWindow().getGuiScaledWidth() / 2 - 91 + options.armorBarOffsetX;
+        var yPos = y_base + options.armorBarOffsetY;
 
         int stackCount = (totalArmorPoint - 1) / 20;
         int stackRow = stackCount * 20;
 
         // Render empty armor bar if no armor is worn but toggleEmptyBar is true
-        if (totalArmorPoint == 0 && getConfig().getOptions().toggleEmptyBar) {
+        if (totalArmorPoint == 0 && options.toggleEmptyBar) {
             for (int count = 0; count < 10; count++) {
                 int xPos;
-                if (getConfig().getOptions().toggleInverseSlot) {
+                if (options.toggleInverseSlot) {
                     xPos = screenWidth + (9 - count) * 8;
                 } else {
                     xPos = screenWidth + count * 8;
@@ -431,7 +427,7 @@ public class ArmorBarRenderer {
             for (int count = 0; count < maxSlots; count++) {
                 // Calculate xPos based on inverse slot setting
                 int xPos;
-                if (getConfig().getOptions().toggleInverseSlot) {
+                if (options.toggleInverseSlot) {
                     // For inverse order (right to left), start from right and move left
                     xPos = screenWidth + (9 - count) * 8;
                 } else {
@@ -449,7 +445,7 @@ public class ArmorBarRenderer {
                         am1.getB().draw(am1.getA(), context, xPos, yPos, true, false);
                     }
                     // Draw sparkle overlay for items with mending
-                    if (getConfig().getOptions().toggleMending && (hasMendingEnchant(am1.getA()) || hasMendingEnchant(am2.getA()))) {
+                    if (options.toggleMending && (hasMendingEnchant(am1.getA()) || hasMendingEnchant(am2.getA()))) {
                         drawSparkleOverlay(context, xPos, yPos);
                     }
                 }
@@ -458,7 +454,7 @@ public class ArmorBarRenderer {
                     Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
                     am.getB().draw(am.getA(), context, xPos, yPos, true, false);
                     // Draw sparkle overlay for item with mending
-                    if (getConfig().getOptions().toggleMending && hasMendingEnchant(am.getA())) {
+                    if (options.toggleMending && hasMendingEnchant(am.getA())) {
                         drawSparkleOverlay(context, xPos, yPos);
                     }
                 }
@@ -475,12 +471,12 @@ public class ArmorBarRenderer {
         }
 
         // Armor Trim Overlay
-        if (getConfig().getOptions().toggleArmorTrims && totalArmorPoint > 0) {
+        if (options.toggleArmorTrims && totalArmorPoint > 0) {
             int maxSlots = 10;
             
             for (int count = 0; count < maxSlots; count++) {
                 int xPos;
-                if (getConfig().getOptions().toggleInverseSlot) {
+                if (options.toggleInverseSlot) {
                     xPos = screenWidth + (9 - count) * 8;
                 } else {
                     xPos = screenWidth + count * 8;
@@ -530,12 +526,12 @@ public class ArmorBarRenderer {
         }
 
         // Durability HUD - shows armor icons with durability percentages in bottom left corner
-        if (getConfig().getOptions().toggleDurabilityOverlay) {
+        if (options.toggleDurabilityOverlay) {
             renderDurabilityHUD(context, player);
         }
 
         //Durability Color
-        if (getConfig().getOptions().toggleDurability) {
+        if (options.toggleDurability) {
             List<Tuple<EquipmentSlot, ItemStack>> equipment = new ArrayList<>();
 
             for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
@@ -558,7 +554,7 @@ public class ArmorBarRenderer {
 
                         // Calculate xPos based on inverse slot setting
                         int xPos;
-                        if (getConfig().getOptions().toggleInverseSlot) {
+                        if (options.toggleInverseSlot) {
                             xPos = screenWidth + (9 - (halfArmors - count)) * 8;
                         } else {
                             xPos = screenWidth + (halfArmors - count) * 8;
@@ -585,7 +581,7 @@ public class ArmorBarRenderer {
         }
 
         //Mending Color
-        if (getConfig().getOptions().toggleMending && totalArmorPoint != 0) {
+        if (options.toggleMending && totalArmorPoint != 0) {
             var mendingTime = DetailArmorBar.getTicks() - LAST_MENDING;
             var mendingSpeed = 3;
 
@@ -596,14 +592,14 @@ public class ArmorBarRenderer {
                     if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
                         // Calculate xPos based on inverse slot setting
                         int xPos;
-                        if (getConfig().getOptions().toggleInverseSlot) {
+                        if (options.toggleInverseSlot) {
                             xPos = screenWidth + (9 - count) * 8;
                         } else {
                             xPos = screenWidth + count * 8;
                         }
 
                         if (armorPoints.size() <= count * 2 + stackRow) {
-                            if (getConfig().getOptions().toggleEmptyBar)
+                            if (options.toggleEmptyBar)
                                 CustomArmorBar.DEFAULT.drawOutLine(ItemStack.EMPTY, context, xPos, yPos, false, false, Color.WHITE);
                         } else {
                             Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
@@ -614,8 +610,8 @@ public class ArmorBarRenderer {
             }
         }
         
-        if (getConfig().getOptions().toggleDurabilityNotifications && 
-            getConfig().getOptions().toggleDurabilityVisualEffect && totalArmorPoint != 0) {
+        if (options.toggleDurabilityNotifications && 
+            options.toggleDurabilityVisualEffect && totalArmorPoint != 0) {
             Color notificationColor = getDurabilityNotificationColor();
             
             if (notificationColor != null && notificationColor.getAlpha() > 0) {
@@ -623,7 +619,7 @@ public class ArmorBarRenderer {
                 
                 for (int count = 0; count < maxSlots; count++) {
                     int xPos;
-                    if (getConfig().getOptions().toggleInverseSlot) {
+                    if (options.toggleInverseSlot) {
                         xPos = screenWidth + (9 - count) * 8;
                     } else {
                         xPos = screenWidth + count * 8;
@@ -638,21 +634,21 @@ public class ArmorBarRenderer {
         }
 
         //Armor Enchantments
-        if (getConfig().getOptions().toggleEnchants && totalEnchants > 0 && totalArmorPoint > 0) {
-            if (getConfig().getOptions().toggleAlignEnchantments) {
+        if (options.toggleEnchants && totalEnchants > 0 && totalArmorPoint > 0) {
+            if (options.toggleAlignEnchantments) {
                 // New behavior - align with armor points
                 int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
                 
                 // Check if uniform color is enabled
-                boolean useUniformColor = getConfig().getOptions().toggleUniformColor;
-                Color baseUniformColor = useUniformColor ? getConfig().getOptions().uniformColorType.getColor() : null;
+                boolean useUniformColor = options.toggleUniformColor;
+                Color baseUniformColor = useUniformColor ? options.uniformColorType.getColor() : null;
                 // Apply animation to the uniform color
                 Color animatedUniformColor = baseUniformColor != null ? getAnimatedUniformColor(baseUniformColor) : null;
                 
                 for (int count = 0; count < displayedArmorIcons; count++) {
                     // Calculate xPos based on inverse slot setting
                     int xPos;
-                    if (getConfig().getOptions().toggleInverseSlot) {
+                    if (options.toggleInverseSlot) {
                         xPos = screenWidth + (9 - count) * 8;
                     } else {
                         xPos = screenWidth + count * 8;
@@ -752,7 +748,7 @@ public class ArmorBarRenderer {
 
                     // Calculate xPos based on inverse slot setting
                     int xPos;
-                    if (getConfig().getOptions().toggleInverseSlot) {
+                    if (options.toggleInverseSlot) {
                         xPos = screenWidth + (9 - count) * 8;
                     } else {
                         xPos = screenWidth + count * 8;
@@ -787,17 +783,17 @@ public class ArmorBarRenderer {
         }
 
         //Thorns Check
-        if (getConfig().getOptions().toggleThorns && thorns.level > 0 && totalArmorPoint > 0) {
+        if (options.toggleThorns && thorns.level > 0 && totalArmorPoint > 0) {
             Color thornsColor = getThornColor();
             
-            if (getConfig().getOptions().toggleAlignEnchantments) {
+            if (options.toggleAlignEnchantments) {
                 // New behavior - align thorns with armor points (similar to protection overlay)
                 int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
                 
                 for (int count = 0; count < displayedArmorIcons; count++) {
                     // Calculate xPos based on inverse slot setting
                     int xPos;
-                    if (getConfig().getOptions().toggleInverseSlot) {
+                    if (options.toggleInverseSlot) {
                         xPos = screenWidth + (9 - count) * 8;
                     } else {
                         xPos = screenWidth + count * 8;
@@ -852,7 +848,7 @@ public class ArmorBarRenderer {
 
                     // Calculate xPos based on inverse slot setting
                     int xPos;
-                    if (getConfig().getOptions().toggleInverseSlot) {
+                    if (options.toggleInverseSlot) {
                         xPos = screenWidth + (9 - count) * 8;
                     } else {
                         xPos = screenWidth + count * 8;
@@ -894,6 +890,8 @@ public class ArmorBarRenderer {
             }
         } else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
             u = 9 + (half * 9);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            u = 9 + (half * 9); // Same texture position as outline
         } else return;
 
         InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, x, y, u, v, color, false);

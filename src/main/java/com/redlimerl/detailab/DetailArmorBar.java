@@ -4,6 +4,7 @@ import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
+import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
 import com.redlimerl.detailab.screen.OptionsScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -147,6 +148,10 @@ public class DetailArmorBar implements ClientModInitializer {
             if (FabricLoader.getInstance().getModContainer(compatibilityMod).isPresent()) {
                 getConfig().getOptions().toggleCompatibleHeartMod = true;
             }
+        }
+        
+        if (ModCompatibility.isOverflowingBarsLoaded()) {
+            LOGGER.info("OverflowingBars detected - using compatible rendering mode");
         }
     }
 

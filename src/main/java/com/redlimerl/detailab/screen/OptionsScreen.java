@@ -450,7 +450,7 @@ public class OptionsScreen extends Screen {
             if (minecraft != null) {
                 minecraft.setScreen(new OptionsScreen(parent, OptionType.FEATURES));
             }
-        }).bounds(width / 2 - 152, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 - 152, height / 6 + 168, 60, 20).build());
         features.active = optionType != OptionType.FEATURES;
 
         Button animation = addRenderableWidget(Button.builder(
@@ -458,7 +458,7 @@ public class OptionsScreen extends Screen {
             if (minecraft != null) {
                 minecraft.setScreen(new OptionsScreen(parent, OptionType.ANIMATION));
             }
-        }).bounds(width / 2 - 90, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 - 90, height / 6 + 168, 60, 20).build());
         animation.active = optionType != OptionType.ANIMATION;
 
         Button positioning = addRenderableWidget(Button.builder(
@@ -466,7 +466,7 @@ public class OptionsScreen extends Screen {
             if (minecraft != null) {
                 minecraft.setScreen(new OptionsScreen(parent, OptionType.POSITIONING));
             }
-        }).bounds(width / 2 - 28, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 - 28, height / 6 + 168, 60, 20).build());
         positioning.active = optionType != OptionType.POSITIONING;
 
         Button durability = addRenderableWidget(Button.builder(
@@ -474,7 +474,7 @@ public class OptionsScreen extends Screen {
             if (minecraft != null) {
                 minecraft.setScreen(new OptionsScreen(parent, OptionType.DURABILITY));
             }
-        }).bounds(width / 2 + 34, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 + 34, height / 6 + 168, 60, 20).build());
         durability.active = optionType != OptionType.DURABILITY;
 
         Button etc = addRenderableWidget(Button.builder(
@@ -482,14 +482,14 @@ public class OptionsScreen extends Screen {
             if (minecraft != null) {
                 minecraft.setScreen(new OptionsScreen(parent, OptionType.ETC));
             }
-        }).bounds(width / 2 + 96, height / 6 + 140, 60, 20).build());
+        }).bounds(width / 2 + 96, height / 6 + 168, 60, 20).build());
         etc.active = optionType != OptionType.ETC;
 
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (matrixStack) -> {
             if (minecraft != null) {
                 minecraft.setScreen(parent);
             }
-        }).bounds(width / 2 - 100, height / 6 + 168, 200, 20).build());
+        }).bounds(width / 2 - 100, height / 6 + 192, 200, 20).build());
     }
 
     @Override
