@@ -4,6 +4,7 @@ import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
+import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.DyedItemColor;
@@ -52,6 +53,11 @@ public class DetailArmorBar {
         
         // Register built-in armor bar renders
         registerBuiltInArmorBars();
+        
+        // Check for OverflowingBars compatibility
+        if (ModCompatibility.isOverflowingBarsLoaded()) {
+            LOGGER.info("OverflowingBars detected - using compatible rendering mode");
+        }
     }
 
     private void registerBuiltInArmorBars() {

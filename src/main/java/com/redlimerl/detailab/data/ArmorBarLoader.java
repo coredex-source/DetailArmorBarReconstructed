@@ -137,10 +137,10 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
         DataComponentMap eqComp = stack.getComponents();
         if (eqComp != null) {
             // DEBUG: print the component data
-            DetailArmorBar.LOGGER.info("Equippable component for {}: {}", stack, eqComp);
+            DetailArmorBar.LOGGER.debug("Equippable component for {}: {}", stack, eqComp);
             return true;
         }
-        DetailArmorBar.LOGGER.warn("Non-armor item: {}", stack.getItem());
+        DetailArmorBar.LOGGER.debug("Non-armor item: {}", stack.getItem());
         return false;
     }
 }

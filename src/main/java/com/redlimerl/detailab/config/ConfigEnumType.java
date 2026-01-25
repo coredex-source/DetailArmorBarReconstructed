@@ -5,7 +5,7 @@ import java.awt.Color;
 public class ConfigEnumType {
 
     public enum ProtectionEffect {
-        NONE, AURA, OUTLINE
+        NONE, AURA, OUTLINE, STATIC
     }
 
     public enum EffectSpeed {
