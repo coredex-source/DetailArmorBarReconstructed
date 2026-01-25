@@ -45,15 +45,36 @@ public class ArmorBarRenderer {
     public static long LAST_THORNS = 0L;
     public static long LAST_MENDING = 0L;
 
+    // Per-tick cache for animation calculations
+    private static long cachedTick = -1;
+    private static int cachedAnimationSpeed = 30;
+    private static Color cachedLowDurabilityColor = null;
+    
+    private static void updateAnimationCache() {
+        long currentTick = DetailArmorBar.getTicks();
+        if (currentTick != cachedTick) {
+            cachedTick = currentTick;
+            cachedAnimationSpeed = switch (getConfig().getOptions().effectSpeed) {
+                case VERY_SLOW -> 45;
+                case SLOW -> 37;
+                case FAST -> 23;
+                case VERY_FAST -> 15;
+                default -> 30;
+            };
+            int speed = cachedAnimationSpeed;
+            long time = currentTick;
+            int alpha;
+            if (time % (speed*4L) >= (speed*2L)) alpha = 0;
+            else if (time % (speed*2L) < speed)
+                alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
+            else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
+            cachedLowDurabilityColor = new Color(255, 25, 25, alpha);
+        }
+    }
 
     private static int getAnimationSpeed() {
-        return switch (getConfig().getOptions().effectSpeed) {
-            case VERY_SLOW -> 45;
-            case SLOW -> 37;
-            case FAST -> 23;
-            case VERY_FAST -> 15;
-            default -> 30;
-        };
+        updateAnimationCache();
+        return cachedAnimationSpeed;
     }
 
     private static Color getProtectColor(int g, int p, int e, int f, int a) {
@@ -66,6 +87,8 @@ public class ArmorBarRenderer {
             else if (time % (speed*2L) < speed)
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
             else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
         } else alpha = 0;
 
         if (g > 0) return new Color(153, 255, 255, alpha);
@@ -100,6 +123,8 @@ public class ArmorBarRenderer {
             } else {
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
             }
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
         } else {
             alpha = 0;
         }
@@ -109,15 +134,8 @@ public class ArmorBarRenderer {
     }
     
     private static Color getLowDurabilityColor() {
-        int speed = getAnimationSpeed();
-        long time = DetailArmorBar.getTicks();
-        int alpha;
-        if (time % (speed*4L) >= (speed*2L)) alpha = 0;
-        else if (time % (speed*2L) < speed)
-            alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
-        else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
-
-        return new Color(255, 25, 25, alpha);
+        updateAnimationCache();
+        return cachedLowDurabilityColor;
     }
 
     private static Color getDurabilityNotificationColor() {
@@ -262,11 +280,12 @@ public class ArmorBarRenderer {
                     if(itemStack.has(DataComponents.ATTRIBUTE_MODIFIERS)) {
                         ItemAttributeModifiers component = itemStack.get(DataComponents.ATTRIBUTE_MODIFIERS);
                         assert component != null;
-                        count += component.modifiers().stream()
-                                .filter((attr) -> attr.attribute().equals(Attributes.ARMOR) && attr.slot().slots().contains(slot))
-                                .findFirst()
-                                .map(x -> x.modifier().amount())
-                                .orElse(0.0);
+                        for (var attr : component.modifiers()) {
+                            if (attr.attribute().equals(Attributes.ARMOR) && attr.slot().slots().contains(slot)) {
+                                count += (int) attr.modifier().amount();
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -293,7 +312,7 @@ public class ArmorBarRenderer {
                     ? DetailArmorBarAPI.getArmorBarList().getOrDefault(itemStack.getItem(), CustomArmorBar.DEFAULT)
                     : CustomArmorBar.DEFAULT;
 
-                var defense = getDefense(itemStack, slot);
+                var defense = ArmorBarUtils.getDefense(itemStack, slot);
                 sumArmor += defense;
                 for (int i = 0; i < defense; i++) {
                     armorPoints.add(new Tuple<>(itemStack, barData));
@@ -335,33 +354,8 @@ public class ArmorBarRenderer {
         return armorPoints;
     }
 
-    private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
-        var modifier = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-        for (var entry : modifier.modifiers()) {
-            if (entry.slot().test(slot) && entry.attribute().equals(Attributes.ARMOR)) {
-                return (int) entry.modifier().amount();
-            }
-        }
-        return 0;
-    }
-
-
-
     private final Minecraft client = Minecraft.getInstance();
     private final Gui hud = client.gui;
-
-    private Iterable<ItemStack> getArmorItems(Player player) {
-        var list = new ArrayList<ItemStack>();
-        Optional.ofNullable(player.getItemBySlot(EquipmentSlot.HEAD))
-                .ifPresent(list::add);
-        Optional.ofNullable(player.getItemBySlot(EquipmentSlot.CHEST))
-                .ifPresent(list::add);
-        Optional.ofNullable(player.getItemBySlot(EquipmentSlot.LEGS))
-                .ifPresent(list::add);
-        Optional.ofNullable(player.getItemBySlot(EquipmentSlot.FEET))
-                .ifPresent(list::add);
-        return list;
-    }
 
     private boolean hasSameProtectionEnchantments(Iterable<ItemStack> equipment) {
         if (!getConfig().getOptions().toggleUniformColor) {
@@ -387,7 +381,9 @@ public class ArmorBarRenderer {
     }
 
     public void render(GuiGraphics context, Player player, int y_base) {
-        var armorItems = getArmorItems(player);
+        var options = getConfig().getOptions();
+        
+        var armorItems = ArmorBarUtils.getArmorItems(player);
         var generic = getEnchantLevel(armorItems, Enchantments.PROTECTION);
         var projectile = getEnchantLevel(armorItems, Enchantments.PROJECTILE_PROTECTION);
         var explosive = getEnchantLevel(armorItems, Enchantments.BLAST_PROTECTION);
@@ -893,6 +889,8 @@ public class ArmorBarRenderer {
             }
         } else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
             u = 9 + (half * 9);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            u = 9 + (half * 9); // Same texture position as outline
         } else return;
 
         InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, x, y, u, v, color, false);

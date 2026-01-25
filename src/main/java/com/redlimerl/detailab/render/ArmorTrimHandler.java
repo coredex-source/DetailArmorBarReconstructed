@@ -274,8 +274,8 @@ public class ArmorTrimHandler {
         
         if (material == null) return null;
 
-        int armorPoints = getDefense(itemStack, slot);
-        
+        int armorPoints = ArmorBarUtils.getDefense(itemStack, slot);
+
         return new TrimInfo(material, armorPoints);
     }
     
@@ -319,16 +319,6 @@ public class ArmorTrimHandler {
         
         MaterialAssetGroup assets = trim.material().value().assets();
         return TrimMaterial.fromArmorTrimAssets(assets);
-    }
-    
-    private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
-        var modifier = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-        for (var entry : modifier.modifiers()) {
-            if (entry.slot().test(slot) && entry.attribute().equals(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)) {
-                return (int) entry.modifier().amount();
-            }
-        }
-        return 0;
     }
     
     public static void clearCache() {

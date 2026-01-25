@@ -10,6 +10,8 @@
   "context.detailarmorbar.effects.effect_type.aura": "Паказваць аўру на радку брані.",
   "option.detailarmorbar.effects.effect_type.outline": "Контур",
   "context.detailarmorbar.effects.effect_type.outline": "Паказваць контур на радку брані.",
+  "option.detailarmorbar.effects.effect_type.static": "Статычны",
+  "context.detailarmorbar.effects.effect_type.static": "Паказваць статычны контур на радку брані (контур без мігцення).",
   "option.detailarmorbar.effects.effect_speed": "Эфект хуткасці",
   "context.detailarmorbar.effects.effect_speed": "Змяняе хуткасць эфекту для/эфекту абароны і папярэджання аб нізкай трываласці.",
   "option.detailarmorbar.effects.effect_speed.normal": "Звычайная",

@@ -22,14 +22,22 @@ public class InventoryArmorOverlayRenderer {
     
     public static final InventoryArmorOverlayRenderer INSTANCE = new InventoryArmorOverlayRenderer();
     
+    private static long cachedTick = -1;
+    private static int cachedAnimationSpeed = 30;
+
     private static int getAnimationSpeed() {
-        return switch (getConfig().getOptions().effectSpeed) {
-            case VERY_SLOW -> 45;
-            case SLOW -> 37;
-            case FAST -> 23;
-            case VERY_FAST -> 15;
-            default -> 30;
-        };
+        long currentTick = DetailArmorBar.getTicks();
+        if (currentTick != cachedTick) {
+            cachedTick = currentTick;
+            cachedAnimationSpeed = switch (getConfig().getOptions().effectSpeed) {
+                case VERY_SLOW -> 45;
+                case SLOW -> 37;
+                case FAST -> 23;
+                case VERY_FAST -> 15;
+                default -> 30;
+            };
+        }
+        return cachedAnimationSpeed;
     }
     
     /**
@@ -53,6 +61,8 @@ public class InventoryArmorOverlayRenderer {
             else if (time % (speed * 2L) < speed)
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.75f) * 255);
             else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.75f, 0f) * 255);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.75f * 255); // Static outline at constant 75% opacity
         } else {
             return null;
         }
@@ -87,6 +97,8 @@ public class InventoryArmorOverlayRenderer {
             else if (time % (speed * 2L) < speed)
                 alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.75f) * 255);
             else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.75f, 0f) * 255);
+        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
+            alpha = Math.round(0.75f * 255); // Static outline at constant 75% opacity
         } else {
             return null;
         }
