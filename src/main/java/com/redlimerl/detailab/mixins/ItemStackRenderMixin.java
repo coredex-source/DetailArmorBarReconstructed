@@ -1,7 +1,7 @@
 package com.redlimerl.detailab.mixins;
 
 import com.redlimerl.detailab.render.InventoryArmorOverlayRenderer;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Mixin to render protection type overlays on armor items in the inventory.
  * Hooks into the item rendering to add the enchantment display overlays.
  */
-@Mixin(GuiGraphics.class)
+@Mixin(GuiGraphicsExtractor.class)
 public class ItemStackRenderMixin {
     
     /**
@@ -23,7 +23,7 @@ public class ItemStackRenderMixin {
             at = @At("RETURN"))
     private void renderProtectionOverlay(net.minecraft.client.gui.Font font, ItemStack itemStack, int x, int y, String text, CallbackInfo ci) {
         if (itemStack != null && !itemStack.isEmpty()) {
-            InventoryArmorOverlayRenderer.INSTANCE.renderOverlay((GuiGraphics)(Object)this, itemStack, x, y);
+            InventoryArmorOverlayRenderer.INSTANCE.renderOverlay((GuiGraphicsExtractor)(Object)this, itemStack, x, y);
         }
     }
 }

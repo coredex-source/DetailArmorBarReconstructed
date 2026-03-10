@@ -2,7 +2,7 @@ package com.redlimerl.detailab.render;
 
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
@@ -148,7 +148,7 @@ public class InventoryArmorOverlayRenderer {
      * @param x X position of the item slot
      * @param y Y position of the item slot
      */
-    public void renderOverlay(GuiGraphics context, ItemStack itemStack, int x, int y) {
+    public void renderOverlay(GuiGraphicsExtractor context, ItemStack itemStack, int x, int y) {
         if (!getConfig().getOptions().toggleInventoryOverlay) return;
         if (itemStack.isEmpty()) return;
     
@@ -172,7 +172,7 @@ public class InventoryArmorOverlayRenderer {
     /**
      * Renders a colored border/overlay for protection enchantments.
      */
-    private void renderProtectionOverlay(GuiGraphics context, int x, int y, Color color) {
+    private void renderProtectionOverlay(GuiGraphicsExtractor context, int x, int y, Color color) {
         int alpha = color.getAlpha();
         int argb = (alpha << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
         
@@ -192,7 +192,7 @@ public class InventoryArmorOverlayRenderer {
         }
     }
 
-    private void renderThornsOverlay(GuiGraphics context, int x, int y, Color color) {
+    private void renderThornsOverlay(GuiGraphicsExtractor context, int x, int y, Color color) {
         int alpha = color.getAlpha();
         int argb = (alpha << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
         context.fill(x + 13, y + 1, x + 15, y + 2, argb);

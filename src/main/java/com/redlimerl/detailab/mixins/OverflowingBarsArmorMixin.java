@@ -1,7 +1,7 @@
 package com.redlimerl.detailab.mixins;
 
 import com.redlimerl.detailab.render.ArmorBarRenderer;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class OverflowingBarsArmorMixin {
 
     @Inject(method = "renderArmorLevelBar", at = @At("RETURN"), require = 0)
-    private static void detailab$afterRenderArmorBar(GuiGraphics guiGraphics, Player player, int leftHeight, boolean rowCount, CallbackInfo ci) {
+    private static void detailab$afterRenderArmorBar(GuiGraphicsExtractor guiGraphics, Player player, int leftHeight, boolean rowCount, CallbackInfo ci) {
         int posY = guiGraphics.guiHeight() - leftHeight;
 
         ArmorBarRenderer.INSTANCE.render(guiGraphics, player, posY);

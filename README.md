@@ -16,7 +16,7 @@ Detail Armor Bar for 1.21.5+
 # Disclaimer for mod devs:
 The project uses official Mojang mappings starting 5.0.0.
 The following has been changed in the API that may affect mods:
- - The functions draw and drawOutLine from CustomArmorBar.java now use GuiGraphics instead of DrawContext
+ - The functions draw and drawOutLine from CustomArmorBar.java now use GuiGraphicsExtractor instead of DrawContext
 
 # To-Do (for version 5.x.x):
 - Major change: Yarn -> Mojang mappings. (Done, won't strike out for visibility reasons)
