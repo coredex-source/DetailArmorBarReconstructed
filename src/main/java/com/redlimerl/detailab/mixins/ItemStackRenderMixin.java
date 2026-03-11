@@ -19,7 +19,7 @@ public class ItemStackRenderMixin {
      * Injects after item decorations are rendered to add our protection overlay.
      * This ensures our overlay appears on top of the item but can be covered by tooltips.
      */
-    @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", 
+    @Inject(method = "itemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", 
             at = @At("RETURN"))
     private void renderProtectionOverlay(net.minecraft.client.gui.Font font, ItemStack itemStack, int x, int y, String text, CallbackInfo ci) {
         if (itemStack != null && !itemStack.isEmpty()) {
