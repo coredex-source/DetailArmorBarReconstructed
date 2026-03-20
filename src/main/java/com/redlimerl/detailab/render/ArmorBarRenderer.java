@@ -7,7 +7,7 @@ import com.redlimerl.detailab.config.ConfigEnumType.Animation;
 import net.minecraft.resources.Identifier;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -380,7 +380,7 @@ public class ArmorBarRenderer {
         return firstLevels != null;
     }
 
-    public void render(GuiGraphics context, Player player, int y_base) {
+    public void render(GuiGraphicsExtractor context, Player player, int y_base) {
         var options = getConfig().getOptions();
         
         var armorItems = ArmorBarUtils.getArmorItems(player);
@@ -864,7 +864,7 @@ public class ArmorBarRenderer {
         }
     }
 
-    private void drawEnchantTexture(GuiGraphics context, int x, int y, Color color, int half) {
+    private void drawEnchantTexture(GuiGraphicsExtractor context, int x, int y, Color color, int half) {
         // Apply the animation speed calculation for aura mode as well
         int u = 0;
         int v = 0;
@@ -903,7 +903,7 @@ public class ArmorBarRenderer {
     }
 
     // Draws a sparkle overlay at the given position
-    private void drawSparkleOverlay(GuiGraphics context, int x, int y) {
+    private void drawSparkleOverlay(GuiGraphicsExtractor context, int x, int y) {
         long currentTicks = DetailArmorBar.getTicks();
         double fastAnimationSpeed = getAnimationSpeed() / 2.5; // 2.5x faster than normal effects
         
@@ -926,7 +926,7 @@ public class ArmorBarRenderer {
         }
     }
     
-    private void drawStar(GuiGraphics context, int x, int y, int frame) {
+    private void drawStar(GuiGraphicsExtractor context, int x, int y, int frame) {
         int alpha = 255;
         if (frame == 0) alpha = 100;
         else if (frame == 1) alpha = 200;
@@ -961,7 +961,7 @@ public class ArmorBarRenderer {
      * @param isHalf Whether to draw half overlay
      * @param isMirror Whether to mirror the overlay (for right half)
      */
-    private void drawTrimOverlay(GuiGraphics context, int x, int y, ArmorTrimHandler.TrimMaterial material, boolean isHalf, boolean isMirror) {
+    private void drawTrimOverlay(GuiGraphicsExtractor context, int x, int y, ArmorTrimHandler.TrimMaterial material, boolean isHalf, boolean isMirror) {
         int u = isHalf ? 9 : 0;
         int v = 0;
         Identifier textureId = ArmorTrimHandler.getColoredTexture(material);
@@ -980,7 +980,7 @@ public class ArmorBarRenderer {
      * @param context The draw context
      * @param player The player whose armor to display
      */
-    private void renderDurabilityHUD(GuiGraphics context, Player player) {
+    private void renderDurabilityHUD(GuiGraphicsExtractor context, Player player) {
         int screenWidth = client.getWindow().getGuiScaledWidth();
         int screenHeight = client.getWindow().getGuiScaledHeight();
         float scale = getConfig().getOptions().durabilityHudScale;
@@ -1048,12 +1048,12 @@ public class ArmorBarRenderer {
                 int yPos = baseY + yOffset;
                 
                 // Render the item icon
-                context.renderItem(itemStack, xPos, yPos);
+                context.item(itemStack, xPos, yPos);
                 
                 // Render durability percentage text
                 int textColor = getDurabilityColor(durabilityPercent);
                 int textYOffset = (iconSize - 8) / 2; // Center text vertically with icon (8 is font height)
-                context.drawString(client.font, percentage + "%", xPos + textXOffset, yPos + textYOffset, textColor, true);
+                context.text(client.font, percentage + "%", xPos + textXOffset, yPos + textYOffset, textColor, true);
                 
                 // Move down if rendering downward
                 if (!renderUpward) {

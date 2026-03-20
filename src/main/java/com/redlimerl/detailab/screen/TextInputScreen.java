@@ -1,6 +1,6 @@
 package com.redlimerl.detailab.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -66,20 +66,20 @@ public class TextInputScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
         
         // Check for keyboard input
         this.handleKeyboardInput();
         
         // Draw label
-        context.drawCenteredString(this.font, this.fieldLabel, this.width / 2, this.height / 2 - 35, 16777215);
+        context.centeredText(this.font, this.fieldLabel, this.width / 2, this.height / 2 - 35, 16777215);
         
         // Draw text field
-        this.textField.render(context, mouseX, mouseY, delta);
+        this.textField.extractRenderState(context, mouseX, mouseY, delta);
         
         // Draw instructions
-        context.drawCenteredString(this.font, Component.literal("Enter a number (positive or negative)"), this.width / 2, this.height / 2 + 50, 11184810);
+        context.centeredText(this.font, Component.literal("Enter a number (positive or negative)"), this.width / 2, this.height / 2 + 50, 11184810);
     }
 
     private void handleKeyboardInput() {

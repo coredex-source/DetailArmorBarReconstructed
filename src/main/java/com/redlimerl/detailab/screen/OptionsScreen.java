@@ -1,7 +1,7 @@
 package com.redlimerl.detailab.screen;
 
 import com.redlimerl.detailab.config.ConfigEnumType;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.Button;
@@ -493,10 +493,10 @@ public class OptionsScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         buttonCount = 0;
-        super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredString(this.font, this.title, this.width / 2, 15, 16777215);
+        super.extractRenderState(context, mouseX, mouseY, delta);
+        context.centeredText(this.font, this.title, this.width / 2, 15, 16777215);
     }
 
     @Override

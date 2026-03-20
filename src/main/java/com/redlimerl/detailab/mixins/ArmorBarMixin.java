@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.render.ArmorBarRenderer;
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.world.entity.player.Player;
 
@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Gui.class)
 public class ArmorBarMixin {
 
-    @Inject(method = "renderArmor", at = @At("RETURN"))
-    private static void renderArmorOverlay(GuiGraphics context, Player player, int y_base, int num_rows, int line_width, int x, CallbackInfo ci) {
+    @Inject(method = {"extractArmor", "renderArmor"}, at = @At("RETURN"))
+    private static void renderArmorOverlay(GuiGraphicsExtractor context, Player player, int y_base, int num_rows, int line_width, int x, CallbackInfo ci) {
         
         if (ModCompatibility.isOverflowingBarsArmorLayerActive()) {
             return;
@@ -29,7 +29,7 @@ public class ArmorBarMixin {
         ArmorBarRenderer.INSTANCE.render(context, player, y);
     }
 
-    @WrapOperation(method = "renderArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getArmorValue()I"))
+    @WrapOperation(method = {"extractArmor", "renderArmor"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getArmorValue()I"))
     private static int supressGameArmorRenderer(Player playerEntity, Operation<Integer> operation) {
         
         if (ModCompatibility.isOverflowingBarsArmorLayerActive()) {
