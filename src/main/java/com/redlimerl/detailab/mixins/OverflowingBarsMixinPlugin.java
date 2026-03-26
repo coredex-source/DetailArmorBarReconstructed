@@ -15,7 +15,8 @@ public class OverflowingBarsMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-        overflowingBarsLoaded = ModList.get().isLoaded(OVERFLOWINGBARS_MOD_ID);
+        ModList modList = ModList.get();
+        overflowingBarsLoaded = modList != null && modList.isLoaded(OVERFLOWINGBARS_MOD_ID);
     }
 
     @Override

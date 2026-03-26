@@ -9,7 +9,8 @@ public class ModCompatibility {
     
     public static boolean isOverflowingBarsLoaded() {
         if (overflowingBarsLoaded == null) {
-            overflowingBarsLoaded = ModList.get().isLoaded("overflowingbars");
+            ModList modList = ModList.get();
+            overflowingBarsLoaded = modList != null && modList.isLoaded("overflowingbars");
         }
         return overflowingBarsLoaded;
     }
