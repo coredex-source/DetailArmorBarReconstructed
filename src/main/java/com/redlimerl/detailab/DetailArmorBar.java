@@ -72,7 +72,7 @@ public class DetailArmorBar implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openConfigKey.consumeClick()) {
                 if (client.screen == null) {
-                    client.setScreen(new OptionsScreen(null));
+                    client.setScreen(OptionsScreen.create(null));
                 }
             }
         });

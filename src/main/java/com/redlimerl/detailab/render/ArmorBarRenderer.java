@@ -641,7 +641,7 @@ public class ArmorBarRenderer {
                 
                 // Check if uniform color is enabled
                 boolean useUniformColor = options.toggleUniformColor;
-                Color baseUniformColor = useUniformColor ? options.uniformColorType.getColor() : null;
+                Color baseUniformColor = useUniformColor ? options.getUniformColor() : null;
                 // Apply animation to the uniform color
                 Color animatedUniformColor = baseUniformColor != null ? getAnimatedUniformColor(baseUniformColor) : null;
                 

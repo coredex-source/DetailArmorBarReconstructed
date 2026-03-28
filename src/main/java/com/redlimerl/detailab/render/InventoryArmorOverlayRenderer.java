@@ -76,7 +76,7 @@ public class InventoryArmorOverlayRenderer {
         }
         
         if (getConfig().getOptions().toggleUniformColor) {
-            var baseColor = getConfig().getOptions().uniformColorType.getColor();
+            var baseColor = getConfig().getOptions().getUniformColor();
             return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha);
         }
         

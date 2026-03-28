@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.awt.Color;
 
 import static com.redlimerl.detailab.config.ConfigEnumType.*;
 import com.redlimerl.detailab.config.ConfigEnumType.HudPosition;
@@ -74,6 +75,8 @@ public class DetailArmorBarConfig {
         public boolean toggleSortSpecialItem = true;
         public boolean toggleAlignEnchantments = true;
         public boolean toggleUniformColor = false;
+        public Integer uniformColorArgb = 0x5099FFFF;
+        @Deprecated
         public UniformColor uniformColorType = UniformColor.AQUA;
         public int armorBarOffsetX = 0;
         public int armorBarOffsetY = 0;
@@ -94,6 +97,21 @@ public class DetailArmorBarConfig {
         public boolean toggleThreshold5 = true;
         public boolean toggleInventoryOverlay = false;
 
+        public int getUniformColorArgb() {
+            if (uniformColorArgb == null) {
+                return DEFAULT.uniformColorArgb;
+            }
+            return uniformColorArgb;
+        }
+
+        public void setUniformColorArgb(int uniformColorArgb) {
+            this.uniformColorArgb = uniformColorArgb;
+        }
+
+        public Color getUniformColor() {
+            return new Color(getUniformColorArgb(), true);
+        }
+
         boolean replaceInvalidOptions() {
             var invalid = false;
             if (effectType == null) {
@@ -108,8 +126,12 @@ public class DetailArmorBarConfig {
                 effectThorn = Options.DEFAULT.effectThorn;
                 invalid = true;
             }
-            if (uniformColorType == null) {
-                uniformColorType = Options.DEFAULT.uniformColorType;
+            if (uniformColorArgb == null) {
+                if (uniformColorType != null) {
+                    uniformColorArgb = uniformColorType.getColor().getRGB();
+                } else {
+                    uniformColorArgb = Options.DEFAULT.uniformColorArgb;
+                }
                 invalid = true;
             }
             return invalid;

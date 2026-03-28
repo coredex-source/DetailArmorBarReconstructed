@@ -9,6 +9,6 @@ public class ModMenuConfigImpl implements ModMenuApi {
 
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return (ConfigScreenFactory<Screen>) OptionsScreen::new;
+        return (ConfigScreenFactory<Screen>) OptionsScreen::create;
     }
 }
