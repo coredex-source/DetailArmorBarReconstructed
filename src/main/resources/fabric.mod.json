@@ -39,7 +39,8 @@
     "fabricloader": "*",
     "fabric-api": "*",
     "java": ">=25",
-    "minecraft": "~26.1-"
+    "minecraft": "~26.1-",
+    "eclipseui": "*"
   },
   "suggests": {
     "modmenu": "*",
