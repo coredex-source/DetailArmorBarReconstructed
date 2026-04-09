@@ -71,8 +71,8 @@ public class DetailArmorBar implements ClientModInitializer {
         // Register client tick event to check for keybind press
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openConfigKey.consumeClick()) {
-                if (client.screen == null) {
-                    client.setScreen(OptionsScreen.create(null));
+                if (client.gui.screen() == null) {
+                    client.setScreenAndShow(OptionsScreen.create(null));
                 }
             }
         });

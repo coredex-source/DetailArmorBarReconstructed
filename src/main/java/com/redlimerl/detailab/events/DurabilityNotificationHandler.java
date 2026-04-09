@@ -174,7 +174,7 @@ public class DurabilityNotificationHandler {
             Component description = Component.translatable("notification.detailarmorbar.durability.description", itemName, durabilityRemaining);
             
             SystemToast.addOrUpdate(
-                client.getToastManager(),
+                client.gui.toastManager(),
                 SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
                 title,
                 description
