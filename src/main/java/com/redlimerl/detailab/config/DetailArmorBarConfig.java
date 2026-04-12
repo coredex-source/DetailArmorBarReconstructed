@@ -76,6 +76,10 @@ public class DetailArmorBarConfig {
         public boolean toggleAlignEnchantments = true;
         public boolean toggleUniformColor = false;
         public Integer uniformColorArgb = 0x5099FFFF;
+        public Integer protectionColorGenericArgb = 0x5099FFFF;
+        public Integer protectionColorProjectileArgb = 0x507033AD;
+        public Integer protectionColorBlastArgb = 0x50FFFF00;
+        public Integer protectionColorFireArgb = 0x50D23800;
         @Deprecated
         public UniformColor uniformColorType = UniformColor.AQUA;
         public int armorBarOffsetX = 0;
@@ -112,6 +116,66 @@ public class DetailArmorBarConfig {
             return new Color(getUniformColorArgb(), true);
         }
 
+        public int getProtectionColorGenericArgb() {
+            if (protectionColorGenericArgb == null) {
+                return DEFAULT.protectionColorGenericArgb;
+            }
+            return protectionColorGenericArgb;
+        }
+
+        public void setProtectionColorGenericArgb(int protectionColorGenericArgb) {
+            this.protectionColorGenericArgb = protectionColorGenericArgb;
+        }
+
+        public Color getProtectionColorGeneric() {
+            return new Color(getProtectionColorGenericArgb(), true);
+        }
+
+        public int getProtectionColorProjectileArgb() {
+            if (protectionColorProjectileArgb == null) {
+                return DEFAULT.protectionColorProjectileArgb;
+            }
+            return protectionColorProjectileArgb;
+        }
+
+        public void setProtectionColorProjectileArgb(int protectionColorProjectileArgb) {
+            this.protectionColorProjectileArgb = protectionColorProjectileArgb;
+        }
+
+        public Color getProtectionColorProjectile() {
+            return new Color(getProtectionColorProjectileArgb(), true);
+        }
+
+        public int getProtectionColorBlastArgb() {
+            if (protectionColorBlastArgb == null) {
+                return DEFAULT.protectionColorBlastArgb;
+            }
+            return protectionColorBlastArgb;
+        }
+
+        public void setProtectionColorBlastArgb(int protectionColorBlastArgb) {
+            this.protectionColorBlastArgb = protectionColorBlastArgb;
+        }
+
+        public Color getProtectionColorBlast() {
+            return new Color(getProtectionColorBlastArgb(), true);
+        }
+
+        public int getProtectionColorFireArgb() {
+            if (protectionColorFireArgb == null) {
+                return DEFAULT.protectionColorFireArgb;
+            }
+            return protectionColorFireArgb;
+        }
+
+        public void setProtectionColorFireArgb(int protectionColorFireArgb) {
+            this.protectionColorFireArgb = protectionColorFireArgb;
+        }
+
+        public Color getProtectionColorFire() {
+            return new Color(getProtectionColorFireArgb(), true);
+        }
+
         boolean replaceInvalidOptions() {
             var invalid = false;
             if (effectType == null) {
@@ -132,6 +196,22 @@ public class DetailArmorBarConfig {
                 } else {
                     uniformColorArgb = Options.DEFAULT.uniformColorArgb;
                 }
+                invalid = true;
+            }
+            if (protectionColorGenericArgb == null) {
+                protectionColorGenericArgb = Options.DEFAULT.protectionColorGenericArgb;
+                invalid = true;
+            }
+            if (protectionColorProjectileArgb == null) {
+                protectionColorProjectileArgb = Options.DEFAULT.protectionColorProjectileArgb;
+                invalid = true;
+            }
+            if (protectionColorBlastArgb == null) {
+                protectionColorBlastArgb = Options.DEFAULT.protectionColorBlastArgb;
+                invalid = true;
+            }
+            if (protectionColorFireArgb == null) {
+                protectionColorFireArgb = Options.DEFAULT.protectionColorFireArgb;
                 invalid = true;
             }
             return invalid;

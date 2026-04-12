@@ -79,11 +79,17 @@ public class InventoryArmorOverlayRenderer {
             var baseColor = getConfig().getOptions().getUniformColor();
             return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha);
         }
-        
-        if (generic > 0) return new Color(153, 255, 255, alpha);
-        if (projectile > 0) return new Color(112, 51, 173, alpha);
-        if (explosive > 0) return new Color(255, 255, 0, alpha);
-        if (fire > 0) return new Color(210, 56, 0, alpha);
+
+        var options = getConfig().getOptions();
+        Color baseColor = null;
+        if (generic > 0) baseColor = options.getProtectionColorGeneric();
+        else if (projectile > 0) baseColor = options.getProtectionColorProjectile();
+        else if (explosive > 0) baseColor = options.getProtectionColorBlast();
+        else if (fire > 0) baseColor = options.getProtectionColorFire();
+
+        if (baseColor != null) {
+            return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha);
+        }
         return null;
     }
     

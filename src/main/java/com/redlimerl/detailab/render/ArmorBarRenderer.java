@@ -77,6 +77,10 @@ public class ArmorBarRenderer {
         return cachedAnimationSpeed;
     }
 
+    private static Color withAlpha(Color color, int alpha) {
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+    }
+
     private static Color getProtectColor(int g, int p, int e, int f, int a) {
         int speed = getAnimationSpeed();
         int alpha;
@@ -91,10 +95,12 @@ public class ArmorBarRenderer {
             alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
         } else alpha = 0;
 
-        if (g > 0) return new Color(153, 255, 255, alpha);
-        if (p > 0) return new Color(112, 51, 173, alpha);
-        if (e > 0) return new Color(255, 255, 0, alpha);
-        if (f > 0) return new Color(210, 56, 0, alpha);
+        var options = getConfig().getOptions();
+
+        if (g > 0) return withAlpha(options.getProtectionColorGeneric(), alpha);
+        if (p > 0) return withAlpha(options.getProtectionColorProjectile(), alpha);
+        if (e > 0) return withAlpha(options.getProtectionColorBlast(), alpha);
+        if (f > 0) return withAlpha(options.getProtectionColorFire(), alpha);
         if (a > 0) return new Color(255, 255, 255, alpha);
         return Color.WHITE;
     }

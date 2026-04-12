@@ -84,6 +84,74 @@ public final class OptionsScreen {
                                         0x50FF0000
                                 )
                         )
+                        .colorPicker(c -> c
+                                .name(option("effects.protection_generic_color"))
+                                .description(context("effects.protection_generic_color"))
+                                .binding(options::getProtectionColorGenericArgb, options::setProtectionColorGenericArgb)
+                                .defaultValue(defaults.getProtectionColorGenericArgb())
+                                .allowAlpha(true)
+                                .presets(
+                                        0x5099FFFF,
+                                        0x507033AD,
+                                        0x50FFFF00,
+                                        0x50D23800,
+                                        0x50FFFFFF,
+                                        0x5000FF00,
+                                        0x500000FF,
+                                        0x50FF0000
+                                )
+                        )
+                        .colorPicker(c -> c
+                                .name(option("effects.protection_projectile_color"))
+                                .description(context("effects.protection_projectile_color"))
+                                .binding(options::getProtectionColorProjectileArgb, options::setProtectionColorProjectileArgb)
+                                .defaultValue(defaults.getProtectionColorProjectileArgb())
+                                .allowAlpha(true)
+                                .presets(
+                                        0x507033AD,
+                                        0x5099FFFF,
+                                        0x50FFFF00,
+                                        0x50D23800,
+                                        0x50FFFFFF,
+                                        0x5000FF00,
+                                        0x500000FF,
+                                        0x50FF0000
+                                )
+                        )
+                        .colorPicker(c -> c
+                                .name(option("effects.protection_blast_color"))
+                                .description(context("effects.protection_blast_color"))
+                                .binding(options::getProtectionColorBlastArgb, options::setProtectionColorBlastArgb)
+                                .defaultValue(defaults.getProtectionColorBlastArgb())
+                                .allowAlpha(true)
+                                .presets(
+                                        0x50FFFF00,
+                                        0x5099FFFF,
+                                        0x507033AD,
+                                        0x50D23800,
+                                        0x50FFFFFF,
+                                        0x5000FF00,
+                                        0x500000FF,
+                                        0x50FF0000
+                                )
+                        )
+                        .colorPicker(c -> c
+                                .name(option("effects.protection_fire_color"))
+                                .description(context("effects.protection_fire_color"))
+                                .binding(options::getProtectionColorFireArgb, options::setProtectionColorFireArgb)
+                                .defaultValue(defaults.getProtectionColorFireArgb())
+                                .allowAlpha(true)
+                                .presets(
+                                        0x50D23800,
+                                        0x5099FFFF,
+                                        0x507033AD,
+                                        0x50FFFF00,
+                                        0x50FFFFFF,
+                                        0x5000FF00,
+                                        0x500000FF,
+                                        0x50FF0000
+                                )
+                        )
                 )
                 .category(cat -> cat
                         .name(option("title.positioning"))

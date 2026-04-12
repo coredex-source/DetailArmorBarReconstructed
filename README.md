@@ -6,6 +6,7 @@
 # Features different from orignal mod:
 - Enchantment overlay alignment (config option) - Align the overlay using levels or armor points.
 - Per-piece enchantment coloring - When using aligned mode, each armor piece's enchantment shows its proper color (blast protection shows yellow, fire protection shows orange, etc.).
+- Per-protection color customization - Set custom colors for Protection, Projectile Protection, Blast Protection, and Fire Protection overlays.
 - Uniform color option - Apply a single customizable color to all enchantment effects regardless of protection type.
 - Added animation speed to aura mode.
 - Added none for enchantment overlay config options.
