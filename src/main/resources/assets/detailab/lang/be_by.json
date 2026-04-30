@@ -50,6 +50,8 @@
   "context.detailarmorbar.toggle.compatible_heart_mod": "Уключае сумяшчальнасць з модамі,/якія паказваюць здароўе адным радком./Пазбягае пермяшчэння радка брані ўверх.",
   "option.detailarmorbar.toggle.inverse_slot": "Адваротныя слаты",
   "context.detailarmorbar.toggle.inverse_slot": "Змяняе парадак слатоў брані на процілеглы.",
+  "option.detailarmorbar.toggle.inverse_overflow_icon": "Адваротны значок перапаўнення",
+  "context.detailarmorbar.toggle.inverse_overflow_icon": "Змяняе размяшчэнне значка перапаўнення для дадатковых радкоў брані на процілеглае.",
   "option.detailarmorbar.toggle.sort_special_item": "Сартаваць спецыяльныя прадметы",
   "context.detailarmorbar.toggle.sort_special_item": "Сартаваць спецыяльныя прадметы (як элітры) справа ад радка брані.",
   "option.detailarmorbar.toggle.armor_trims": "Аздабленне брані",

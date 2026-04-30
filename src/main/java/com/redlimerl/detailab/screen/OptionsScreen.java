@@ -343,6 +343,15 @@ public class OptionsScreen extends Screen {
                             .build()
             );
             buttonCount++;
+
+            addRenderableWidget(Button.builder(getToggleName("inverse_overflow_icon", getConfig().getOptions().toggleInverseOverflowIcon), (button) -> {
+                        getConfig().getOptions().toggleInverseOverflowIcon = !getConfig().getOptions().toggleInverseOverflowIcon; getConfig().save();
+                        button.setMessage(getToggleName("inverse_overflow_icon", getConfig().getOptions().toggleInverseOverflowIcon));
+                    }).bounds(width / 2 - 155 + buttonCount % 2 * 160, height / 6 - 12 + 24 * (buttonCount / 2), 150, 20)
+                            .tooltip(Tooltip.create(Component.translatable("context.detailarmorbar.toggle.inverse_overflow_icon")))
+                            .build()
+            );
+            buttonCount++;
         }
 
         Button features = addRenderableWidget(Button.builder(
