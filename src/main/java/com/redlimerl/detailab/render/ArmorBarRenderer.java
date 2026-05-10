@@ -45,62 +45,19 @@ public class ArmorBarRenderer {
     public static long LAST_THORNS = 0L;
     public static long LAST_MENDING = 0L;
 
-    // Per-tick cache for animation calculations
-    private static long cachedTick = -1;
-    private static int cachedAnimationSpeed = 30;
+    // Per-tick cache for low durability calculations
+    private static long cachedLowDurabilityTick = -1;
     private static Color cachedLowDurabilityColor = null;
-    
-    private static void updateAnimationCache() {
-        long currentTick = DetailArmorBar.getTicks();
-        if (currentTick != cachedTick) {
-            cachedTick = currentTick;
-            cachedAnimationSpeed = switch (getConfig().getOptions().effectSpeed) {
-                case VERY_SLOW -> 45;
-                case SLOW -> 37;
-                case FAST -> 23;
-                case VERY_FAST -> 15;
-                default -> 30;
-            };
-            int speed = cachedAnimationSpeed;
-            long time = currentTick;
-            int alpha;
-            if (time % (speed*4L) >= (speed*2L)) alpha = 0;
-            else if (time % (speed*2L) < speed)
-                alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
-            else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
-            cachedLowDurabilityColor = new Color(255, 25, 25, alpha);
-        }
-    }
-
-    private static int getAnimationSpeed() {
-        updateAnimationCache();
-        return cachedAnimationSpeed;
-    }
-
-    private static Color withAlpha(Color color, int alpha) {
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-    }
 
     private static Color getProtectColor(int g, int p, int e, int f, int a) {
-        int speed = getAnimationSpeed();
-        int alpha;
-        if (getConfig().getOptions().effectType == ProtectionEffect.AURA) alpha = 80;
-        else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
-            long time = DetailArmorBar.getTicks();
-            if (time % (speed*4L) < (speed*2L)) alpha = 0;
-            else if (time % (speed*2L) < speed)
-                alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
-            else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
-        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
-            alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
-        } else alpha = 0;
+        int alpha = ArmorEffectUtils.getEffectAlpha(80, 0.65f);
 
         var options = getConfig().getOptions();
 
-        if (g > 0) return withAlpha(options.getProtectionColorGeneric(), alpha);
-        if (p > 0) return withAlpha(options.getProtectionColorProjectile(), alpha);
-        if (e > 0) return withAlpha(options.getProtectionColorBlast(), alpha);
-        if (f > 0) return withAlpha(options.getProtectionColorFire(), alpha);
+        if (g > 0) return ArmorEffectUtils.withAlpha(options.getProtectionColorGeneric(), alpha);
+        if (p > 0) return ArmorEffectUtils.withAlpha(options.getProtectionColorProjectile(), alpha);
+        if (e > 0) return ArmorEffectUtils.withAlpha(options.getProtectionColorBlast(), alpha);
+        if (f > 0) return ArmorEffectUtils.withAlpha(options.getProtectionColorFire(), alpha);
         if (a > 0) return new Color(255, 255, 255, alpha);
         return Color.WHITE;
     }
@@ -115,32 +72,16 @@ public class ArmorBarRenderer {
     
     // Add this new method to apply animations to uniform color
     private static Color getAnimatedUniformColor(Color baseColor) {
-        int speed = getAnimationSpeed();
-        int alpha;
-        
-        if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
-            alpha = 80; // Same as in getProtectColor
-        } else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
-            long time = DetailArmorBar.getTicks();
-            if (time % (speed*4L) < (speed*2L)) {
-                alpha = 0;
-            } else if (time % (speed*2L) < speed) {
-                alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.65f) * 255);
-            } else {
-                alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.65f, 0f) * 255);
-            }
-        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
-            alpha = Math.round(0.65f * 255); // Static outline at constant 65% opacity
-        } else {
-            alpha = 0;
-        }
-        
-        // Apply the calculated alpha to the base color while preserving its RGB values
-        return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha);
+        return ArmorEffectUtils.applyEffectAlpha(baseColor, 80, 0.65f);
     }
     
     private static Color getLowDurabilityColor() {
-        updateAnimationCache();
+        long currentTick = DetailArmorBar.getTicks();
+        if (currentTick != cachedLowDurabilityTick) {
+            cachedLowDurabilityTick = currentTick;
+            int alpha = ArmorEffectUtils.getPulsingAlpha(currentTick, ArmorEffectUtils.getAnimationSpeed(), 0.65f, true);
+            cachedLowDurabilityColor = new Color(255, 25, 25, alpha);
+        }
         return cachedLowDurabilityColor;
     }
 
@@ -150,20 +91,14 @@ public class ArmorBarRenderer {
             return null;
         }
         
-        var handler = com.redlimerl.detailab.events.DurabilityNotificationHandler.class;
-        var currentLevel = com.redlimerl.detailab.events.DurabilityNotificationHandler.CURRENT_WARNING_LEVEL;
+        var currentLevel = com.redlimerl.detailab.events.DurabilityNotificationHandler.getCurrentWarningLevel();
         
         if (currentLevel == null) {
             return null;
         }
         
         long currentTick = DetailArmorBar.getTicks();
-        long lastWarning = switch (currentLevel) {
-            case HALF -> com.redlimerl.detailab.events.DurabilityNotificationHandler.LAST_WARNING_50;
-            case QUARTER -> com.redlimerl.detailab.events.DurabilityNotificationHandler.LAST_WARNING_25;
-            case LOW -> com.redlimerl.detailab.events.DurabilityNotificationHandler.LAST_WARNING_10;
-            case CRITICAL -> com.redlimerl.detailab.events.DurabilityNotificationHandler.LAST_WARNING_5;
-        };
+        long lastWarning = com.redlimerl.detailab.events.DurabilityNotificationHandler.getLastWarningTime(currentLevel);
         
         long timeSinceWarning = currentTick - lastWarning;
         
@@ -175,11 +110,11 @@ public class ArmorBarRenderer {
         };
         
         if (timeSinceWarning > effectDuration) {
-            com.redlimerl.detailab.events.DurabilityNotificationHandler.CURRENT_WARNING_LEVEL = null;
+            com.redlimerl.detailab.events.DurabilityNotificationHandler.clearCurrentWarningLevel();
             return null;
         }
         
-        int speed = getAnimationSpeed() / 2;
+        int speed = ArmorEffectUtils.getAnimationSpeed() / 2;
         if (currentLevel == com.redlimerl.detailab.config.ConfigEnumType.DurabilityThreshold.CRITICAL) {
             speed = speed / 2;
         }
@@ -256,24 +191,6 @@ public class ArmorBarRenderer {
 
     private static LevelData getEnchantLevel(Iterable<ItemStack> equipment, ResourceKey<Enchantment> type) {
         return getEnchantments(equipment).getOrDefault(type, new LevelData(0, 0));
-    }
-
-    /**
-     * Efficiently gets all protection-related enchantment levels for a single item in one pass.
-     */
-    private static int[] getProtectionLevels(ItemStack itemStack) {
-        int[] levels = new int[5];
-        if (itemStack.isEmpty()) return levels;
-        
-        EnchantmentHelper.getEnchantmentsForCrafting(itemStack).entrySet().forEach(enchantment -> {
-            ResourceKey<Enchantment> type = enchantment.getKey().unwrapKey().orElse(null);
-            if (type == Enchantments.PROTECTION) levels[0] = enchantment.getIntValue();
-            else if (type == Enchantments.PROJECTILE_PROTECTION) levels[1] = enchantment.getIntValue();
-            else if (type == Enchantments.BLAST_PROTECTION) levels[2] = enchantment.getIntValue();
-            else if (type == Enchantments.FIRE_PROTECTION) levels[3] = enchantment.getIntValue();
-            else if (type == Enchantments.THORNS) levels[4] = enchantment.getIntValue();
-        });
-        return levels;
     }
 
     private int getLowDurabilityItem(Iterable<Tuple<EquipmentSlot, ItemStack>> equipment) {
@@ -362,6 +279,9 @@ public class ArmorBarRenderer {
 
     private final Minecraft client = Minecraft.getInstance();
     private final Gui hud = client.gui;
+    private static final int ARMOR_POINTS_PER_ROW = 20;
+    private static final int ARMOR_SLOTS_PER_ROW = 10;
+    private static final int ARMOR_ROW_HEIGHT = 10;
 
     private boolean hasSameProtectionEnchantments(Iterable<ItemStack> equipment) {
         if (!getConfig().getOptions().toggleUniformColor) {
@@ -372,7 +292,7 @@ public class ArmorBarRenderer {
         
         for (ItemStack item : equipment) {
             if (!item.isEmpty()) {
-                int[] levels = getProtectionLevels(item);
+                int[] levels = ArmorEffectUtils.getProtectionLevels(item);
                 if (firstLevels == null) {
                     firstLevels = levels;
                 } else {
@@ -385,6 +305,32 @@ public class ArmorBarRenderer {
         }
         
         return firstLevels != null;
+    }
+
+    private int getRenderedArmorRows(int totalArmorPoint, boolean stackArmorBars) {
+        if (totalArmorPoint <= 0) {
+            return 0;
+        }
+        return stackArmorBars ? Mth.ceil(totalArmorPoint / (float) ARMOR_POINTS_PER_ROW) : 1;
+    }
+
+    private int getArmorRowStart(int totalArmorPoint, int rowIndex, boolean stackArmorBars) {
+        int highestRowStart = Math.max(0, ((Math.max(totalArmorPoint, 1) - 1) / ARMOR_POINTS_PER_ROW) * ARMOR_POINTS_PER_ROW);
+        if (!stackArmorBars || totalArmorPoint <= ARMOR_POINTS_PER_ROW) {
+            return highestRowStart;
+        }
+        return Math.max(0, highestRowStart - (rowIndex * ARMOR_POINTS_PER_ROW));
+    }
+
+    private int getArmorRowY(int baseYPos, int rowIndex) {
+        return baseYPos - (rowIndex * ARMOR_ROW_HEIGHT);
+    }
+
+    private int getArmorSlotX(int screenWidth, int slotIndex, boolean inverseSlotOrder) {
+        if (inverseSlotOrder) {
+            return screenWidth + (ARMOR_SLOTS_PER_ROW - 1 - slotIndex) * 8;
+        }
+        return screenWidth + slotIndex * 8;
     }
 
     public void render(GuiGraphicsExtractor context, Player player, int y_base) {
@@ -408,124 +354,104 @@ public class ArmorBarRenderer {
         }
 
         var screenWidth = client.getWindow().getGuiScaledWidth() / 2 - 91 + options.armorBarOffsetX;
-        var yPos = y_base + options.armorBarOffsetY;
-
-        int stackCount = (totalArmorPoint - 1) / 20;
-        int stackRow = stackCount * 20;
+        var baseYPos = y_base + options.armorBarOffsetY;
+        boolean stackArmorBars = options.toggleStackArmorBars && totalArmorPoint > ARMOR_POINTS_PER_ROW;
+        int totalArmorRows = totalArmorPoint > 0 ? Mth.ceil(totalArmorPoint / (float) ARMOR_POINTS_PER_ROW) : 0;
+        int renderedArmorRows = getRenderedArmorRows(totalArmorPoint, stackArmorBars);
+        int overflowRowCount = Math.max(0, totalArmorRows - 1);
 
         // Render empty armor bar if no armor is worn but toggleEmptyBar is true
         if (totalArmorPoint == 0 && options.toggleEmptyBar) {
-            for (int count = 0; count < 10; count++) {
-                int xPos;
-                if (options.toggleInverseSlot) {
-                    xPos = screenWidth + (9 - count) * 8;
-                } else {
-                    xPos = screenWidth + count * 8;
-                }
-                CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
+            for (int count = 0; count < ARMOR_SLOTS_PER_ROW; count++) {
+                int xPos = getArmorSlotX(screenWidth, count, options.toggleInverseSlot);
+                CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, baseYPos, false, false);
             }
         }
         
         //Default
         if (totalArmorPoint > 0) {
-            int maxSlots = 10;
+            for (int rowIndex = 0; rowIndex < renderedArmorRows; rowIndex++) {
+                int rowStart = getArmorRowStart(totalArmorPoint, rowIndex, stackArmorBars);
+                int rowEnd = Math.min(totalArmorPoint, rowStart + ARMOR_POINTS_PER_ROW);
+                int rowYPos = getArmorRowY(baseYPos, rowIndex);
 
-            for (int count = 0; count < maxSlots; count++) {
-                // Calculate xPos based on inverse slot setting
-                int xPos;
-                if (options.toggleInverseSlot) {
-                    // For inverse order (right to left), start from right and move left
-                    xPos = screenWidth + (9 - count) * 8;
-                } else {
-                    // Normal order (left to right)
-                    xPos = screenWidth + count * 8;
-                }
+                for (int count = 0; count < ARMOR_SLOTS_PER_ROW; count++) {
+                    int xPos = getArmorSlotX(screenWidth, count, options.toggleInverseSlot);
+                    int armorIndex = rowStart + count * 2;
+                    int nextArmorIndex = armorIndex + 1;
 
-                if (count * 2 + 1 + stackRow < totalArmorPoint) {
-                    Tuple<ItemStack, CustomArmorBar> am1 = armorPoints.get(count * 2 + stackRow);
-                    Tuple<ItemStack, CustomArmorBar> am2 = armorPoints.get(count * 2 + 1 + stackRow);
-                    if (am1.getB() == am2.getB()) {
-                        am1.getB().draw(am1.getA(), context, xPos, yPos, false, false);
+                    if (nextArmorIndex < rowEnd) {
+                        Tuple<ItemStack, CustomArmorBar> am1 = armorPoints.get(armorIndex);
+                        Tuple<ItemStack, CustomArmorBar> am2 = armorPoints.get(nextArmorIndex);
+                        if (am1.getB() == am2.getB()) {
+                            am1.getB().draw(am1.getA(), context, xPos, rowYPos, false, false);
+                        } else {
+                            am2.getB().draw(am2.getA(), context, xPos, rowYPos, true, true);
+                            am1.getB().draw(am1.getA(), context, xPos, rowYPos, true, false);
+                        }
+                        if (options.toggleMending && (hasMendingEnchant(am1.getA()) || hasMendingEnchant(am2.getA()))) {
+                            drawSparkleOverlay(context, xPos, rowYPos);
+                        }
+                    } else if (armorIndex < rowEnd) {
+                        CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, rowYPos, false, false);
+                        Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(armorIndex);
+                        am.getB().draw(am.getA(), context, xPos, rowYPos, true, false);
+                        if (options.toggleMending && hasMendingEnchant(am.getA())) {
+                            drawSparkleOverlay(context, xPos, rowYPos);
+                        }
                     } else {
-                        am2.getB().draw(am2.getA(), context, xPos, yPos, true, true);
-                        am1.getB().draw(am1.getA(), context, xPos, yPos, true, false);
+                        CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, rowYPos, false, false);
                     }
-                    // Draw sparkle overlay for items with mending
-                    if (options.toggleMending && (hasMendingEnchant(am1.getA()) || hasMendingEnchant(am2.getA()))) {
-                        drawSparkleOverlay(context, xPos, yPos);
-                    }
-                }
-                if (count * 2 + 1 + stackRow == totalArmorPoint) {
-                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
-                    Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
-                    am.getB().draw(am.getA(), context, xPos, yPos, true, false);
-                    // Draw sparkle overlay for item with mending
-                    if (options.toggleMending && hasMendingEnchant(am.getA())) {
-                        drawSparkleOverlay(context, xPos, yPos);
-                    }
-                }
-                if (count * 2 + 1 + stackRow > totalArmorPoint) {
-                    CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
                 }
             }
 
-            if (armorPoints.size() > 20) {
-                for (int i = 0; i < stackCount; i++) {
-                    CustomArmorBar.DEFAULT.draw(ItemStack.EMPTY, context, screenWidth - 7 - ((stackCount - i)*3), yPos, false, false);
+            if (!stackArmorBars && overflowRowCount > 0) {
+                for (int i = 0; i < overflowRowCount; i++) {
+                    CustomArmorBar.DEFAULT.draw(ItemStack.EMPTY, context, screenWidth - 7 - ((overflowRowCount - i) * 3), baseYPos, false, false);
                 }
             }
         }
 
         // Armor Trim Overlay
         if (options.toggleArmorTrims && totalArmorPoint > 0) {
-            int maxSlots = 10;
-            
-            for (int count = 0; count < maxSlots; count++) {
-                int xPos;
-                if (options.toggleInverseSlot) {
-                    xPos = screenWidth + (9 - count) * 8;
-                } else {
-                    xPos = screenWidth + count * 8;
-                }
-                
-                int armorIndex = count * 2 + stackRow;
-                int nextArmorIndex = armorIndex + 1;
-                boolean hasFirstPoint = armorIndex < totalArmorPoint;
-                boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
-                
-                if (hasFirstPoint || hasSecondPoint) {
-                    ArmorTrimHandler.TrimMaterial firstTrimMaterial = null;
-                    ArmorTrimHandler.TrimMaterial secondTrimMaterial = null;
-                    
-                    // Check if first armor point has a trim
-                    if (hasFirstPoint) {
-                        ItemStack armorItem = armorPoints.get(armorIndex).getA();
-                        firstTrimMaterial = ArmorTrimHandler.getTrimMaterial(armorItem);
-                    }
-                    
-                    // Check if second armor point has a trim
-                    if (hasSecondPoint) {
-                        ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getA();
-                        secondTrimMaterial = ArmorTrimHandler.getTrimMaterial(nextArmorItem);
-                    }
-                    
-                    // Draw trim overlay based on which armor points have trims
-                    if (firstTrimMaterial != null && secondTrimMaterial != null) {
-                        // Both points have trims
-                        if (firstTrimMaterial == secondTrimMaterial) {
-                            // Same trim material - draw full overlay
-                            drawTrimOverlay(context, xPos, yPos, firstTrimMaterial, false, false);
-                        } else {
-                            // Different trim materials - draw half overlays
-                            drawTrimOverlay(context, xPos, yPos, firstTrimMaterial, true, false);
-                            drawTrimOverlay(context, xPos, yPos, secondTrimMaterial, true, true);
+            for (int rowIndex = 0; rowIndex < renderedArmorRows; rowIndex++) {
+                int rowStart = getArmorRowStart(totalArmorPoint, rowIndex, stackArmorBars);
+                int rowEnd = Math.min(totalArmorPoint, rowStart + ARMOR_POINTS_PER_ROW);
+                int rowYPos = getArmorRowY(baseYPos, rowIndex);
+
+                for (int count = 0; count < ARMOR_SLOTS_PER_ROW; count++) {
+                    int xPos = getArmorSlotX(screenWidth, count, options.toggleInverseSlot);
+                    int armorIndex = rowStart + count * 2;
+                    int nextArmorIndex = armorIndex + 1;
+                    boolean hasFirstPoint = armorIndex < rowEnd;
+                    boolean hasSecondPoint = nextArmorIndex < rowEnd;
+
+                    if (hasFirstPoint || hasSecondPoint) {
+                        ArmorTrimHandler.TrimMaterial firstTrimMaterial = null;
+                        ArmorTrimHandler.TrimMaterial secondTrimMaterial = null;
+
+                        if (hasFirstPoint) {
+                            ItemStack armorItem = armorPoints.get(armorIndex).getA();
+                            firstTrimMaterial = ArmorTrimHandler.getTrimMaterial(armorItem);
                         }
-                    } else if (firstTrimMaterial != null) {
-                        // Only first point has trim - draw left half
-                        drawTrimOverlay(context, xPos, yPos, firstTrimMaterial, true, false);
-                    } else if (secondTrimMaterial != null) {
-                        // Only second point has trim - draw right half (mirrored)
-                        drawTrimOverlay(context, xPos, yPos, secondTrimMaterial, true, true);
+
+                        if (hasSecondPoint) {
+                            ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getA();
+                            secondTrimMaterial = ArmorTrimHandler.getTrimMaterial(nextArmorItem);
+                        }
+
+                        if (firstTrimMaterial != null && secondTrimMaterial != null) {
+                            if (firstTrimMaterial == secondTrimMaterial) {
+                                drawTrimOverlay(context, xPos, rowYPos, firstTrimMaterial, false, false);
+                            } else {
+                                drawTrimOverlay(context, xPos, rowYPos, firstTrimMaterial, true, false);
+                                drawTrimOverlay(context, xPos, rowYPos, secondTrimMaterial, true, true);
+                            }
+                        } else if (firstTrimMaterial != null) {
+                            drawTrimOverlay(context, xPos, rowYPos, firstTrimMaterial, true, false);
+                        } else if (secondTrimMaterial != null) {
+                            drawTrimOverlay(context, xPos, rowYPos, secondTrimMaterial, true, true);
+                        }
                     }
                 }
             }
@@ -553,32 +479,29 @@ public class ArmorBarRenderer {
             if (totalArmorPoint != 0 && lowDur != 0) {
                 Color lowDurColor = getLowDurabilityColor();
                 if (lowDurColor.getAlpha() != 0) {
-                    int armorPreset = ((totalArmorPoint - 1) % 20) + 1;
-                    int halfArmors = (int) Math.ceil(armorPreset / 2.0) - 1;
-                    for (int count = 0; count <= halfArmors; count++) {
-                        if (lowDur <= 0) break;
+                    int remainingLowDur = lowDur;
+                    for (int rowIndex = 0; rowIndex < renderedArmorRows && remainingLowDur > 0; rowIndex++) {
+                        int rowStart = getArmorRowStart(totalArmorPoint, rowIndex, stackArmorBars);
+                        int rowEnd = Math.min(totalArmorPoint, rowStart + ARMOR_POINTS_PER_ROW);
+                        int rowYPos = getArmorRowY(baseYPos, rowIndex);
+                        int armorPreset = rowEnd - rowStart;
+                        int halfArmors = (int) Math.ceil(armorPreset / 2.0) - 1;
 
-                        // Calculate xPos based on inverse slot setting
-                        int xPos;
-                        if (options.toggleInverseSlot) {
-                            xPos = screenWidth + (9 - (halfArmors - count)) * 8;
-                        } else {
-                            xPos = screenWidth + (halfArmors - count) * 8;
-                        }
-                        
-                        Tuple<ItemStack, CustomArmorBar> am = armorPoints.get((halfArmors - count) * 2 + stackRow);
-                        if (armorPreset == (halfArmors - count) * 2 + 1) {
-                            if (count == 0) {
-                                am.getB().drawOutLine(am.getA(), context, xPos, yPos, true, false, lowDurColor);
-                                lowDur--;
-                            }
-                        } else {
-                            if (lowDur == 1) {
-                                am.getB().drawOutLine(am.getA(), context, xPos, yPos, true, true, lowDurColor);
-                                lowDur = 0;
+                        for (int count = 0; count <= halfArmors && remainingLowDur > 0; count++) {
+                            int slotIndex = halfArmors - count;
+                            int xPos = getArmorSlotX(screenWidth, slotIndex, options.toggleInverseSlot);
+                            Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(rowStart + slotIndex * 2);
+                            if (armorPreset == slotIndex * 2 + 1) {
+                                if (count == 0) {
+                                    am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, true, false, lowDurColor);
+                                    remainingLowDur--;
+                                }
+                            } else if (remainingLowDur == 1) {
+                                am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, true, true, lowDurColor);
+                                remainingLowDur = 0;
                             } else {
-                                am.getB().drawOutLine(am.getA(), context, xPos, yPos, false, false, lowDurColor);
-                                lowDur -= 2;
+                                am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, false, false, lowDurColor);
+                                remainingLowDur -= 2;
                             }
                         }
                     }
@@ -592,24 +515,24 @@ public class ArmorBarRenderer {
             var mendingSpeed = 3;
 
             if (mendingTime < (mendingSpeed * 4)) {
-                int maxSlots = 10;
-                    
-                for (int count = 0; count < maxSlots; count++) {
-                    if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
-                        // Calculate xPos based on inverse slot setting
-                        int xPos;
-                        if (options.toggleInverseSlot) {
-                            xPos = screenWidth + (9 - count) * 8;
-                        } else {
-                            xPos = screenWidth + count * 8;
-                        }
+                if (mendingTime % (mendingSpeed * 2) < mendingSpeed) {
+                    for (int rowIndex = 0; rowIndex < renderedArmorRows; rowIndex++) {
+                        int rowStart = getArmorRowStart(totalArmorPoint, rowIndex, stackArmorBars);
+                        int rowEnd = Math.min(totalArmorPoint, rowStart + ARMOR_POINTS_PER_ROW);
+                        int rowYPos = getArmorRowY(baseYPos, rowIndex);
 
-                        if (armorPoints.size() <= count * 2 + stackRow) {
-                            if (options.toggleEmptyBar)
-                                CustomArmorBar.DEFAULT.drawOutLine(ItemStack.EMPTY, context, xPos, yPos, false, false, Color.WHITE);
-                        } else {
-                            Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
-                            am.getB().drawOutLine(am.getA(), context, xPos, yPos, false, false, Color.WHITE);
+                        for (int count = 0; count < ARMOR_SLOTS_PER_ROW; count++) {
+                            int xPos = getArmorSlotX(screenWidth, count, options.toggleInverseSlot);
+                            int armorIndex = rowStart + count * 2;
+
+                            if (armorIndex >= rowEnd) {
+                                if (options.toggleEmptyBar) {
+                                    CustomArmorBar.DEFAULT.drawOutLine(ItemStack.EMPTY, context, xPos, rowYPos, false, false, Color.WHITE);
+                                }
+                            } else {
+                                Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(armorIndex);
+                                am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, false, false, Color.WHITE);
+                            }
                         }
                     }
                 }
@@ -621,19 +544,20 @@ public class ArmorBarRenderer {
             Color notificationColor = getDurabilityNotificationColor();
             
             if (notificationColor != null && notificationColor.getAlpha() > 0) {
-                int maxSlots = Math.min(10, (int) Math.ceil(totalArmorPoint / 2.0));
-                
-                for (int count = 0; count < maxSlots; count++) {
-                    int xPos;
-                    if (options.toggleInverseSlot) {
-                        xPos = screenWidth + (9 - count) * 8;
-                    } else {
-                        xPos = screenWidth + count * 8;
-                    }
-                    
-                    if (count * 2 + stackRow < armorPoints.size()) {
-                        Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(count * 2 + stackRow);
-                        am.getB().drawOutLine(am.getA(), context, xPos, yPos, false, false, notificationColor);
+                for (int rowIndex = 0; rowIndex < renderedArmorRows; rowIndex++) {
+                    int rowStart = getArmorRowStart(totalArmorPoint, rowIndex, stackArmorBars);
+                    int rowEnd = Math.min(totalArmorPoint, rowStart + ARMOR_POINTS_PER_ROW);
+                    int rowYPos = getArmorRowY(baseYPos, rowIndex);
+                    int maxSlots = Math.min(ARMOR_SLOTS_PER_ROW, (int) Math.ceil((rowEnd - rowStart) / 2.0));
+
+                    for (int count = 0; count < maxSlots; count++) {
+                        int xPos = getArmorSlotX(screenWidth, count, options.toggleInverseSlot);
+                        int armorIndex = rowStart + count * 2;
+
+                        if (armorIndex < rowEnd) {
+                            Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(armorIndex);
+                            am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, false, false, notificationColor);
+                        }
                     }
                 }
             }
@@ -643,101 +567,97 @@ public class ArmorBarRenderer {
         if (options.toggleEnchants && totalEnchants > 0 && totalArmorPoint > 0) {
             if (options.toggleAlignEnchantments) {
                 // New behavior - align with armor points
-                int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
-                
                 // Check if uniform color is enabled
                 boolean useUniformColor = options.toggleUniformColor;
                 Color baseUniformColor = useUniformColor ? options.getUniformColor() : null;
                 // Apply animation to the uniform color
                 Color animatedUniformColor = baseUniformColor != null ? getAnimatedUniformColor(baseUniformColor) : null;
-                
-                for (int count = 0; count < displayedArmorIcons; count++) {
-                    // Calculate xPos based on inverse slot setting
-                    int xPos;
-                    if (options.toggleInverseSlot) {
-                        xPos = screenWidth + (9 - count) * 8;
-                    } else {
-                        xPos = screenWidth + count * 8;
-                    }
-                    
-                    int armorIndex = count * 2 + stackRow;
-                    int nextArmorIndex = armorIndex + 1;
-                    boolean hasFirstPoint = armorIndex < totalArmorPoint;
-                    boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
-                    
-                    if (hasFirstPoint || hasSecondPoint) {
-                        if (useUniformColor) {
-                            // Use animated uniform color for all armor points
-                            if (hasFirstPoint && hasSecondPoint) {
-                                drawEnchantTexture(context, xPos, yPos, animatedUniformColor, 0);
-                            } else if (hasFirstPoint) {
-                                drawEnchantTexture(context, xPos, yPos, animatedUniformColor, 2);
-                            } else if (hasSecondPoint) {
-                                drawEnchantTexture(context, xPos, yPos, animatedUniformColor, 1);
-                            }
-                        } else {
-                            // Original per-piece coloring logic
-                            if (hasFirstPoint) {
-                                ItemStack armorItem = armorPoints.get(armorIndex).getA();
-                                if (!armorItem.isEmpty()) {
-                                    var armorGeneric = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROTECTION);
-                                    var armorProjectile = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROJECTILE_PROTECTION);
-                                    var armorExplosive = getEnchantLevel(Collections.singleton(armorItem), Enchantments.BLAST_PROTECTION);
-                                    var armorFire = getEnchantLevel(Collections.singleton(armorItem), Enchantments.FIRE_PROTECTION);
-                                    var armorProtectArr = new int[] { armorGeneric.level, armorProjectile.level, armorExplosive.level, armorFire.level, 0 };
-                                    if (Arrays.stream(armorProtectArr).sum() > 0) {
-                                        if (hasSecondPoint) {
-                                            ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getA();
-                                            if (!nextArmorItem.isEmpty()) {
-                                                var nextGeneric = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROTECTION);
-                                                var nextProjectile = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROJECTILE_PROTECTION);
-                                                var nextExplosive = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.BLAST_PROTECTION);
-                                                var nextFire = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.FIRE_PROTECTION);
-                                                if (armorGeneric.level == nextGeneric.level && 
-                                                    armorProjectile.level == nextProjectile.level &&
-                                                    armorExplosive.level == nextExplosive.level &&
-                                                    armorFire.level == nextFire.level) {
-                                                    drawEnchantTexture(context, xPos, yPos, getProtectColor(armorProtectArr), 0);
+
+                for (int rowIndex = 0; rowIndex < renderedArmorRows; rowIndex++) {
+                    int rowStart = getArmorRowStart(totalArmorPoint, rowIndex, stackArmorBars);
+                    int rowEnd = Math.min(totalArmorPoint, rowStart + ARMOR_POINTS_PER_ROW);
+                    int rowYPos = getArmorRowY(baseYPos, rowIndex);
+                    int displayedArmorIcons = Math.min(ARMOR_SLOTS_PER_ROW, (int) Math.ceil((rowEnd - rowStart) / 2.0));
+
+                    for (int count = 0; count < displayedArmorIcons; count++) {
+                        int xPos = getArmorSlotX(screenWidth, count, options.toggleInverseSlot);
+                        int armorIndex = rowStart + count * 2;
+                        int nextArmorIndex = armorIndex + 1;
+                        boolean hasFirstPoint = armorIndex < rowEnd;
+                        boolean hasSecondPoint = nextArmorIndex < rowEnd;
+
+                        if (hasFirstPoint || hasSecondPoint) {
+                            if (useUniformColor) {
+                                if (hasFirstPoint && hasSecondPoint) {
+                                    drawEnchantTexture(context, xPos, rowYPos, animatedUniformColor, 0);
+                                } else if (hasFirstPoint) {
+                                    drawEnchantTexture(context, xPos, rowYPos, animatedUniformColor, 2);
+                                } else if (hasSecondPoint) {
+                                    drawEnchantTexture(context, xPos, rowYPos, animatedUniformColor, 1);
+                                }
+                            } else {
+                                if (hasFirstPoint) {
+                                    ItemStack armorItem = armorPoints.get(armorIndex).getA();
+                                    if (!armorItem.isEmpty()) {
+                                        var armorGeneric = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROTECTION);
+                                        var armorProjectile = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROJECTILE_PROTECTION);
+                                        var armorExplosive = getEnchantLevel(Collections.singleton(armorItem), Enchantments.BLAST_PROTECTION);
+                                        var armorFire = getEnchantLevel(Collections.singleton(armorItem), Enchantments.FIRE_PROTECTION);
+                                        var armorProtectArr = new int[] { armorGeneric.level, armorProjectile.level, armorExplosive.level, armorFire.level, 0 };
+                                        if (Arrays.stream(armorProtectArr).sum() > 0) {
+                                            if (hasSecondPoint) {
+                                                ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getA();
+                                                if (!nextArmorItem.isEmpty()) {
+                                                    var nextGeneric = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROTECTION);
+                                                    var nextProjectile = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROJECTILE_PROTECTION);
+                                                    var nextExplosive = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.BLAST_PROTECTION);
+                                                    var nextFire = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.FIRE_PROTECTION);
+                                                    if (armorGeneric.level == nextGeneric.level && 
+                                                        armorProjectile.level == nextProjectile.level &&
+                                                        armorExplosive.level == nextExplosive.level &&
+                                                        armorFire.level == nextFire.level) {
+                                                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), 0);
+                                                    } else {
+                                                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), 2);
+                                                    }
                                                 } else {
-                                                    drawEnchantTexture(context, xPos, yPos, getProtectColor(armorProtectArr), 2);
+                                                    drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), 2);
                                                 }
                                             } else {
-                                                drawEnchantTexture(context, xPos, yPos, getProtectColor(armorProtectArr), 2);
+                                                drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), 2);
                                             }
-                                        } else {
-                                            drawEnchantTexture(context, xPos, yPos, getProtectColor(armorProtectArr), 2);
                                         }
                                     }
                                 }
-                            }
-                            
-                            if (hasSecondPoint) {
-                                ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getA();
-                                if (!nextArmorItem.isEmpty()) {
-                                    var nextGeneric = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROTECTION);
-                                    var nextProjectile = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROJECTILE_PROTECTION);
-                                    var nextExplosive = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.BLAST_PROTECTION);
-                                    var nextFire = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.FIRE_PROTECTION);
-                                    var nextProtectArr = new int[] { nextGeneric.level, nextProjectile.level, nextExplosive.level, nextFire.level, 0 };
-                                    
-                                    if (Arrays.stream(nextProtectArr).sum() > 0) {
-                                        if (hasFirstPoint) {
-                                            ItemStack armorItem = armorPoints.get(armorIndex).getA();
-                                            if (!armorItem.isEmpty()) {
-                                                var armorGeneric = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROTECTION);
-                                                var armorProjectile = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROJECTILE_PROTECTION);
-                                                var armorExplosive = getEnchantLevel(Collections.singleton(armorItem), Enchantments.BLAST_PROTECTION);
-                                                var armorFire = getEnchantLevel(Collections.singleton(armorItem), Enchantments.FIRE_PROTECTION);
-                                                
-                                                if (armorGeneric.level != nextGeneric.level || 
-                                                    armorProjectile.level != nextProjectile.level ||
-                                                    armorExplosive.level != nextExplosive.level ||
-                                                    armorFire.level != nextFire.level) {
-                                                    drawEnchantTexture(context, xPos, yPos, getProtectColor(nextProtectArr), 1);
+
+                                if (hasSecondPoint) {
+                                    ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getA();
+                                    if (!nextArmorItem.isEmpty()) {
+                                        var nextGeneric = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROTECTION);
+                                        var nextProjectile = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.PROJECTILE_PROTECTION);
+                                        var nextExplosive = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.BLAST_PROTECTION);
+                                        var nextFire = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.FIRE_PROTECTION);
+                                        var nextProtectArr = new int[] { nextGeneric.level, nextProjectile.level, nextExplosive.level, nextFire.level, 0 };
+
+                                        if (Arrays.stream(nextProtectArr).sum() > 0) {
+                                            if (hasFirstPoint) {
+                                                ItemStack armorItem = armorPoints.get(armorIndex).getA();
+                                                if (!armorItem.isEmpty()) {
+                                                    var armorGeneric = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROTECTION);
+                                                    var armorProjectile = getEnchantLevel(Collections.singleton(armorItem), Enchantments.PROJECTILE_PROTECTION);
+                                                    var armorExplosive = getEnchantLevel(Collections.singleton(armorItem), Enchantments.BLAST_PROTECTION);
+                                                    var armorFire = getEnchantLevel(Collections.singleton(armorItem), Enchantments.FIRE_PROTECTION);
+
+                                                    if (armorGeneric.level != nextGeneric.level || 
+                                                        armorProjectile.level != nextProjectile.level ||
+                                                        armorExplosive.level != nextExplosive.level ||
+                                                        armorFire.level != nextFire.level) {
+                                                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(nextProtectArr), 1);
+                                                    }
                                                 }
+                                            } else {
+                                                drawEnchantTexture(context, xPos, rowYPos, getProtectColor(nextProtectArr), 1);
                                             }
-                                        } else {
-                                            drawEnchantTexture(context, xPos, yPos, getProtectColor(nextProtectArr), 1);
                                         }
                                     }
                                 }
@@ -747,18 +667,15 @@ public class ArmorBarRenderer {
                 }
             } else {
                 // Original behavior - based on enchantment levels
-                int maxSlots = 10;
-                    
+                int maxSlots = stackArmorBars ? renderedArmorRows * ARMOR_SLOTS_PER_ROW : ARMOR_SLOTS_PER_ROW;
+
                 for (int count = 0; count * 2 + 1 <= totalEnchants; count++) {
                     if (count >= maxSlots) break;
 
-                    // Calculate xPos based on inverse slot setting
-                    int xPos;
-                    if (options.toggleInverseSlot) {
-                        xPos = screenWidth + (9 - count) * 8;
-                    } else {
-                        xPos = screenWidth + count * 8;
-                    }
+                    int rowIndex = stackArmorBars ? count / ARMOR_SLOTS_PER_ROW : 0;
+                    int slotIndex = count % ARMOR_SLOTS_PER_ROW;
+                    int xPos = getArmorSlotX(screenWidth, slotIndex, options.toggleInverseSlot);
+                    int rowYPos = getArmorRowY(baseYPos, rowIndex);
                     
                     if (count * 2 + 1 < totalEnchants) {
                         var min = -1;
@@ -772,17 +689,17 @@ public class ArmorBarRenderer {
                             } else if (min != -1 && max == -1 && protectArr[pw] >= 1) max = pw;
                         }
                         if (min != -1 && max != -1) {
-                            drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
+                            drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), 2);
                             protectArr[min] = 0;
-                            drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 1);
+                            drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), 1);
                             protectArr[max] -= 1;
                         } else {
-                            drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 0);
+                            drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), 0);
                             protectArr[min] -= 2;
                         }
                     }
                     if (count * 2 + 1 == totalEnchants) {
-                        drawEnchantTexture(context, xPos, yPos, getProtectColor(protectArr), 2);
+                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), 2);
                     }
                 }
             }
@@ -794,77 +711,67 @@ public class ArmorBarRenderer {
             
             if (options.toggleAlignEnchantments) {
                 // New behavior - align thorns with armor points (similar to protection overlay)
-                int displayedArmorIcons = Math.min(10, (int)Math.ceil(totalArmorPoint / 2.0));
-                
-                for (int count = 0; count < displayedArmorIcons; count++) {
-                    // Calculate xPos based on inverse slot setting
-                    int xPos;
-                    if (options.toggleInverseSlot) {
-                        xPos = screenWidth + (9 - count) * 8;
-                    } else {
-                        xPos = screenWidth + count * 8;
-                    }
-                    
-                    int armorIndex = count * 2 + stackRow;
-                    int nextArmorIndex = armorIndex + 1;
-                    boolean hasFirstPoint = armorIndex < totalArmorPoint;
-                    boolean hasSecondPoint = nextArmorIndex < totalArmorPoint;
-                    
-                    if (hasFirstPoint || hasSecondPoint) {
-                        boolean firstHasThorns = false;
-                        boolean secondHasThorns = false;
-                        
-                        // Check if first armor point has thorns
-                        if (hasFirstPoint) {
-                            ItemStack armorItem = armorPoints.get(armorIndex).getA();
-                            if (!armorItem.isEmpty()) {
-                                var thornLevel = getEnchantLevel(Collections.singleton(armorItem), Enchantments.THORNS);
-                                firstHasThorns = thornLevel.level > 0;
+
+                for (int rowIndex = 0; rowIndex < renderedArmorRows; rowIndex++) {
+                    int rowStart = getArmorRowStart(totalArmorPoint, rowIndex, stackArmorBars);
+                    int rowEnd = Math.min(totalArmorPoint, rowStart + ARMOR_POINTS_PER_ROW);
+                    int rowYPos = getArmorRowY(baseYPos, rowIndex);
+                    int displayedArmorIcons = Math.min(ARMOR_SLOTS_PER_ROW, (int) Math.ceil((rowEnd - rowStart) / 2.0));
+
+                    for (int count = 0; count < displayedArmorIcons; count++) {
+                        int xPos = getArmorSlotX(screenWidth, count, options.toggleInverseSlot);
+                        int armorIndex = rowStart + count * 2;
+                        int nextArmorIndex = armorIndex + 1;
+                        boolean hasFirstPoint = armorIndex < rowEnd;
+                        boolean hasSecondPoint = nextArmorIndex < rowEnd;
+
+                        if (hasFirstPoint || hasSecondPoint) {
+                            boolean firstHasThorns = false;
+                            boolean secondHasThorns = false;
+
+                            if (hasFirstPoint) {
+                                ItemStack armorItem = armorPoints.get(armorIndex).getA();
+                                if (!armorItem.isEmpty()) {
+                                    var thornLevel = getEnchantLevel(Collections.singleton(armorItem), Enchantments.THORNS);
+                                    firstHasThorns = thornLevel.level > 0;
+                                }
                             }
-                        }
-                        
-                        // Check if second armor point has thorns
-                        if (hasSecondPoint) {
-                            ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getA();
-                            if (!nextArmorItem.isEmpty()) {
-                                var thornLevel = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.THORNS);
-                                secondHasThorns = thornLevel.level > 0;
+
+                            if (hasSecondPoint) {
+                                ItemStack nextArmorItem = armorPoints.get(nextArmorIndex).getA();
+                                if (!nextArmorItem.isEmpty()) {
+                                    var thornLevel = getEnchantLevel(Collections.singleton(nextArmorItem), Enchantments.THORNS);
+                                    secondHasThorns = thornLevel.level > 0;
+                                }
                             }
-                        }
-                        
-                        // Draw thorns overlay based on which armor points have thorns
-                        if (firstHasThorns && secondHasThorns) {
-                            // Both points have thorns - draw full icon
-                            InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 36, 18, thornsColor, false);
-                        } else if (firstHasThorns) {
-                            // Only first point has thorns - draw left half
-                            InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 27, 18, thornsColor, false);
-                        } else if (secondHasThorns) {
-                            // Only second point has thorns - draw right half
-                            InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 27, 18, thornsColor, true);
+
+                            if (firstHasThorns && secondHasThorns) {
+                                InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 36, 18, thornsColor, false);
+                            } else if (firstHasThorns) {
+                                InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, false);
+                            } else if (secondHasThorns) {
+                                InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, true);
+                            }
                         }
                     }
                 }
             } else {
                 // Original behavior - based on total thorns level
-                int maxSlots = 10;
-                    
+                int maxSlots = stackArmorBars ? renderedArmorRows * ARMOR_SLOTS_PER_ROW : ARMOR_SLOTS_PER_ROW;
+
                 for (int count = 0; count < maxSlots; count++) {
                     if (count * 2 + 1 > thorns.level) break;
 
-                    // Calculate xPos based on inverse slot setting
-                    int xPos;
-                    if (options.toggleInverseSlot) {
-                        xPos = screenWidth + (9 - count) * 8;
-                    } else {
-                        xPos = screenWidth + count * 8;
-                    }
+                    int rowIndex = stackArmorBars ? count / ARMOR_SLOTS_PER_ROW : 0;
+                    int slotIndex = count % ARMOR_SLOTS_PER_ROW;
+                    int xPos = getArmorSlotX(screenWidth, slotIndex, options.toggleInverseSlot);
+                    int rowYPos = getArmorRowY(baseYPos, rowIndex);
                     
                     if (count * 2 + 1 < thorns.level) {
-                        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 36, 18, thornsColor, false);
+                        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 36, 18, thornsColor, false);
                     }
                     if (count * 2 + 1 == thorns.level) {
-                        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, yPos, 27, 18, thornsColor, false);
+                        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, false);
                     }
                 }
             }
@@ -877,13 +784,7 @@ public class ArmorBarRenderer {
         int v = 0;
         
         // Calculate animation speed factor based on the config
-        float speedFactor = 1.0f;
-        switch (getConfig().getOptions().effectSpeed) {
-            case VERY_SLOW -> speedFactor = 0.5f;
-            case SLOW -> speedFactor = 0.75f;
-            case FAST -> speedFactor = 1.25f;
-            case VERY_FAST -> speedFactor = 1.5f;
-        }
+        float speedFactor = ArmorEffectUtils.getAnimationSpeedMultiplier();
         
         // Apply speed factor to the animation timing
         var tickDivisor = Math.max(1, Math.round(3.0f / speedFactor));
@@ -912,7 +813,7 @@ public class ArmorBarRenderer {
     // Draws a sparkle overlay at the given position
     private void drawSparkleOverlay(GuiGraphicsExtractor context, int x, int y) {
         long currentTicks = DetailArmorBar.getTicks();
-        double fastAnimationSpeed = getAnimationSpeed() / 2.5; // 2.5x faster than normal effects
+        double fastAnimationSpeed = ArmorEffectUtils.getAnimationSpeed() / 2.5; // 2.5x faster than normal effects
         
         // Star 1: Top-left area, slower animation
         int star1Cycle = (int) ((currentTicks / fastAnimationSpeed) % 12);

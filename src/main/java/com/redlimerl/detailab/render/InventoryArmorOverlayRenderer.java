@@ -3,17 +3,9 @@ package com.redlimerl.detailab.render;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 
 import java.awt.*;
-import java.util.Collections;
-
-import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
 /**
@@ -23,24 +15,6 @@ import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 public class InventoryArmorOverlayRenderer {
     
     public static final InventoryArmorOverlayRenderer INSTANCE = new InventoryArmorOverlayRenderer();
-    
-    private static long cachedTick = -1;
-    private static int cachedAnimationSpeed = 30;
-
-    private static int getAnimationSpeed() {
-        long currentTick = DetailArmorBar.getTicks();
-        if (currentTick != cachedTick) {
-            cachedTick = currentTick;
-            cachedAnimationSpeed = switch (getConfig().getOptions().effectSpeed) {
-                case VERY_SLOW -> 45;
-                case SLOW -> 37;
-                case FAST -> 23;
-                case VERY_FAST -> 15;
-                default -> 30;
-            };
-        }
-        return cachedAnimationSpeed;
-    }
     
     /**
      * Gets the protection color for the item based on its enchantments.
@@ -57,27 +31,15 @@ public class InventoryArmorOverlayRenderer {
         if (generic == 0 && projectile == 0 && explosive == 0 && fire == 0) {
             return null;
         }
-        
-        int speed = getAnimationSpeed();
-        int alpha;
-        
-        if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
-            alpha = 120;
-        } else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
-            long time = DetailArmorBar.getTicks();
-            if (time % (speed * 4L) < (speed * 2L)) alpha = 0;
-            else if (time % (speed * 2L) < speed)
-                alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.75f) * 255);
-            else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.75f, 0f) * 255);
-        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
-            alpha = Math.round(0.75f * 255); // Static outline at constant 75% opacity
-        } else {
+
+        int alpha = ArmorEffectUtils.getEffectAlpha(120, 0.75f);
+        if (getConfig().getOptions().effectType == ProtectionEffect.NONE) {
             return null;
         }
         
         if (getConfig().getOptions().toggleUniformColor) {
             var baseColor = getConfig().getOptions().getUniformColor();
-            return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha);
+            return ArmorEffectUtils.withAlpha(baseColor, alpha);
         }
 
         var options = getConfig().getOptions();
@@ -88,7 +50,7 @@ public class InventoryArmorOverlayRenderer {
         else if (fire > 0) baseColor = options.getProtectionColorFire();
 
         if (baseColor != null) {
-            return new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha);
+            return ArmorEffectUtils.withAlpha(baseColor, alpha);
         }
         return null;
     }
@@ -98,42 +60,15 @@ public class InventoryArmorOverlayRenderer {
         
         int thorns = levels[4];
         if (thorns == 0) return null;
-        
-        int speed = getAnimationSpeed();
-        int alpha;
-        
-        if (getConfig().getOptions().effectType == ProtectionEffect.AURA) {
-            alpha = 120;
-        } else if (getConfig().getOptions().effectType == ProtectionEffect.OUTLINE) {
-            long time = DetailArmorBar.getTicks();
-            if (time % (speed * 4L) < (speed * 2L)) alpha = 0;
-            else if (time % (speed * 2L) < speed)
-                alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0f, 0.75f) * 255);
-            else alpha = Math.round(Mth.lerp((time % speed) / (speed - 1f), 0.75f, 0f) * 255);
-        } else if (getConfig().getOptions().effectType == ProtectionEffect.STATIC) {
-            alpha = Math.round(0.75f * 255); // Static outline at constant 75% opacity
-        } else {
+
+        if (getConfig().getOptions().effectType == ProtectionEffect.NONE) {
             return null;
         }
-        
+
+        int alpha = ArmorEffectUtils.getEffectAlpha(120, 0.75f);
         return new Color(255, 255, 255, alpha);
     }
 
-    private int[] getProtectionLevels(ItemStack itemStack) {
-        int[] levels = new int[5];
-        if (itemStack.isEmpty()) return levels;
-        
-        EnchantmentHelper.getEnchantmentsForCrafting(itemStack).entrySet().forEach(enchantment -> {
-            ResourceKey<Enchantment> type = enchantment.getKey().unwrapKey().orElse(null);
-            if (type == Enchantments.PROTECTION) levels[0] = enchantment.getIntValue();
-            else if (type == Enchantments.PROJECTILE_PROTECTION) levels[1] = enchantment.getIntValue();
-            else if (type == Enchantments.BLAST_PROTECTION) levels[2] = enchantment.getIntValue();
-            else if (type == Enchantments.FIRE_PROTECTION) levels[3] = enchantment.getIntValue();
-            else if (type == Enchantments.THORNS) levels[4] = enchantment.getIntValue();
-        });
-        return levels;
-    }
-    
     /**
      * Checks if the item is an armor piece that should have overlays rendered.
      */
@@ -141,7 +76,7 @@ public class InventoryArmorOverlayRenderer {
         if (!getConfig().getOptions().toggleInventoryOverlay) return false;
         if (itemStack.isEmpty()) return false;
         
-        int[] levels = getProtectionLevels(itemStack);
+        int[] levels = ArmorEffectUtils.getProtectionLevels(itemStack);
         return getProtectionColor(itemStack, levels) != null || getThornsColor(itemStack, levels) != null;
     }
     
@@ -158,7 +93,7 @@ public class InventoryArmorOverlayRenderer {
         if (!getConfig().getOptions().toggleInventoryOverlay) return;
         if (itemStack.isEmpty()) return;
     
-        int[] levels = getProtectionLevels(itemStack);
+        int[] levels = ArmorEffectUtils.getProtectionLevels(itemStack);
         
         if (getConfig().getOptions().toggleEnchants) {
             Color protectionColor = getProtectionColor(itemStack, levels);
