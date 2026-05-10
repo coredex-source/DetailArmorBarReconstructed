@@ -8,7 +8,7 @@ import net.minecraft.resources.Identifier;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.equipment.Equippable;
@@ -21,7 +21,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Tuple;
 import net.minecraft.util.Mth;
 
 import java.awt.*;
@@ -32,6 +31,24 @@ import static com.redlimerl.detailab.DetailArmorBar.GUI_ARMOR_BAR;
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
 public class ArmorBarRenderer {
+    private static final class Tuple<A, B> {
+        private final A a;
+        private final B b;
+
+        private Tuple(A a, B b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        private A getA() {
+            return a;
+        }
+
+        private B getB() {
+            return b;
+        }
+    }
+
     static class LevelData {
         int level;
         int count;
@@ -278,7 +295,7 @@ public class ArmorBarRenderer {
     }
 
     private final Minecraft client = Minecraft.getInstance();
-    private final Gui hud = client.gui;
+    private final Hud hud = client.gui.hud;
     private static final int ARMOR_POINTS_PER_ROW = 20;
     private static final int ARMOR_SLOTS_PER_ROW = 10;
     private static final int ARMOR_ROW_HEIGHT = 10;
