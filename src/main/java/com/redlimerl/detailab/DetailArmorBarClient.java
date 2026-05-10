@@ -23,7 +23,7 @@ public class DetailArmorBarClient {
     public DetailArmorBarClient(IEventBus modEventBus, ModContainer container) {
         // Register config screen factory - shows our custom OptionsScreen when clicking config button
         container.registerExtensionPoint(IConfigScreenFactory.class, 
-            (modContainer, parent) -> new OptionsScreen(parent));
+            (modContainer, parent) -> OptionsScreen.create(parent));
         
         // Register mod event listeners
         modEventBus.addListener(this::onClientSetup);
