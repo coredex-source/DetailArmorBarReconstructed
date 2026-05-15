@@ -1,5 +1,5 @@
 {
-   "option.detailarmorbar.title.features": "功能",
+    "option.detailarmorbar.title.features": "功能",
     "option.detailarmorbar.title.animation": "动画",
     "option.detailarmorbar.title.positioning": "位置",
     "option.detailarmorbar.title.etc": "其他",
@@ -47,6 +47,8 @@
     "context.detailarmorbar.toggle.item_types": "装备特殊物品时（如鞘翅），在护甲栏显示。",
     "option.detailarmorbar.toggle.empty_bar": "空护甲栏",
     "context.detailarmorbar.toggle.empty_bar": "显示空护甲栏槽位。",
+    "option.detailarmorbar.toggle.stack_armor_bars": "堆叠护甲栏",
+    "context.detailarmorbar.toggle.stack_armor_bars": "当护甲值超过20点时，显示额外的护甲行而不是溢出标记。",
     "option.detailarmorbar.toggle.vanilla_texture": "原版风格材质",
     "context.detailarmorbar.toggle.vanilla_texture": "以原版风格显示护甲栏。关闭时显示改进材质。鸣谢：Heamaci, snessim",
     "option.detailarmorbar.toggle.compatible_heart_mod": "兼容模式",
@@ -129,5 +131,5 @@
     "notification.detailarmorbar.durability.low.title": "§6⚠ 低耐久警告",
     "notification.detailarmorbar.durability.quarter.title": "§e⚠ 耐久警告",
     "notification.detailarmorbar.durability.half.title": "§e⚠ 耐久提示",
-    "notification.detailarmorbar.durability.description": "%s剩余%d%%耐久" 
+    "notification.detailarmorbar.durability.description": "%s剩余%d%%耐久"
 }
