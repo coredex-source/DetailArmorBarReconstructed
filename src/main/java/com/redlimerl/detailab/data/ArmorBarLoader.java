@@ -11,7 +11,9 @@ import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.render.ArmorTrimHandler;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
+//? if fabric {
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+//?}
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +27,10 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.Map;
 import java.util.Optional;
 
-public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement> implements IdentifiableResourceReloadListener {
+public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement>
+        //? if fabric
+        implements IdentifiableResourceReloadListener
+{
 
     private static final Codec<JsonElement> JSON_CODEC = Codec.PASSTHROUGH.xmap(
             dynamic -> dynamic.convert(JsonOps.INSTANCE).getValue(),
@@ -51,10 +56,12 @@ public class ArmorBarLoader extends SimpleJsonResourceReloadListener<JsonElement
         return armorList != null && itemList != null;
     }
 
+    //? if fabric {
     @Override
     public Identifier getFabricId() {
         return Identifier.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "armor");
     }
+    //?}
 
     @Override
     protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {

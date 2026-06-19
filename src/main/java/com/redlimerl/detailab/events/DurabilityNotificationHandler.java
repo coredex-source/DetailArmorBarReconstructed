@@ -2,7 +2,7 @@ package com.redlimerl.detailab.events;
 
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.DurabilityThreshold;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import com.redlimerl.detailab.loaders.Platform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -42,7 +42,7 @@ public class DurabilityNotificationHandler {
     }
 
     public static void register() {
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        Platform.registerClientTick(client -> {
             if (!getConfig().getOptions().toggleDurabilityNotifications) {
                 return;
             }

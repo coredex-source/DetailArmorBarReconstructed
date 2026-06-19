@@ -1,6 +1,6 @@
 package com.redlimerl.detailab.mixins;
 
-import net.fabricmc.loader.api.FabricLoader;
+import com.redlimerl.detailab.loaders.Platform;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -15,7 +15,7 @@ public class OverflowingBarsMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-        overflowingBarsLoaded = FabricLoader.getInstance().isModLoaded(OVERFLOWINGBARS_MOD_ID);
+        overflowingBarsLoaded = Platform.isModLoaded(OVERFLOWINGBARS_MOD_ID);
     }
 
     @Override

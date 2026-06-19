@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "detailabreconst",
-  "version": "${version}",
-  "name": "Detail Armor Bar Reconstructed",
-  "description": "Show more details of armors in Armor bar!",
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
   "authors": [
     "coredex-source"
   ],
@@ -15,17 +15,14 @@
     "ram6ert or rambert"
   ],
   "contact": {
-    "sources": "https://github.com/coredex-source/DetailArmorBarReconstructed"
+    "sources": "${mod_sources}"
   },
-  "license": "MIT",
-  "icon": "assets/detailab/icon.png",
+  "license": "${mod_license}",
+  "icon": "${mod_icon}",
   "environment": "client",
   "entrypoints": {
     "client": [
-      {
-        "adapter": "default",
-        "value": "com.redlimerl.detailab.DetailArmorBar"
-      }
+      "com.redlimerl.detailab.loaders.fabric.DetailArmorBarFabric"
     ],
     "modmenu": [
       "com.redlimerl.detailab.config.ModMenuConfigImpl"
@@ -39,7 +36,7 @@
     "fabricloader": "*",
     "fabric-api": "*",
     "java": ">=25",
-    "minecraft": "~26.2-",
+    "minecraft": "${minecraft_dependency}",
     "eclipseui": "*"
   },
   "suggests": {

@@ -1,6 +1,6 @@
 package com.redlimerl.detailab.compat;
 
-import net.fabricmc.loader.api.FabricLoader;
+import com.redlimerl.detailab.loaders.Platform;
 
 public class ModCompatibility {
     
@@ -9,7 +9,7 @@ public class ModCompatibility {
     
     public static boolean isOverflowingBarsLoaded() {
         if (overflowingBarsLoaded == null) {
-            overflowingBarsLoaded = FabricLoader.getInstance().isModLoaded("overflowingbars");
+            overflowingBarsLoaded = Platform.isModLoaded("overflowingbars");
         }
         return overflowingBarsLoaded;
     }

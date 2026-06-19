@@ -6,18 +6,12 @@ import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
 import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
+import com.redlimerl.detailab.loaders.Platform;
 import com.redlimerl.detailab.screen.OptionsScreen;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,11 +21,12 @@ import java.awt.*;
 import java.io.File;
 import java.nio.file.Path;
 
-public class DetailArmorBar implements ClientModInitializer {
+public class DetailArmorBar {
 
     public static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
-    public static String MOD_ID = "detailab";
-    public static Identifier GUI_ARMOR_BAR = Identifier.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
+    public static final String MOD_CONTAINER_ID = "detailabreconst";
+    public static final String MOD_ID = "detailab";
+    public static final Identifier GUI_ARMOR_BAR = Identifier.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
     private final static String[] compatibilityMods = { "healthoverlay" };
 
     private static DetailArmorBarConfig config = null;
@@ -49,27 +44,27 @@ public class DetailArmorBar implements ClientModInitializer {
     }
 
     private static void loadConfig() {
-        Path configPath = FabricLoader.getInstance().getConfigDir();
+        Path configPath = Platform.getConfigDir();
         File configFile = new File(configPath.toFile(), "detailarmorbar.json");
         config = new DetailArmorBarConfig(configFile);
         config.load();
     }
 
-    public void onInitializeClient() {
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(DetailArmorBarAPI.LOADER);
+    public static void initializeClient() {
+        Platform.registerResourceReloadListener(DetailArmorBarAPI.LOADER);
 
         // Register custom keybind category
         KeyMapping.Category detailArmorBarCategory = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "keybinds"));
         
         // Register keybind for opening config screen (unbound by default)
-        openConfigKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+        openConfigKey = Platform.registerKeyMapping(new KeyMapping(
                 "key.detailab.open_config",
                 GLFW.GLFW_KEY_UNKNOWN, // Unbound by default
                 detailArmorBarCategory
         ));
         
         // Register client tick event to check for keybind press
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        Platform.registerClientTick(client -> {
             while (openConfigKey.consumeClick()) {
                 if (client.gui.screen() == null) {
                     client.gui.setScreen(OptionsScreen.create(null));
@@ -145,7 +140,7 @@ public class DetailArmorBar implements ClientModInitializer {
         com.redlimerl.detailab.events.DurabilityNotificationHandler.register();
 
         for (String compatibilityMod : compatibilityMods) {
-            if (FabricLoader.getInstance().getModContainer(compatibilityMod).isPresent()) {
+            if (Platform.isModLoaded(compatibilityMod)) {
                 getConfig().getOptions().toggleCompatibleHeartMod = true;
             }
         }

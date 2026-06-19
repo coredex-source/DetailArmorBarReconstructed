@@ -1,3 +1,4 @@
+//? if fabric {
 package com.redlimerl.detailab.config;
 
 import com.redlimerl.detailab.screen.OptionsScreen;
@@ -12,3 +13,4 @@ public class ModMenuConfigImpl implements ModMenuApi {
         return (ConfigScreenFactory<Screen>) OptionsScreen::create;
     }
 }
+//?}

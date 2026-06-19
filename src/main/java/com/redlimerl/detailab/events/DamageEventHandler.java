@@ -1,9 +1,9 @@
 package com.redlimerl.detailab.events;
 
 import com.redlimerl.detailab.DetailArmorBar;
+import com.redlimerl.detailab.loaders.Platform;
 import com.redlimerl.detailab.render.ArmorBarRenderer;
 import com.redlimerl.detailab.render.ArmorBarUtils;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -30,7 +30,7 @@ public class DamageEventHandler {
      */
     public static void register() {
         // Monitor player health changes each tick to detect damage
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        Platform.registerClientTick(client -> {
             Player player = client.player;
             if (player != null) {
                 float currentHealth = player.getHealth();
