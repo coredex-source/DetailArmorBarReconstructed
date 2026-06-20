@@ -121,7 +121,7 @@
   "option.detailarmorbar.toggle.toast_notification": "Усплыўныя апавяшчэнні",
   "context.detailarmorbar.toggle.toast_notification": "Паказваць усплыўнае паведамленне, калі трываласць брані апускаецца ніжэй парога.",
   "option.detailarmorbar.toggle.visual_effect": "Візуальны эфект",
-  "context.detailarmorbar.toggle.visual_effect": "Паказваць візуальны эфект на радку брані пры нізкай трываласці.",
+  "context.detailarmorbar.toggle.visual_effect": "Паказваць візуальны эфект на радку брані пры нізкай трываласці. Анімацыі абароны прыпыняюцца, пакуль гэты эфект выконваецца.",
   "option.detailarmorbar.toggle.threshold_50": "Папярэджанне 50%",
   "context.detailarmorbar.toggle.threshold_50": "Апавяшчаць, калі трываласць брані апускаецца да 50% ці ніжэй.",
   "option.detailarmorbar.toggle.threshold_25": "Папярэджанне 25%",

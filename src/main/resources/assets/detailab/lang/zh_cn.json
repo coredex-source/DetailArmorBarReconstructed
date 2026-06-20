@@ -111,7 +111,7 @@
     "option.detailarmorbar.toggle.toast_notification": "弹窗警报",
     "context.detailarmorbar.toggle.toast_notification": "护甲耐久低于阈值时显示弹窗通知。",
     "option.detailarmorbar.toggle.visual_effect": "视觉效果",
-    "context.detailarmorbar.toggle.visual_effect": "耐久低时在护甲栏显示视觉效果。",
+    "context.detailarmorbar.toggle.visual_effect": "耐久低时在护甲栏显示视觉效果。此效果运行时，防护动画会暂停。",
     "option.detailarmorbar.toggle.threshold_50": "50%警告",
     "context.detailarmorbar.toggle.threshold_50": "护甲耐久降至50%及以下时通知。",
     "option.detailarmorbar.toggle.threshold_25": "25%警告",

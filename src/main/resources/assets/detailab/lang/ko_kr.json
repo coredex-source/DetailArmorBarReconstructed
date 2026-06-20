@@ -121,7 +121,7 @@
   "option.detailarmorbar.toggle.toast_notification": "토스트 알림",
   "context.detailarmorbar.toggle.toast_notification": "갑옷 내구도가 임계값 아래로 떨어지면 토스트 알림을 표시합니다.",
   "option.detailarmorbar.toggle.visual_effect": "시각 효과",
-  "context.detailarmorbar.toggle.visual_effect": "내구도가 낮을 때 갑옷바에 시각 효과를 표시합니다.",
+  "context.detailarmorbar.toggle.visual_effect": "내구도가 낮을 때 갑옷바에 시각 효과를 표시합니다. 이 효과가 실행되는 동안 보호 애니메이션이 일시 중지됩니다.",
   "option.detailarmorbar.toggle.threshold_50": "50% 경고",
   "context.detailarmorbar.toggle.threshold_50": "갑옷 내구도가 50% 이하로 떨어지면 알립니다.",
   "option.detailarmorbar.toggle.threshold_25": "25% 경고",

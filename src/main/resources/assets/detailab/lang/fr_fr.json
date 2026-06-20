@@ -101,7 +101,7 @@
   "option.detailarmorbar.toggle.toast_notification": "Alertes Toast",
   "context.detailarmorbar.toggle.toast_notification": "Affiche une notification toast quand la durabilité de l'armure descend en dessous d'un seuil.",
   "option.detailarmorbar.toggle.visual_effect": "Effet Visuel",
-  "context.detailarmorbar.toggle.visual_effect": "Affiche un effet visuel sur la barre d'armure quand la durabilité est faible.",
+  "context.detailarmorbar.toggle.visual_effect": "Affiche un effet visuel sur la barre d'armure quand la durabilité est faible. Les animations de protection sont mises en pause pendant que cet effet est en cours.",
   "option.detailarmorbar.toggle.threshold_50": "Avertissement 50%",
   "context.detailarmorbar.toggle.threshold_50": "Notifie quand la durabilité de l'armure descend à 50% ou en dessous.",
   "option.detailarmorbar.toggle.threshold_25": "Avertissement 25%",
