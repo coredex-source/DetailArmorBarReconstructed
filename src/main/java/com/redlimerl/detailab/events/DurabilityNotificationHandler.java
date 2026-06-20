@@ -107,7 +107,7 @@ public class DurabilityNotificationHandler {
             DurabilityThreshold activeThreshold = getMostSevereEnabledThreshold(durabilityPercent);
             resetRecoveredThresholds(slot, durabilityPercent);
             if (activeThreshold != null) {
-                checkThreshold(slot, currentItem, activeThreshold, durabilityPercent, client);
+                checkThreshold(slot, currentItem, durabilityPercent, activeThreshold, client);
             }
         }
     }

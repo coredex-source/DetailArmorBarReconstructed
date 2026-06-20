@@ -64,12 +64,9 @@ public class ArmorBarRenderer {
     public static final ArmorBarRenderer INSTANCE = new ArmorBarRenderer();
     public static long LAST_THORNS = 0L;
     public static long LAST_MENDING = 0L;
-    private DurabilityThreshold queuedDurabilityLevel = null;
-    private long queuedDurabilityWarningTime = -1L;
-    private DurabilityThreshold activeDurabilityLevel = null;
-    private long activeDurabilityWarningTime = -1L;
+    private boolean pendingDurabilityFlash = false;
     private long activeDurabilityStartTick = -1L;
-    private long handledDurabilityWarningTime = -1L;
+    private long nextDurabilityCanStartTick = -1L;
 
     private static Color getProtectColor(int g, int p, int e, int f, int a) {
         int alpha = ArmorEffectUtils.getEffectAlpha(80, 0.65f);
@@ -455,9 +452,29 @@ public class ArmorBarRenderer {
         }
         
         boolean protectionAnimationAvailable = options.toggleEnchants && totalEnchants > 0 && totalArmorPoint > 0;
-        updateDurabilityAnimationQueue(totalArmorPoint != 0, protectionAnimationAvailable);
-        Color durabilityNotificationColor = getActiveDurabilityNotificationColor();
-        boolean durabilityNotificationActive = durabilityNotificationColor != null;
+
+        // Repeat alerts ON  → continuous pulsing while any item is at a threshold.
+        // Repeat alerts OFF → single-shot flash driven by the event queue (once per crossing).
+        boolean durabilityVisualApplicable = options.toggleDurabilityVisualEffect
+            && totalArmorPoint > 0
+            && hasAnyItemAtThreshold(armorPoints);
+
+        int durabilityNotificationAlpha = -1;
+        if (durabilityVisualApplicable && options.toggleRepeatedDurabilityNotifications) {
+            // Continuous mode: drain queue (irrelevant here), pulse freely on the clock.
+            while (com.redlimerl.detailab.events.DurabilityNotificationHandler.pollVisualWarning() != null) {}
+            int speed = ArmorEffectUtils.getAnimationSpeed();
+            durabilityNotificationAlpha = ArmorEffectUtils.getPulsingAlpha(DetailArmorBar.getTicks(), speed, 0.85f, false);
+        } else if (options.toggleDurabilityVisualEffect) {
+            // Single-shot mode: event queue drives the animation.
+            updateDurabilityAnimationQueue(totalArmorPoint != 0, protectionAnimationAvailable);
+            durabilityNotificationAlpha = getActiveDurabilityNotificationAlpha();
+        } else {
+            // Visual effects off: just drain the queue so it doesn't back up.
+            while (com.redlimerl.detailab.events.DurabilityNotificationHandler.pollVisualWarning() != null) {}
+        }
+        // Only suppress protection when durability is actually visible (alpha > 0).
+        boolean durabilityNotificationActive = durabilityNotificationAlpha > 0;
 
         //Armor Enchantments
         if (!durabilityNotificationActive && protectionAnimationAvailable) {
@@ -682,7 +699,7 @@ public class ArmorBarRenderer {
                 renderedArmorRows,
                 totalArmorPoint,
                 stackArmorBars,
-                durabilityNotificationColor
+                durabilityNotificationAlpha
             );
         }
     }
@@ -697,37 +714,33 @@ public class ArmorBarRenderer {
         long currentTick = DetailArmorBar.getTicks();
         long animationDuration = getDurabilityAnimationDuration();
 
-        if (activeDurabilityLevel != null && currentTick - activeDurabilityStartTick >= animationDuration) {
-            handledDurabilityWarningTime = Math.max(handledDurabilityWarningTime, activeDurabilityWarningTime);
-            clearActiveDurabilityAnimation();
-        }
-
-        DurabilityThreshold currentLevel = com.redlimerl.detailab.events.DurabilityNotificationHandler.getCurrentWarningLevel();
-        if (currentLevel != null) {
-            long warningTime = com.redlimerl.detailab.events.DurabilityNotificationHandler.getLastWarningTime(currentLevel);
-            boolean isNewWarning = warningTime > handledDurabilityWarningTime
-                && warningTime != queuedDurabilityWarningTime
-                && warningTime != activeDurabilityWarningTime;
-
-            if (isNewWarning) {
-                queuedDurabilityLevel = currentLevel;
-                queuedDurabilityWarningTime = warningTime;
+        if (activeDurabilityStartTick >= 0 && currentTick - activeDurabilityStartTick >= animationDuration) {
+            if (protectionAnimationAvailable) {
+                nextDurabilityCanStartTick = currentTick + animationDuration;
             }
+            activeDurabilityStartTick = -1L;
         }
 
-        if (activeDurabilityLevel == null && queuedDurabilityLevel != null &&
+        // Consume all pending visual warnings; any new one marks a flash as pending
+        while (com.redlimerl.detailab.events.DurabilityNotificationHandler.pollVisualWarning() != null) {
+            pendingDurabilityFlash = true;
+        }
+
+        if (activeDurabilityStartTick < 0 && pendingDurabilityFlash &&
             canStartDurabilityAnimation(protectionAnimationAvailable)) {
-            activeDurabilityLevel = queuedDurabilityLevel;
-            activeDurabilityWarningTime = queuedDurabilityWarningTime;
             activeDurabilityStartTick = currentTick;
-            queuedDurabilityLevel = null;
-            queuedDurabilityWarningTime = -1L;
+            pendingDurabilityFlash = false;
         }
     }
 
     private boolean canStartDurabilityAnimation(boolean protectionAnimationAvailable) {
         if (!protectionAnimationAvailable) {
             return true;
+        }
+
+        long currentTick = DetailArmorBar.getTicks();
+        if (nextDurabilityCanStartTick > 0 && currentTick < nextDurabilityCanStartTick) {
+            return false;
         }
 
         return switch (getConfig().getOptions().effectType) {
@@ -748,33 +761,53 @@ public class ArmorBarRenderer {
         return ArmorEffectUtils.getAnimationSpeed() * 2L;
     }
 
-    private Color getActiveDurabilityNotificationColor() {
-        if (activeDurabilityLevel == null) {
-            return null;
-        }
+    private int getActiveDurabilityNotificationAlpha() {
+        if (activeDurabilityStartTick < 0) return -1;
 
         long elapsed = DetailArmorBar.getTicks() - activeDurabilityStartTick;
         if (elapsed < 0 || elapsed >= getDurabilityAnimationDuration()) {
-            handledDurabilityWarningTime = Math.max(handledDurabilityWarningTime, activeDurabilityWarningTime);
-            clearActiveDurabilityAnimation();
-            return null;
+            activeDurabilityStartTick = -1L;
+            return -1;
         }
 
         int speed = ArmorEffectUtils.getAnimationSpeed();
-        int alpha = ArmorEffectUtils.getPulsingAlpha(elapsed, speed, 0.85f, true);
-        return activeDurabilityLevel.getColorWithAlpha(alpha);
+        return ArmorEffectUtils.getPulsingAlpha(elapsed, speed, 0.85f, true);
     }
 
     private void resetDurabilityAnimationQueue() {
-        queuedDurabilityLevel = null;
-        queuedDurabilityWarningTime = -1L;
-        clearActiveDurabilityAnimation();
+        pendingDurabilityFlash = false;
+        activeDurabilityStartTick = -1L;
+        nextDurabilityCanStartTick = -1L;
+        // drain stale warnings so they don't fire after re-enable
+        while (com.redlimerl.detailab.events.DurabilityNotificationHandler.pollVisualWarning() != null) {}
     }
 
     private void clearActiveDurabilityAnimation() {
-        activeDurabilityLevel = null;
-        activeDurabilityWarningTime = -1L;
         activeDurabilityStartTick = -1L;
+    }
+
+    private boolean hasAnyItemAtThreshold(List<Tuple<ItemStack, CustomArmorBar>> armorPoints) {
+        for (Tuple<ItemStack, CustomArmorBar> tuple : armorPoints) {
+            if (getItemDurabilityThreshold(tuple.getA()) != null) return true;
+        }
+        return false;
+    }
+
+    private DurabilityThreshold getItemDurabilityThreshold(ItemStack item) {
+        if (item.isEmpty() || item.getMaxDamage() <= 0) return null;
+        float pct = (1.0f - ((float) item.getDamageValue() / item.getMaxDamage())) * 100f;
+        var options = getConfig().getOptions();
+        DurabilityThreshold result = null;
+        for (DurabilityThreshold t : DurabilityThreshold.values()) {
+            boolean enabled = switch (t) {
+                case HALF     -> options.toggleThreshold50;
+                case QUARTER  -> options.toggleThreshold25;
+                case LOW      -> options.toggleThreshold10;
+                case CRITICAL -> options.toggleThreshold5;
+            };
+            if (enabled && pct <= t.getPercentage()) result = t;
+        }
+        return result;
     }
 
     private void drawDurabilityNotificationEffect(GuiGraphicsExtractor context,
@@ -784,7 +817,7 @@ public class ArmorBarRenderer {
                                                   int renderedArmorRows,
                                                   int totalArmorPoint,
                                                   boolean stackArmorBars,
-                                                  Color notificationColor) {
+                                                  int notificationAlpha) {
         var options = getConfig().getOptions();
 
         for (int rowIndex = 0; rowIndex < renderedArmorRows; rowIndex++) {
@@ -796,10 +829,27 @@ public class ArmorBarRenderer {
             for (int count = 0; count < maxSlots; count++) {
                 int xPos = getArmorSlotX(screenWidth, count, options.toggleInverseSlot);
                 int armorIndex = rowStart + count * 2;
+                int nextArmorIndex = armorIndex + 1;
+                boolean hasFirst = armorIndex < rowEnd;
+                boolean hasSecond = nextArmorIndex < rowEnd;
 
-                if (armorIndex < rowEnd) {
-                    Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(armorIndex);
-                    am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, false, false, notificationColor);
+                DurabilityThreshold firstThreshold = hasFirst ? getItemDurabilityThreshold(armorPoints.get(armorIndex).getA()) : null;
+                DurabilityThreshold secondThreshold = hasSecond ? getItemDurabilityThreshold(armorPoints.get(nextArmorIndex).getA()) : null;
+
+                if (firstThreshold == null && secondThreshold == null) continue;
+
+                Color firstColor = firstThreshold != null ? firstThreshold.getColorWithAlpha(notificationAlpha) : null;
+                Color secondColor = secondThreshold != null ? secondThreshold.getColorWithAlpha(notificationAlpha) : null;
+
+                if (firstThreshold != null && secondThreshold != null && firstThreshold == secondThreshold) {
+                    armorPoints.get(armorIndex).getB().drawOutLine(armorPoints.get(armorIndex).getA(), context, xPos, rowYPos, false, false, firstColor);
+                } else if (firstThreshold != null && secondThreshold != null) {
+                    armorPoints.get(armorIndex).getB().drawOutLine(armorPoints.get(armorIndex).getA(), context, xPos, rowYPos, true, isRightHalf(false, options.toggleInverseSlot), firstColor);
+                    armorPoints.get(nextArmorIndex).getB().drawOutLine(armorPoints.get(nextArmorIndex).getA(), context, xPos, rowYPos, true, isRightHalf(true, options.toggleInverseSlot), secondColor);
+                } else if (firstThreshold != null) {
+                    armorPoints.get(armorIndex).getB().drawOutLine(armorPoints.get(armorIndex).getA(), context, xPos, rowYPos, true, isRightHalf(false, options.toggleInverseSlot), firstColor);
+                } else {
+                    armorPoints.get(nextArmorIndex).getB().drawOutLine(armorPoints.get(nextArmorIndex).getA(), context, xPos, rowYPos, true, isRightHalf(true, options.toggleInverseSlot), secondColor);
                 }
             }
         }
