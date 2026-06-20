@@ -358,6 +358,14 @@ public class ArmorBarRenderer {
         return screenWidth + slotIndex * 8;
     }
 
+    private boolean isRightHalf(boolean secondPoint, boolean inverseSlotOrder) {
+        return secondPoint ^ inverseSlotOrder;
+    }
+
+    private int getEnchantHalf(boolean secondPoint, boolean inverseSlotOrder) {
+        return isRightHalf(secondPoint, inverseSlotOrder) ? 1 : 2;
+    }
+
     public void render(GuiGraphicsExtractor context, Player player, int y_base) {
         var options = getConfig().getOptions();
         
@@ -411,8 +419,8 @@ public class ArmorBarRenderer {
                         if (am1.getB() == am2.getB()) {
                             am1.getB().draw(am1.getA(), context, xPos, rowYPos, false, false);
                         } else {
-                            am2.getB().draw(am2.getA(), context, xPos, rowYPos, true, true);
-                            am1.getB().draw(am1.getA(), context, xPos, rowYPos, true, false);
+                            am2.getB().draw(am2.getA(), context, xPos, rowYPos, true, isRightHalf(true, options.toggleInverseSlot));
+                            am1.getB().draw(am1.getA(), context, xPos, rowYPos, true, isRightHalf(false, options.toggleInverseSlot));
                         }
                         if (options.toggleMending && (hasMendingEnchant(am1.getA()) || hasMendingEnchant(am2.getA()))) {
                             drawSparkleOverlay(context, xPos, rowYPos);
@@ -420,7 +428,7 @@ public class ArmorBarRenderer {
                     } else if (armorIndex < rowEnd) {
                         CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, rowYPos, false, false);
                         Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(armorIndex);
-                        am.getB().draw(am.getA(), context, xPos, rowYPos, true, false);
+                        am.getB().draw(am.getA(), context, xPos, rowYPos, true, isRightHalf(false, options.toggleInverseSlot));
                         if (options.toggleMending && hasMendingEnchant(am.getA())) {
                             drawSparkleOverlay(context, xPos, rowYPos);
                         }
@@ -469,13 +477,13 @@ public class ArmorBarRenderer {
                             if (firstTrimMaterial == secondTrimMaterial) {
                                 drawTrimOverlay(context, xPos, rowYPos, firstTrimMaterial, false, false);
                             } else {
-                                drawTrimOverlay(context, xPos, rowYPos, firstTrimMaterial, true, false);
-                                drawTrimOverlay(context, xPos, rowYPos, secondTrimMaterial, true, true);
+                                drawTrimOverlay(context, xPos, rowYPos, firstTrimMaterial, true, isRightHalf(false, options.toggleInverseSlot));
+                                drawTrimOverlay(context, xPos, rowYPos, secondTrimMaterial, true, isRightHalf(true, options.toggleInverseSlot));
                             }
                         } else if (firstTrimMaterial != null) {
-                            drawTrimOverlay(context, xPos, rowYPos, firstTrimMaterial, true, false);
+                            drawTrimOverlay(context, xPos, rowYPos, firstTrimMaterial, true, isRightHalf(false, options.toggleInverseSlot));
                         } else if (secondTrimMaterial != null) {
-                            drawTrimOverlay(context, xPos, rowYPos, secondTrimMaterial, true, true);
+                            drawTrimOverlay(context, xPos, rowYPos, secondTrimMaterial, true, isRightHalf(true, options.toggleInverseSlot));
                         }
                     }
                 }
@@ -509,26 +517,35 @@ public class ArmorBarRenderer {
                         int rowStart = getArmorRowStart(totalArmorPoint, rowIndex, stackArmorBars);
                         int rowEnd = Math.min(totalArmorPoint, rowStart + ARMOR_POINTS_PER_ROW);
                         int rowYPos = getArmorRowY(baseYPos, rowIndex);
-                        int armorPreset = rowEnd - rowStart;
-                        int halfArmors = (int) Math.ceil(armorPreset / 2.0) - 1;
+                        int pointsToDraw = Math.min(remainingLowDur, rowEnd - rowStart);
+                        int lowDurStart = rowEnd - pointsToDraw;
 
-                        for (int count = 0; count <= halfArmors && remainingLowDur > 0; count++) {
-                            int slotIndex = halfArmors - count;
+                        for (int slotIndex = 0; slotIndex < ARMOR_SLOTS_PER_ROW; slotIndex++) {
                             int xPos = getArmorSlotX(screenWidth, slotIndex, options.toggleInverseSlot);
-                            Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(rowStart + slotIndex * 2);
-                            if (armorPreset == slotIndex * 2 + 1) {
-                                if (count == 0) {
-                                    am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, true, false, lowDurColor);
-                                    remainingLowDur--;
+                            int armorIndex = rowStart + slotIndex * 2;
+                            int nextArmorIndex = armorIndex + 1;
+                            boolean drawFirstPoint = armorIndex < rowEnd && armorIndex >= lowDurStart;
+                            boolean drawSecondPoint = nextArmorIndex < rowEnd && nextArmorIndex >= lowDurStart;
+
+                            if (drawFirstPoint && drawSecondPoint) {
+                                Tuple<ItemStack, CustomArmorBar> am1 = armorPoints.get(armorIndex);
+                                Tuple<ItemStack, CustomArmorBar> am2 = armorPoints.get(nextArmorIndex);
+                                if (am1.getB() == am2.getB()) {
+                                    am1.getB().drawOutLine(am1.getA(), context, xPos, rowYPos, false, false, lowDurColor);
+                                } else {
+                                    am2.getB().drawOutLine(am2.getA(), context, xPos, rowYPos, true, isRightHalf(true, options.toggleInverseSlot), lowDurColor);
+                                    am1.getB().drawOutLine(am1.getA(), context, xPos, rowYPos, true, isRightHalf(false, options.toggleInverseSlot), lowDurColor);
                                 }
-                            } else if (remainingLowDur == 1) {
-                                am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, true, true, lowDurColor);
-                                remainingLowDur = 0;
-                            } else {
-                                am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, false, false, lowDurColor);
-                                remainingLowDur -= 2;
+                            } else if (drawFirstPoint) {
+                                Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(armorIndex);
+                                am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, true, isRightHalf(false, options.toggleInverseSlot), lowDurColor);
+                            } else if (drawSecondPoint) {
+                                Tuple<ItemStack, CustomArmorBar> am = armorPoints.get(nextArmorIndex);
+                                am.getB().drawOutLine(am.getA(), context, xPos, rowYPos, true, isRightHalf(true, options.toggleInverseSlot), lowDurColor);
                             }
                         }
+
+                        remainingLowDur -= pointsToDraw;
                     }
                 }
             }
@@ -616,9 +633,9 @@ public class ArmorBarRenderer {
                                 if (hasFirstPoint && hasSecondPoint) {
                                     drawEnchantTexture(context, xPos, rowYPos, animatedUniformColor, 0);
                                 } else if (hasFirstPoint) {
-                                    drawEnchantTexture(context, xPos, rowYPos, animatedUniformColor, 2);
+                                    drawEnchantTexture(context, xPos, rowYPos, animatedUniformColor, getEnchantHalf(false, options.toggleInverseSlot));
                                 } else if (hasSecondPoint) {
-                                    drawEnchantTexture(context, xPos, rowYPos, animatedUniformColor, 1);
+                                    drawEnchantTexture(context, xPos, rowYPos, animatedUniformColor, getEnchantHalf(true, options.toggleInverseSlot));
                                 }
                             } else {
                                 if (hasFirstPoint) {
@@ -643,13 +660,13 @@ public class ArmorBarRenderer {
                                                         armorFire.level == nextFire.level) {
                                                         drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), 0);
                                                     } else {
-                                                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), 2);
+                                                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), getEnchantHalf(false, options.toggleInverseSlot));
                                                     }
                                                 } else {
-                                                    drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), 2);
+                                                    drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), getEnchantHalf(false, options.toggleInverseSlot));
                                                 }
                                             } else {
-                                                drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), 2);
+                                                drawEnchantTexture(context, xPos, rowYPos, getProtectColor(armorProtectArr), getEnchantHalf(false, options.toggleInverseSlot));
                                             }
                                         }
                                     }
@@ -677,11 +694,11 @@ public class ArmorBarRenderer {
                                                         armorProjectile.level != nextProjectile.level ||
                                                         armorExplosive.level != nextExplosive.level ||
                                                         armorFire.level != nextFire.level) {
-                                                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(nextProtectArr), 1);
+                                                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(nextProtectArr), getEnchantHalf(true, options.toggleInverseSlot));
                                                     }
                                                 }
                                             } else {
-                                                drawEnchantTexture(context, xPos, rowYPos, getProtectColor(nextProtectArr), 1);
+                                                drawEnchantTexture(context, xPos, rowYPos, getProtectColor(nextProtectArr), getEnchantHalf(true, options.toggleInverseSlot));
                                             }
                                         }
                                     }
@@ -714,9 +731,9 @@ public class ArmorBarRenderer {
                             } else if (min != -1 && max == -1 && protectArr[pw] >= 1) max = pw;
                         }
                         if (min != -1 && max != -1) {
-                            drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), 2);
+                            drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), getEnchantHalf(false, options.toggleInverseSlot));
                             protectArr[min] = 0;
-                            drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), 1);
+                            drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), getEnchantHalf(true, options.toggleInverseSlot));
                             protectArr[max] -= 1;
                         } else {
                             drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), 0);
@@ -724,7 +741,7 @@ public class ArmorBarRenderer {
                         }
                     }
                     if (count * 2 + 1 == totalEnchants) {
-                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), 2);
+                        drawEnchantTexture(context, xPos, rowYPos, getProtectColor(protectArr), getEnchantHalf(false, options.toggleInverseSlot));
                     }
                 }
             }
@@ -773,9 +790,9 @@ public class ArmorBarRenderer {
                             if (firstHasThorns && secondHasThorns) {
                                 InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 36, 18, thornsColor, false);
                             } else if (firstHasThorns) {
-                                InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, false);
+                                InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, isRightHalf(false, options.toggleInverseSlot));
                             } else if (secondHasThorns) {
-                                InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, true);
+                                InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, isRightHalf(true, options.toggleInverseSlot));
                             }
                         }
                     }
@@ -796,7 +813,7 @@ public class ArmorBarRenderer {
                         InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 36, 18, thornsColor, false);
                     }
                     if (count * 2 + 1 == thorns.level) {
-                        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, false);
+                        InGameDrawer.drawTexture(GUI_ARMOR_BAR, context, xPos, rowYPos, 27, 18, thornsColor, isRightHalf(false, options.toggleInverseSlot));
                     }
                 }
             }
