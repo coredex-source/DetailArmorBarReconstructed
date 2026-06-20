@@ -8,16 +8,23 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.redlimerl.detailab.DetailArmorBar.getConfig;
+
 /**
  * Mixin for OverflowingBars compatibility.
  */
-@Mixin(targets = "fuzs.overflowingbars.client.gui.BarOverlayRenderer", remap = false)
+@Mixin(targets = "fuzs.overflowingbars.common.client.gui.BarOverlayRenderer", remap = false)
 public class OverflowingBarsArmorMixin {
 
-    @Inject(method = "renderArmorLevelBar", at = @At("RETURN"), require = 0)
-    private static void detailab$afterRenderArmorBar(GuiGraphicsExtractor guiGraphics, Player player, int leftHeight, boolean rowCount, CallbackInfo ci) {
+    @Inject(method = "renderArmorLevelBar", at = @At("HEAD"), cancellable = true, require = 0)
+    private static void detailab$replaceRenderArmorLevelBar(GuiGraphicsExtractor guiGraphics, Player player, int leftHeight, boolean rowCount, CallbackInfo ci) {
+        if (!getConfig().getOptions().toggleCompatibleHeartMod) {
+            return;
+        }
+
         int posY = guiGraphics.guiHeight() - leftHeight;
 
         ArmorBarRenderer.INSTANCE.render(guiGraphics, player, posY);
+        ci.cancel();
     }
 }

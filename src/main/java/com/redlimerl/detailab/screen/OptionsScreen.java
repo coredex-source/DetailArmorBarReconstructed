@@ -12,6 +12,7 @@ import java.util.Locale;
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
 public final class OptionsScreen {
+    private static final int DEFAULT_EFFECT_ALPHA = 0x50000000;
 
     private OptionsScreen() {
     }
@@ -71,86 +72,81 @@ public final class OptionsScreen {
                         .colorPicker(c -> c
                                 .name(option("effects.uniform_color"))
                                 .description(context("effects.uniform_color"))
-                                .binding(options::getUniformColorArgb, options::setUniformColorArgb)
-                                .defaultValue(defaults.getUniformColorArgb())
-                                .allowAlpha(true)
+                                .binding(() -> toOpaqueArgb(options.getUniformColorArgb()), v -> options.setUniformColorArgb(withStoredAlpha(options.getUniformColorArgb(), v)))
+                                .defaultValue(toOpaqueArgb(defaults.getUniformColorArgb()))
                                 .presets(
-                                        0x5099FFFF,
-                                        0x507033AD,
-                                        0x50FFFF00,
-                                        0x50D23800,
-                                        0x50FFFFFF,
-                                        0x5000FF00,
-                                        0x500000FF,
-                                        0x50FF0000
+                                        0xFF99FFFF,
+                                        0xFF7033AD,
+                                        0xFFFFFF00,
+                                        0xFFD23800,
+                                        0xFFFFFFFF,
+                                        0xFF00FF00,
+                                        0xFF0000FF,
+                                        0xFFFF0000
                                 )
                         )
                         .colorPicker(c -> c
                                 .name(option("effects.protection_generic_color"))
                                 .description(context("effects.protection_generic_color"))
-                                .binding(options::getProtectionColorGenericArgb, options::setProtectionColorGenericArgb)
-                                .defaultValue(defaults.getProtectionColorGenericArgb())
-                                .allowAlpha(true)
+                                .binding(() -> toOpaqueArgb(options.getProtectionColorGenericArgb()), v -> options.setProtectionColorGenericArgb(withStoredAlpha(options.getProtectionColorGenericArgb(), v)))
+                                .defaultValue(toOpaqueArgb(defaults.getProtectionColorGenericArgb()))
                                 .presets(
-                                        0x5099FFFF,
-                                        0x507033AD,
-                                        0x50FFFF00,
-                                        0x50D23800,
-                                        0x50FFFFFF,
-                                        0x5000FF00,
-                                        0x500000FF,
-                                        0x50FF0000
+                                        0xFF99FFFF,
+                                        0xFF7033AD,
+                                        0xFFFFFF00,
+                                        0xFFD23800,
+                                        0xFFFFFFFF,
+                                        0xFF00FF00,
+                                        0xFF0000FF,
+                                        0xFFFF0000
                                 )
                         )
                         .colorPicker(c -> c
                                 .name(option("effects.protection_projectile_color"))
                                 .description(context("effects.protection_projectile_color"))
-                                .binding(options::getProtectionColorProjectileArgb, options::setProtectionColorProjectileArgb)
-                                .defaultValue(defaults.getProtectionColorProjectileArgb())
-                                .allowAlpha(true)
+                                .binding(() -> toOpaqueArgb(options.getProtectionColorProjectileArgb()), v -> options.setProtectionColorProjectileArgb(withStoredAlpha(options.getProtectionColorProjectileArgb(), v)))
+                                .defaultValue(toOpaqueArgb(defaults.getProtectionColorProjectileArgb()))
                                 .presets(
-                                        0x507033AD,
-                                        0x5099FFFF,
-                                        0x50FFFF00,
-                                        0x50D23800,
-                                        0x50FFFFFF,
-                                        0x5000FF00,
-                                        0x500000FF,
-                                        0x50FF0000
+                                        0xFF7033AD,
+                                        0xFF99FFFF,
+                                        0xFFFFFF00,
+                                        0xFFD23800,
+                                        0xFFFFFFFF,
+                                        0xFF00FF00,
+                                        0xFF0000FF,
+                                        0xFFFF0000
                                 )
                         )
                         .colorPicker(c -> c
                                 .name(option("effects.protection_blast_color"))
                                 .description(context("effects.protection_blast_color"))
-                                .binding(options::getProtectionColorBlastArgb, options::setProtectionColorBlastArgb)
-                                .defaultValue(defaults.getProtectionColorBlastArgb())
-                                .allowAlpha(true)
+                                .binding(() -> toOpaqueArgb(options.getProtectionColorBlastArgb()), v -> options.setProtectionColorBlastArgb(withStoredAlpha(options.getProtectionColorBlastArgb(), v)))
+                                .defaultValue(toOpaqueArgb(defaults.getProtectionColorBlastArgb()))
                                 .presets(
-                                        0x50FFFF00,
-                                        0x5099FFFF,
-                                        0x507033AD,
-                                        0x50D23800,
-                                        0x50FFFFFF,
-                                        0x5000FF00,
-                                        0x500000FF,
-                                        0x50FF0000
+                                        0xFFFFFF00,
+                                        0xFF99FFFF,
+                                        0xFF7033AD,
+                                        0xFFD23800,
+                                        0xFFFFFFFF,
+                                        0xFF00FF00,
+                                        0xFF0000FF,
+                                        0xFFFF0000
                                 )
                         )
                         .colorPicker(c -> c
                                 .name(option("effects.protection_fire_color"))
                                 .description(context("effects.protection_fire_color"))
-                                .binding(options::getProtectionColorFireArgb, options::setProtectionColorFireArgb)
-                                .defaultValue(defaults.getProtectionColorFireArgb())
-                                .allowAlpha(true)
+                                .binding(() -> toOpaqueArgb(options.getProtectionColorFireArgb()), v -> options.setProtectionColorFireArgb(withStoredAlpha(options.getProtectionColorFireArgb(), v)))
+                                .defaultValue(toOpaqueArgb(defaults.getProtectionColorFireArgb()))
                                 .presets(
-                                        0x50D23800,
-                                        0x5099FFFF,
-                                        0x507033AD,
-                                        0x50FFFF00,
-                                        0x50FFFFFF,
-                                        0x5000FF00,
-                                        0x500000FF,
-                                        0x50FF0000
+                                        0xFFD23800,
+                                        0xFF99FFFF,
+                                        0xFF7033AD,
+                                        0xFFFFFF00,
+                                        0xFFFFFFFF,
+                                        0xFF00FF00,
+                                        0xFF0000FF,
+                                        0xFFFF0000
                                 )
                         )
                 )
@@ -234,6 +230,22 @@ public final class OptionsScreen {
 
     private static Component context(String key) {
         return Component.translatable("context.detailarmorbar." + key);
+    }
+
+    private static int toRgb(int argb) {
+        return argb & 0xFFFFFF;
+    }
+
+    private static int toOpaqueArgb(int argb) {
+        return 0xFF000000 | toRgb(argb);
+    }
+
+    private static int withStoredAlpha(int currentArgb, int rgb) {
+        int alpha = currentArgb & 0xFF000000;
+        if (alpha == 0) {
+            alpha = DEFAULT_EFFECT_ALPHA;
+        }
+        return alpha | toRgb(rgb);
     }
 
     private static <T extends Enum<T>> Component enumOption(String prefix, T value) {

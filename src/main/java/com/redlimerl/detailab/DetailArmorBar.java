@@ -27,7 +27,7 @@ public class DetailArmorBar {
     public static final String MOD_CONTAINER_ID = "detailabreconst";
     public static final String MOD_ID = "detailab";
     public static final Identifier GUI_ARMOR_BAR = Identifier.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
-    private final static String[] compatibilityMods = { "healthoverlay" };
+    private final static String[] compatibilityMods = { "healthoverlay", "overflowingbars" };
 
     private static DetailArmorBarConfig config = null;
     
