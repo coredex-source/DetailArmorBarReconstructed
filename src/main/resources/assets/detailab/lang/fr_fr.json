@@ -53,6 +53,8 @@
   "context.detailarmorbar.toggle.compatible_heart_mod": "Le rend compatible avec les mods où la santé est affichée sur une seule ligne. Empêche la barre d'armure de se déplacer vers le haut.",
   "option.detailarmorbar.toggle.inverse_slot": "Ordre des Emplacements Inversé",
   "context.detailarmorbar.toggle.inverse_slot": "Inverse l'ordre des emplacements de la barre d'armure.",
+  "option.detailarmorbar.toggle.inverse_overflow_icon": "Icône de Débordement Inversée",
+  "context.detailarmorbar.toggle.inverse_overflow_icon": "Inverse l'emplacement de l'icône de débordement pour les rangées d'armure supplémentaires.",
   "option.detailarmorbar.toggle.hide_bar_without_armor": "Masquer la Barre sans Armure",
   "context.detailarmorbar.toggle.hide_bar_without_armor": "Masque complètement la barre d'armure quand aucune armure n'est portée, correspondant au comportement vanilla de Minecraft.",
   "option.detailarmorbar.toggle.sort_special_item": "Trier les Objets Spéciaux",

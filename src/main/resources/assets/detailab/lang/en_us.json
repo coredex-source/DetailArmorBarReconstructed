@@ -55,6 +55,8 @@
   "context.detailarmorbar.toggle.compatible_heart_mod": "Makes it compatible with mods where health is displayed as a single line. Prevents the armor bar from moving upwards.",
   "option.detailarmorbar.toggle.inverse_slot": "Reverse Slot Order",
   "context.detailarmorbar.toggle.inverse_slot": "Reverses the slot order of the armor bar.",
+  "option.detailarmorbar.toggle.inverse_overflow_icon": "Reverse Overflow Icon",
+  "context.detailarmorbar.toggle.inverse_overflow_icon": "Reverses the placement of the overflow icon for extra armor rows.",
   "option.detailarmorbar.toggle.hide_bar_without_armor": "Hide Bar Without Armor",
   "context.detailarmorbar.toggle.hide_bar_without_armor": "Hides the armor bar completely when no armor is worn, matching vanilla Minecraft behavior.",
   "option.detailarmorbar.toggle.sort_special_item": "Sort Special Items",

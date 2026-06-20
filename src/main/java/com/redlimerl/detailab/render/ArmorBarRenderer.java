@@ -440,7 +440,13 @@ public class ArmorBarRenderer {
 
             if (!stackArmorBars && overflowRowCount > 0) {
                 for (int i = 0; i < overflowRowCount; i++) {
-                    CustomArmorBar.DEFAULT.draw(ItemStack.EMPTY, context, screenWidth - 7 - ((overflowRowCount - i) * 3), baseYPos, false, false);
+                    int overflowXPos;
+                    if (options.toggleInverseOverflowIcon) {
+                        overflowXPos = screenWidth + 79 + ((overflowRowCount - i) * 3);
+                    } else {
+                        overflowXPos = screenWidth - 7 - ((overflowRowCount - i) * 3);
+                    }
+                    CustomArmorBar.DEFAULT.draw(ItemStack.EMPTY, context, overflowXPos, baseYPos, false, false);
                 }
             }
         }

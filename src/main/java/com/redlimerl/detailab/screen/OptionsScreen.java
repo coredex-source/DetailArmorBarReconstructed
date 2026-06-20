@@ -222,6 +222,7 @@ public final class OptionsScreen {
                         .toggle(t -> t.name(option("toggle.vanilla_texture")).description(context("toggle.vanilla_texture")).binding(() -> options.toggleVanillaTexture, v -> options.toggleVanillaTexture = v).defaultValue(defaults.toggleVanillaTexture))
                         .toggle(t -> t.name(option("toggle.compatible_heart_mod")).description(context("toggle.compatible_heart_mod")).binding(() -> options.toggleCompatibleHeartMod, v -> options.toggleCompatibleHeartMod = v).defaultValue(defaults.toggleCompatibleHeartMod))
                         .toggle(t -> t.name(option("toggle.inverse_slot")).description(context("toggle.inverse_slot")).binding(() -> options.toggleInverseSlot, v -> options.toggleInverseSlot = v).defaultValue(defaults.toggleInverseSlot))
+                        .toggle(t -> t.name(option("toggle.inverse_overflow_icon")).description(context("toggle.inverse_overflow_icon")).binding(() -> options.toggleInverseOverflowIcon, v -> options.toggleInverseOverflowIcon = v).defaultValue(defaults.toggleInverseOverflowIcon))
                         .toggle(t -> t.name(option("toggle.hide_bar_without_armor")).description(context("toggle.hide_bar_without_armor")).binding(() -> options.toggleHideBarWithoutArmor, v -> options.toggleHideBarWithoutArmor = v).defaultValue(defaults.toggleHideBarWithoutArmor))
                 )
                 .build();

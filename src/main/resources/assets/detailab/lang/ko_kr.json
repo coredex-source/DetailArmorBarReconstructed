@@ -52,6 +52,8 @@
   "context.detailarmorbar.toggle.compatible_heart_mod": "체력이 한 줄로 표시되는 모드와 호환되게 만듭니다. 갑옷바가 혼자 위로 뜨는 현상을 막습니다.",
   "option.detailarmorbar.toggle.inverse_slot": "슬롯 반전",
   "context.detailarmorbar.toggle.inverse_slot": "아머바의 슬롯 순서를 반전합니다.",
+  "option.detailarmorbar.toggle.inverse_overflow_icon": "오버플로 아이콘 반전",
+  "context.detailarmorbar.toggle.inverse_overflow_icon": "추가 방어구 줄의 오버플로 아이콘 위치를 반전합니다.",
   "option.detailarmorbar.toggle.sort_special_item": "특수 아이템 정렬",
   "context.detailarmorbar.toggle.sort_special_item": "특수 아이템(Elytra 같은)을 오른쪽에 정렬합니다.",
   "option.detailarmorbar.toggle.armor_trims": "갑옷 장식 표시",

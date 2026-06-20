@@ -55,6 +55,8 @@
     "context.detailarmorbar.toggle.compatible_heart_mod": "与血量单行显示的模组兼容，防止护甲栏上移。",
     "option.detailarmorbar.toggle.inverse_slot": "槽位反转",
     "context.detailarmorbar.toggle.inverse_slot": "反转护甲栏槽位顺序。",
+    "option.detailarmorbar.toggle.inverse_overflow_icon": "溢出图标反转",
+    "context.detailarmorbar.toggle.inverse_overflow_icon": "反转额外护甲行溢出图标的位置。",
     "option.detailarmorbar.toggle.hide_bar_without_armor": "无护甲隐藏栏",
     "context.detailarmorbar.toggle.hide_bar_without_armor": "未穿护甲时完全隐藏护甲栏，符合原版行为。",
     "option.detailarmorbar.toggle.sort_special_item": "特殊物品排序",
