@@ -66,9 +66,15 @@ public class DetailArmorBar {
         // Register client tick event to check for keybind press
         Platform.registerClientTick(client -> {
             while (openConfigKey.consumeClick()) {
+                //? if minecraft_26_2 {
                 if (client.gui.screen() == null) {
                     client.gui.setScreen(OptionsScreen.create(null));
                 }
+                //?} else {
+                /*if (client.screen == null) {
+                    client.setScreen(OptionsScreen.create(null));
+                }
+                *///?}
             }
         });
 

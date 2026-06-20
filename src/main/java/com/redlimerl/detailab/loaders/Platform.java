@@ -31,7 +31,14 @@ public final class Platform {
         //? if fabric {
         return net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded(modId);
         //?} else if neoforge {
-        /*return net.neoforged.fml.ModList.get().isLoaded(modId);
+        /*var modList = net.neoforged.fml.ModList.get();
+        if (modList != null) {
+            return modList.isLoaded(modId);
+        }
+
+        var fmlLoader = net.neoforged.fml.loading.FMLLoader.getCurrentOrNull();
+        var loadingModList = fmlLoader != null ? fmlLoader.getLoadingModList() : null;
+        return loadingModList != null && loadingModList.getModFileById(modId) != null;
         *///?}
     }
 

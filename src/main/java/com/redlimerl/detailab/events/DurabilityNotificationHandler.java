@@ -173,12 +173,20 @@ public class DurabilityNotificationHandler {
             Component description = Component.translatable("notification.detailarmorbar.durability.description", itemName, durabilityRemaining);
             
             SystemToast.addOrUpdate(
-                client.gui.toastManager(),
+                getToastManager(client),
                 SystemToast.SystemToastId.PERIODIC_NOTIFICATION,
                 title,
                 description
             );
         }
+    }
+
+    private static net.minecraft.client.gui.components.toasts.ToastManager getToastManager(Minecraft client) {
+        //? if minecraft_26_2 {
+        return client.gui.toastManager();
+        //?} else {
+        /*return client.getToastManager();
+        *///?}
     }
     
     private static void resetThresholdsForSlot(EquipmentSlot slot) {

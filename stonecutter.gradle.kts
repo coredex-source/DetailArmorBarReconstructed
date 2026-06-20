@@ -10,10 +10,10 @@ tasks.register<Delete>("clean") {
 
 tasks.register("chiseledBuild") {
     group = "build"
-    dependsOn(":26.2-fabric:build", ":26.2-neoforge:build")
+    dependsOn(":26.1.2-fabric:build", ":26.1.2-neoforge:build", ":26.2-fabric:build", ":26.2-neoforge:build")
 }
 
 tasks.register("binJar") {
     group = "build"
-    dependsOn(":26.2-fabric:binJar", ":26.2-neoforge:binJar")
+    dependsOn(":26.1.2-fabric:binJar", ":26.1.2-neoforge:binJar", ":26.2-fabric:binJar", ":26.2-neoforge:binJar")
 }

@@ -8,7 +8,11 @@ import net.minecraft.resources.Identifier;
 import com.redlimerl.detailab.config.ConfigEnumType.ProtectionEffect;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//? if minecraft_26_2 {
 import net.minecraft.client.gui.Hud;
+//?} else {
+/*import net.minecraft.client.gui.Gui;
+*///?}
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.equipment.Equippable;
@@ -295,7 +299,11 @@ public class ArmorBarRenderer {
     }
 
     private final Minecraft client = Minecraft.getInstance();
+    //? if minecraft_26_2 {
     private final Hud hud = client.gui.hud;
+    //?} else {
+    /*private final Gui hud = client.gui;
+    *///?}
     private static final int ARMOR_POINTS_PER_ROW = 20;
     private static final int ARMOR_SLOTS_PER_ROW = 10;
     private static final int ARMOR_ROW_HEIGHT = 10;

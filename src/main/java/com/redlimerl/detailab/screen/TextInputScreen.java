@@ -112,7 +112,11 @@ public class TextInputScreen extends Screen {
     @Override
     public void onClose() {
         if (this.minecraft != null) {
+            //? if minecraft_26_2 {
             this.minecraft.gui.setScreen(this.parent);
+            //?} else {
+            /*this.minecraft.setScreen(this.parent);
+            *///?}
         }
     }
 }

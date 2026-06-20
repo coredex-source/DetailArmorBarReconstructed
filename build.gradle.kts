@@ -46,6 +46,7 @@ modstitch {
         replacementProperties.put("mod_sources", stringProp("mod.sources"))
         replacementProperties.put("mod_icon", stringProp("mod.icon"))
         replacementProperties.put("minecraft_dependency", stringProp("mod.minecraft_dependency"))
+        replacementProperties.put("neoforge_minecraft_dependency", stringProp("mod.neoforge_minecraft_dependency"))
     }
 
     loom {
@@ -71,6 +72,8 @@ stonecutter {
     constants {
         put("fabric", loader.equals("fabric"))
         put("neoforge", loader.equals("neoforge"))
+        put("minecraft_26_1_2", targetMinecraftVersion == "26.1.2")
+        put("minecraft_26_2", targetMinecraftVersion == "26.2")
     }
 }
 

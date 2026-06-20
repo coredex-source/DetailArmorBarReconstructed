@@ -21,7 +21,7 @@ side = "CLIENT"
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 type = "required"
-versionRange = "[26.2]"
+versionRange = "${neoforge_minecraft_dependency}"
 ordering = "NONE"
 side = "CLIENT"
 
