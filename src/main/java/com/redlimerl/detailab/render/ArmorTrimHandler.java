@@ -214,9 +214,9 @@ public class ArmorTrimHandler {
      */
     private static int applyPaletteColor(int pixel, Color[] palette) {
         int a = (pixel >> 24) & 0xFF;
-        int r = (pixel >> 16) & 0xFF;
+        int b = (pixel >> 16) & 0xFF;
         int g = (pixel >> 8) & 0xFF;
-        int b = pixel & 0xFF;
+        int r = pixel & 0xFF;
 
         if (a == 0) return pixel;
 
