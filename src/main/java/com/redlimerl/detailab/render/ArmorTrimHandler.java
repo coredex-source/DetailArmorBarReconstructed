@@ -10,7 +10,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.equipment.trim.ArmorTrim;
-import net.minecraft.world.item.equipment.trim.MaterialAssetGroup;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.Identifier;
 
@@ -22,6 +21,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
+
+//? if <=26.2 {
+import net.minecraft.world.item.equipment.trim.MaterialAssetGroup;
+//?}
 
 public class ArmorTrimHandler {
     
@@ -118,6 +121,17 @@ public class ArmorTrimHandler {
             return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
 
+        //? if >=26.3 {
+        /*public static TrimMaterial fromMinecraftTrimMaterial(net.minecraft.world.item.equipment.trim.TrimMaterial material) {
+            return fromPaletteId(material != null ? material.paletteId() : null);
+        }
+
+        private static TrimMaterial fromPaletteId(Identifier paletteId) {
+            if (paletteId == null) return null;
+
+            return fromName(paletteId.getPath());
+        }
+        *///?} else {
         public static TrimMaterial fromArmorTrimAssets(MaterialAssetGroup assets) {
             if (assets == null) return null;
             
@@ -133,6 +147,19 @@ public class ArmorTrimHandler {
             if (assets.equals(MaterialAssetGroup.REDSTONE)) return REDSTONE;
             if (assets.equals(MaterialAssetGroup.RESIN)) return RESIN;
             
+            return null;
+        }
+        //?}
+
+        private static TrimMaterial fromName(String name) {
+            if (name == null) return null;
+
+            for (TrimMaterial material : values()) {
+                if (material.name.equals(name)) {
+                    return material;
+                }
+            }
+
             return null;
         }
     }
@@ -269,8 +296,7 @@ public class ArmorTrimHandler {
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        MaterialAssetGroup assets = trim.material().value().assets();
-        TrimMaterial material = TrimMaterial.fromArmorTrimAssets(assets);
+        TrimMaterial material = getTrimMaterial(trim);
         
         if (material == null) return null;
 
@@ -305,8 +331,7 @@ public class ArmorTrimHandler {
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        MaterialAssetGroup assets = trim.material().value().assets();
-        TrimMaterial material = TrimMaterial.fromArmorTrimAssets(assets);
+        TrimMaterial material = getTrimMaterial(trim);
         
         return material != null ? material.getColor() : null;
     }
@@ -317,8 +342,15 @@ public class ArmorTrimHandler {
         ArmorTrim trim = itemStack.get(DataComponents.TRIM);
         if (trim == null) return null;
         
-        MaterialAssetGroup assets = trim.material().value().assets();
-        return TrimMaterial.fromArmorTrimAssets(assets);
+        return getTrimMaterial(trim);
+    }
+
+    private static TrimMaterial getTrimMaterial(ArmorTrim trim) {
+        //? if >=26.3 {
+        /*return TrimMaterial.fromMinecraftTrimMaterial(trim.material().value());
+        *///?} else {
+        return TrimMaterial.fromArmorTrimAssets(trim.material().value().assets());
+        //?}
     }
     
     public static void clearCache() {

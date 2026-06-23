@@ -72,8 +72,7 @@ stonecutter {
     constants {
         put("fabric", loader.equals("fabric"))
         put("neoforge", loader.equals("neoforge"))
-        put("minecraft_26_1_2", targetMinecraftVersion == "26.1.2")
-        put("minecraft_26_2", targetMinecraftVersion == "26.2")
+        put("minecraft_26_1", targetMinecraftVersion == "26.1.2")
     }
 }
 

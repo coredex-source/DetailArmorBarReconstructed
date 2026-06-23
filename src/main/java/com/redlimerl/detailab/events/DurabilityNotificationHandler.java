@@ -246,11 +246,11 @@ public class DurabilityNotificationHandler {
     }
 
     private static net.minecraft.client.gui.components.toasts.ToastManager getToastManager(Minecraft client) {
-        //? if minecraft_26_2 {
-        return client.gui.toastManager();
-        //?} else {
+        //? if minecraft_26_1 {
         /*return client.getToastManager();
-        *///?}
+        *///?} else {
+        return client.gui.toastManager();
+        //?}
     }
     
     private static void resetThresholdsForSlot(EquipmentSlot slot) {

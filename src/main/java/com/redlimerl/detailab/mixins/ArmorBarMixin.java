@@ -6,11 +6,11 @@ import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.render.ArmorBarRenderer;
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-//? if minecraft_26_2 {
-import net.minecraft.client.gui.Hud;
-//?} else {
+//? if minecraft_26_1 {
 /*import net.minecraft.client.gui.Gui;
-*///?}
+*///?} else {
+import net.minecraft.client.gui.Hud;
+//?}
 import net.minecraft.world.entity.player.Player;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,11 +18,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//? if minecraft_26_2 {
-@Mixin(Hud.class)
-//?} else {
+//? if minecraft_26_1 {
 /*@Mixin(Gui.class)
-*///?}
+*///?} else {
+@Mixin(Hud.class)
+//?}
 public class ArmorBarMixin {
 
     @Inject(method = "extractArmor", at = @At("RETURN"))
