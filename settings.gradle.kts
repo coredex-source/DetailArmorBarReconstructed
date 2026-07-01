@@ -10,6 +10,10 @@ pluginManagement {
         maven("https://maven.kikugie.dev/snapshots")
     }
 
+    plugins {
+        id("fabric-loom") version settings.extra["loom.version"] as String
+    }
+
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "dev.isxander.modstitch.base" && requested.version == null) {

@@ -1,5 +1,6 @@
 plugins {
     id("dev.isxander.modstitch.base")
+    id("fabric-loom") apply false
     id("maven-publish")
 }
 
