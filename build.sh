@@ -1,1 +1,1 @@
-./gradlew clean build binJar
+CI=true ./gradlew clean build binJar
