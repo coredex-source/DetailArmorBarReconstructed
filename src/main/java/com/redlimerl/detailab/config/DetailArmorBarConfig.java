@@ -70,6 +70,7 @@ public class DetailArmorBarConfig {
         public boolean toggleCompatibleHeartMod = false;
         public boolean toggleInverseSlot = false;
         public boolean toggleInverseOverflowIcon = false;
+        public boolean toggleHideBarWithoutArmor = true;
         public boolean toggleSortSpecialItem = true;
         public boolean toggleAlignEnchantments = true;
         public boolean toggleUniformColor = false;

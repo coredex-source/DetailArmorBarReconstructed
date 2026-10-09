@@ -53,6 +53,8 @@
   "context.detailarmorbar.toggle.inverse_slot": "Reverses the slot order of the armor bar.",
   "option.detailarmorbar.toggle.inverse_overflow_icon": "Reverse Overflow Icon",
   "context.detailarmorbar.toggle.inverse_overflow_icon": "Reverses the placement of the overflow icon for extra armor rows.",
+  "option.detailarmorbar.toggle.hide_bar_without_armor": "Hide Bar Without Armor",
+  "context.detailarmorbar.toggle.hide_bar_without_armor": "Hides the armor bar completely when no armor is worn, matching vanilla Minecraft behavior.",
   "option.detailarmorbar.toggle.sort_special_item": "Sort Special Items",
   "context.detailarmorbar.toggle.sort_special_item": "Sort special items (like Elytra) to the right on the armor bar.",
   "option.detailarmorbar.toggle.align_enchantments": "Align Enchantments",
