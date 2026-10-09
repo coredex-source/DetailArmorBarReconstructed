@@ -409,7 +409,8 @@ public class ArmorBarRenderer {
                 && ModCompatibility.isOverflowingBarsSkipEmptyArmorPoints();
 
         // Render empty armor bar if no armor is worn but toggleEmptyBar is true
-        if (totalArmorPoint == 0 && getConfig().getOptions().toggleEmptyBar) {
+        // (unless replacing Overflowing Bars' bar with skipEmptyArmorPoints enabled, which draws nothing at zero armor)
+        if (totalArmorPoint == 0 && getConfig().getOptions().toggleEmptyBar && !skipEmptyPoints) {
             for (int count = 0; count < 10; count++) {
                 int xPos;
                 if (getConfig().getOptions().toggleInverseSlot) {
