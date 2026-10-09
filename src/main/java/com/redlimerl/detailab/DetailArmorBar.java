@@ -14,6 +14,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.fml.ModList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class DetailArmorBar {
     public static final Logger LOGGER = LoggerFactory.getLogger("DetailArmorBar");
     public static final String MOD_ID = "detailab";
     public static ResourceLocation GUI_ARMOR_BAR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
-    private final static String[] compatibilityMods = { "healthoverlay" };
+    private final static String[] compatibilityMods = { "healthoverlay", "overflowingbars" };
 
     private static DetailArmorBarConfig config = null;
 
@@ -53,7 +54,14 @@ public class DetailArmorBar {
         
         // Register built-in armor bar renders
         registerBuiltInArmorBars();
-        
+
+        // Automatically enable compatible rendering when a supported heart/bar mod is installed
+        for (String compatibilityMod : compatibilityMods) {
+            if (ModList.get().isLoaded(compatibilityMod)) {
+                getConfig().getOptions().toggleCompatibleHeartMod = true;
+            }
+        }
+
         // Check for OverflowingBars compatibility
         if (ModCompatibility.isOverflowingBarsLoaded()) {
             LOGGER.info("OverflowingBars detected - using compatible rendering mode");
