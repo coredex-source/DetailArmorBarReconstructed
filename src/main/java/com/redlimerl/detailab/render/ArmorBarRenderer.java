@@ -1,6 +1,7 @@
 package com.redlimerl.detailab.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.CustomArmorBar;
@@ -403,6 +404,10 @@ public class ArmorBarRenderer {
         int stackCount = (totalArmorPoint - 1) / 20;
         int stackRow = stackCount * 20;
 
+        // When replacing Overflowing Bars' armor bar, respect its "skipEmptyArmorPoints" setting
+        boolean skipEmptyPoints = getConfig().getOptions().toggleCompatibleHeartMod
+                && ModCompatibility.isOverflowingBarsSkipEmptyArmorPoints();
+
         // Render empty armor bar if no armor is worn but toggleEmptyBar is true
         if (totalArmorPoint == 0 && getConfig().getOptions().toggleEmptyBar) {
             for (int count = 0; count < 10; count++) {
@@ -460,7 +465,7 @@ public class ArmorBarRenderer {
                         drawSparkleOverlay(context, xPos, yPos);
                     }
                 }
-                if (count * 2 + 1 + stackRow > totalArmorPoint) {
+                if (!skipEmptyPoints && count * 2 + 1 + stackRow > totalArmorPoint) {
                     CustomArmorBar.EMPTY.draw(ItemStack.EMPTY, context, xPos, yPos, false, false);
                 }
             }
