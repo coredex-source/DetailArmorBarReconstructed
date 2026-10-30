@@ -18,6 +18,10 @@ repositories {
         name = "Terraformers"
         url = "https://maven.terraformersmc.com/"
     }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+    }
 }
 
 dependencies {
@@ -27,6 +31,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricVersion}"
 
     modImplementation "com.terraformersmc:modmenu:$project.modMenuVersion"
+    modImplementation "maven.modrinth:eclipseui:${project.eclipseuiVersion}"
 }
 
 processResources {

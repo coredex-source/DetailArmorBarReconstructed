@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -274,7 +273,7 @@ public class ArmorTrimHandler {
         
         if (material == null) return null;
 
-        int armorPoints = getDefense(itemStack, slot);
+        int armorPoints = ArmorBarUtils.getDefense(itemStack, slot);
         
         return new TrimInfo(material, armorPoints);
     }
@@ -320,22 +319,7 @@ public class ArmorTrimHandler {
         ResourceKey<net.minecraft.world.item.armortrim.TrimMaterial> materialKey = trim.material().unwrapKey().orElse(null);
         return TrimMaterial.fromTrimMaterialKey(materialKey);
     }
-    
-    private static int getDefense(ItemStack itemStack, EquipmentSlot slot) {
-        if (itemStack.getItem() instanceof net.minecraft.world.item.ArmorItem armorItem) {
-            if (armorItem.getEquipmentSlot() == slot) {
-                return armorItem.getDefense();
-            }
-        }
-        var modifier = itemStack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-        for (var entry : modifier.modifiers()) {
-            if (entry.slot().test(slot) && entry.attribute().is(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)) {
-                return (int) entry.modifier().amount();
-            }
-        }
-        return 0;
-    }
-    
+
     public static void clearCache() {
         COLORED_TEXTURE_CACHE.clear();
         texturesGenerated = false;

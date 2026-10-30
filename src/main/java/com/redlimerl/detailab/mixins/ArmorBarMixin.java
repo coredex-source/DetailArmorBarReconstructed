@@ -2,6 +2,7 @@ package com.redlimerl.detailab.mixins;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.render.ArmorBarRenderer;
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,6 +19,11 @@ public class ArmorBarMixin {
 
     @Inject(method = "renderArmor", at = @At("RETURN"))
     private static void renderArmorOverlay(GuiGraphics context, Player player, int y_base, int num_rows, int line_width, int x, CallbackInfo ci) {
+        
+        if (ModCompatibility.isOverflowingBarsArmorLayerActive()) {
+            return;
+        }
+
         if(getConfig().getOptions().toggleCompatibleHeartMod){ num_rows = 1; }
         int y = y_base - (num_rows - 1) * line_width - 10;
         ArmorBarRenderer.INSTANCE.render(context, player, y);
@@ -25,6 +31,10 @@ public class ArmorBarMixin {
 
     @WrapOperation(method = "renderArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getArmorValue()I"))
     private static int supressGameArmorRenderer(Player playerEntity, Operation<Integer> operation) {
+        
+        if (ModCompatibility.isOverflowingBarsArmorLayerActive()) {
+            return operation.call(playerEntity);
+        }
         return 0;
     }
 }

@@ -1,13 +1,19 @@
 package com.redlimerl.detailab;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
+import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
+import com.redlimerl.detailab.screen.OptionsScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -23,11 +29,15 @@ import java.nio.file.Path;
 public class DetailArmorBar implements ClientModInitializer {
 
     public static Logger LOGGER = LogManager.getLogger("DetailArmorBar");
-    public static String MOD_ID = "detailab";
-    public static ResourceLocation GUI_ARMOR_BAR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
-    private final static String[] compatibilityMods = { "healthoverlay" };
+    public static final String MOD_CONTAINER_ID = "detailabreconst";
+    public static final String MOD_ID = "detailab";
+    public static final ResourceLocation GUI_ARMOR_BAR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
+    private final static String[] compatibilityMods = { "healthoverlay", "overflowingbars" };
 
     private static DetailArmorBarConfig config = null;
+    
+    // Keybind for opening config screen (unbound by default)
+    private static KeyMapping openConfigKey;
 
     public static DetailArmorBarConfig getConfig() {
         if (config == null) loadConfig();
@@ -47,6 +57,22 @@ public class DetailArmorBar implements ClientModInitializer {
 
     public void onInitializeClient() {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(DetailArmorBarAPI.LOADER);
+
+        // Register keybind for opening config screen (unbound by default)
+        openConfigKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.detailab.open_config",
+                InputConstants.UNKNOWN.getValue(), // Unbound by default
+                "key.category.detailab.keybinds"
+        ));
+
+        // Register client tick event to check for keybind press
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (openConfigKey.consumeClick()) {
+                if (client.screen == null) {
+                    client.setScreen(OptionsScreen.create(null));
+                }
+            }
+        });
 
         TextureOffset outline = new TextureOffset(9, 0);
         TextureOffset outlineHalf = new TextureOffset(27, 0);
@@ -85,7 +111,7 @@ public class DetailArmorBar implements ClientModInitializer {
                 .render((ItemStack itemStack) ->
             new ArmorBarRenderManager(GUI_ARMOR_BAR, 128, 128,
                     new TextureOffset(99, 9 + isVanillaTexture()), new TextureOffset(90, 9 + isVanillaTexture()), outline, outlineHalf)
-        ).register();    
+        ).register();
 
         DetailArmorBarAPI.customArmorBarBuilder().armor(Items.LEATHER_HELMET, Items.LEATHER_LEGGINGS, Items.LEATHER_CHESTPLATE, Items.LEATHER_BOOTS)
                 .render((ItemStack itemStack) -> {
@@ -109,9 +135,13 @@ public class DetailArmorBar implements ClientModInitializer {
         com.redlimerl.detailab.events.DurabilityNotificationHandler.register();
 
         for (String compatibilityMod : compatibilityMods) {
-            if (FabricLoader.getInstance().getModContainer(compatibilityMod).isPresent()) {
+            if (FabricLoader.getInstance().isModLoaded(compatibilityMod)) {
                 getConfig().getOptions().toggleCompatibleHeartMod = true;
             }
+        }
+        
+        if (ModCompatibility.isOverflowingBarsLoaded()) {
+            LOGGER.info("OverflowingBars detected - using compatible rendering mode");
         }
     }
 

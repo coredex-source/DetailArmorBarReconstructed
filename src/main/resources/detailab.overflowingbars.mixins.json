@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "package": "com.redlimerl.detailab.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "com.redlimerl.detailab.mixins.OverflowingBarsMixinPlugin",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "OverflowingBarsArmorMixin"
+  ]
+}

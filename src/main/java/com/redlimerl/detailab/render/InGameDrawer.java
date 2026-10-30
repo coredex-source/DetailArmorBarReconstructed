@@ -20,7 +20,7 @@ public class InGameDrawer {
     }
 
     public static void drawTexture(ResourceLocation identifier, GuiGraphics context, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, Color color, boolean mirror) {
-        RenderSystem.setShaderColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, color.getAlpha()/100f);
+        RenderSystem.setShaderColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, color.getAlpha()/255f);
         drawTexture(identifier, context, x, y, width, height, u, v, width, height, textureWidth, textureHeight, mirror);
     }
 

@@ -32,14 +32,16 @@
     ]
   },
   "mixins": [
-    "detailab.mixins.json"
+    "detailab.mixins.json",
+    "detailab.overflowingbars.mixins.json"
   ],
   "depends": {
     "fabricloader": "*",
     "fabric": "*",
     "fabric-api": "*",
     "minecraft": ">=1.21 <=1.21.1",
-    "java": ">=21"
+    "java": ">=21",
+    "eclipseui": "*"
   },
   "suggests": {
     "modmenu": "*",
