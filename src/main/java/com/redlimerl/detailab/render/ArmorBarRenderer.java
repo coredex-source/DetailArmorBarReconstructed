@@ -157,10 +157,12 @@ public class ArmorBarRenderer {
         return getEnchantments(equipment).getOrDefault(type, new LevelData(0, 0));
     }
 
+    private static final Set<Identifier> EQUIPMENT_ARMOR_MODIFIER_IDS = new HashSet<>();
+
     private static List<Tuple<ItemStack, CustomArmorBar>> getArmorPoints(Player player) {
         ArrayList<Tuple<ItemStack, CustomArmorBar>> armorPoints = new ArrayList<>();
         ArrayList<Tuple<ItemStack, CustomArmorBar>> itemPoints = new ArrayList<>();
-        int sumArmor = 0;
+        Set<Identifier> equippedArmorModifierIds = new HashSet<>();
 
         // Stats from equipment
         for (var slot : EquipmentSlot.VALUES) {
@@ -176,8 +178,12 @@ public class ArmorBarRenderer {
                     ? DetailArmorBarAPI.getArmorBarList().getOrDefault(itemStack.getItem(), CustomArmorBar.DEFAULT)
                     : CustomArmorBar.DEFAULT;
 
-                var defense = ArmorBarUtils.getDefense(itemStack, slot);
-                sumArmor += defense;
+                var armorModifier = ArmorBarUtils.getArmorModifier(itemStack, slot);
+                int defense = 0;
+                if (armorModifier != null) {
+                    defense = (int) armorModifier.amount();
+                    equippedArmorModifierIds.add(armorModifier.id());
+                }
                 for (int i = 0; i < defense; i++) {
                     armorPoints.add(new Tuple<>(itemStack, barData));
                 }
@@ -204,12 +210,23 @@ public class ArmorBarRenderer {
 
         // Base stats
         int baseArmor = Mth.floor(player.getAttributeBaseValue(Attributes.ARMOR));
-        sumArmor += baseArmor;
         for (int i = 0; i < baseArmor; i++) {
             armorPoints.add(new Tuple<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
         }
 
-        int unrepresentedArmor = Math.max(0, player.getArmorValue() - sumArmor);
+        int syncedEquipmentArmor = 0;
+        var armorAttribute = player.getAttribute(Attributes.ARMOR);
+        if (armorAttribute != null) {
+            EQUIPMENT_ARMOR_MODIFIER_IDS.removeIf(id -> !equippedArmorModifierIds.contains(id) && !armorAttribute.hasModifier(id));
+            EQUIPMENT_ARMOR_MODIFIER_IDS.addAll(equippedArmorModifierIds);
+            for (var modifier : armorAttribute.getModifiers()) {
+                if (EQUIPMENT_ARMOR_MODIFIER_IDS.contains(modifier.id())) {
+                    syncedEquipmentArmor += (int) modifier.amount();
+                }
+            }
+        }
+
+        int unrepresentedArmor = Math.max(0, player.getArmorValue() - baseArmor - syncedEquipmentArmor);
         for (int i = 0; i < unrepresentedArmor; i++) {
             armorPoints.add(new Tuple<>(ItemStack.EMPTY, CustomArmorBar.DEFAULT));
         }
@@ -269,6 +286,9 @@ public class ArmorBarRenderer {
         if (!stackArmorBars || totalArmorPoint <= ARMOR_POINTS_PER_ROW) {
             return highestRowStart;
         }
+        if (getConfig().getOptions().toggleStackUpward) {
+            return rowIndex * ARMOR_POINTS_PER_ROW;
+        }
         return Math.max(0, highestRowStart - (rowIndex * ARMOR_POINTS_PER_ROW));
     }
 
@@ -301,6 +321,9 @@ public class ArmorBarRenderer {
         var fire = getEnchantLevel(armorItems, Enchantments.FIRE_PROTECTION);
         var protectArr = new int[] { generic.level + generic.count, projectile.level, explosive.level, fire.level, 0 };
         var armorPoints = getArmorPoints(player);
+        if (!options.toggleArmorOverflow && armorPoints.size() > ARMOR_POINTS_PER_ROW) {
+            armorPoints = armorPoints.subList(0, ARMOR_POINTS_PER_ROW);
+        }
         var thorns = getEnchantLevel(armorItems, Enchantments.THORNS);
 
         var totalArmorPoint = armorPoints.size();

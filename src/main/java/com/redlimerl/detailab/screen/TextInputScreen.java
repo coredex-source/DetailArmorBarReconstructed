@@ -49,14 +49,23 @@ public class TextInputScreen extends Screen {
     }
 
     @Override
+    //? if >=26.4 {
+    /*public void extractRenderState(GuiGraphicsExtractor context) {
+        super.extractRenderState(context);
+    *///?} else {
     public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         super.extractRenderState(context, mouseX, mouseY, delta);
-        
+    //?}
+
         // Draw label
         context.centeredText(this.font, this.fieldLabel, this.width / 2, this.height / 2 - 35, 16777215);
         
         // Draw text field
+        //? if >=26.4 {
+        /*this.textField.extractRenderState(context);
+        *///?} else {
         this.textField.extractRenderState(context, mouseX, mouseY, delta);
+        //?}
         
         // Draw instructions
         context.centeredText(this.font, Component.literal("Enter a number (positive or negative)"), this.width / 2, this.height / 2 + 50, 11184810);

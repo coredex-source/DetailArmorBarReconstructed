@@ -3,7 +3,11 @@ package com.redlimerl.detailab.render;
 import com.redlimerl.detailab.DetailArmorBar;
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.NativeImage;
+//? if >=26.4 {
+/*import net.minecraft.client.renderer.texture.TextureResources;
+*///?} else {
 import net.minecraft.client.renderer.texture.DynamicTexture;
+//?}
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -222,8 +226,15 @@ public class ArmorTrimHandler {
         }
 
         Identifier textureId = Identifier.fromNamespaceAndPath(DetailArmorBar.MOD_ID, "dynamic/trim_" + material.getName());
+        //? if >=26.4 {
+        /*try (coloredImage) {
+            client.getTextureManager().register(textureId,
+                    TextureResources.from2dImage(() -> "trim_" + material.getName(), coloredImage));
+        }
+        *///?} else {
         DynamicTexture dynamicTexture = new DynamicTexture(() -> "trim_" + material.getName(), coloredImage);
         client.getTextureManager().register(textureId, dynamicTexture);
+        //?}
         
         return textureId;
     }

@@ -12,6 +12,7 @@ pluginManagement {
 
     plugins {
         id("fabric-loom") version settings.extra["loom.version"] as String
+        id("net.neoforged.moddev") version settings.extra["moddevgradle.version"] as String
     }
 
     resolutionStrategy {

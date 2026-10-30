@@ -2,7 +2,11 @@ package com.redlimerl.detailab.render;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
+//? if >=26.4 {
+/*import net.minecraft.client.gui.GuiPipeline;
+*///?} else {
 import net.minecraft.client.renderer.RenderPipelines;
+//?}
 
 import java.awt.*;
 
@@ -29,10 +33,18 @@ public class InGameDrawer {
     }
 
     private static void drawTexture(Identifier identifier, GuiGraphicsExtractor context, int x, int y, int width, int height, float u, float v, int regionWidth, int regionHeight, int textureWidth, int textureHeight, int color, boolean mirror) {
+        //? if >=26.4 {
+        /*if(!mirror) {
+            context.blit(GuiPipeline.TEXTURED, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
+        } else {
+            context.blit(GuiPipeline.TEXTURED, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight, color);
+        }
+        *///?} else {
         if(!mirror) {
             context.blit(RenderPipelines.GUI_TEXTURED, identifier, x, y, u, v, width, height, regionWidth, regionHeight, textureWidth, textureHeight, color);
         } else {
             context.blit(RenderPipelines.GUI_TEXTURED, identifier, x, y, u + (float)regionWidth, v, width, height, -regionWidth, regionHeight, textureWidth, textureHeight, color);
         }
+        //?}
     }
 }

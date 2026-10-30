@@ -73,7 +73,9 @@ public class DetailArmorBarConfig {
         public boolean toggleCompatibleHeartMod = false;
         public boolean toggleInverseSlot = false;
         public boolean toggleInverseOverflowIcon = false;
+        public boolean toggleArmorOverflow = true;
         public boolean toggleStackArmorBars = false;
+        public boolean toggleStackUpward = false;
         public boolean toggleSortSpecialItem = true;
         public boolean toggleAlignEnchantments = true;
         public boolean toggleUniformColor = false;
