@@ -4,6 +4,7 @@ import com.redlimerl.detailab.api.DetailArmorBarAPI;
 import com.redlimerl.detailab.api.render.ArmorBarRenderManager;
 import com.redlimerl.detailab.api.render.ItemBarRenderManager;
 import com.redlimerl.detailab.api.render.TextureOffset;
+import com.redlimerl.detailab.compat.ModCompatibility;
 import com.redlimerl.detailab.config.DetailArmorBarConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.component.DyedItemColor;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLPaths;
 import org.slf4j.Logger;
@@ -26,7 +28,7 @@ public class DetailArmorBar {
     public static final Logger LOGGER = LoggerFactory.getLogger("DetailArmorBar");
     public static final String MOD_ID = "detailab";
     public static ResourceLocation GUI_ARMOR_BAR = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/armor_bar.png");
-    private final static String[] compatibilityMods = { "healthoverlay" };
+    private final static String[] compatibilityMods = { "healthoverlay", "overflowingbars" };
 
     private static DetailArmorBarConfig config = null;
 
@@ -52,6 +54,16 @@ public class DetailArmorBar {
         
         // Register built-in armor bar renders
         registerBuiltInArmorBars();
+
+        for (String compatibilityMod : compatibilityMods) {
+            if (ModList.get().isLoaded(compatibilityMod)) {
+                getConfig().getOptions().toggleCompatibleHeartMod = true;
+            }
+        }
+
+        if (ModCompatibility.isOverflowingBarsLoaded()) {
+            LOGGER.info("OverflowingBars detected - using compatible rendering mode");
+        }
     }
 
     private void registerBuiltInArmorBars() {

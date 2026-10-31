@@ -5,7 +5,7 @@ import java.awt.Color;
 public class ConfigEnumType {
 
     public enum ProtectionEffect {
-        NONE, AURA, OUTLINE
+        NONE, AURA, OUTLINE, STATIC
     }
 
     public enum EffectSpeed {
@@ -62,5 +62,9 @@ public class ConfigEnumType {
         public Color getColorWithAlpha(int alpha) {
             return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
+    }
+
+    public enum HudPosition {
+        TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
     }
 }

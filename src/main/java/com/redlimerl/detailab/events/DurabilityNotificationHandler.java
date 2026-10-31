@@ -2,6 +2,8 @@ package com.redlimerl.detailab.events;
 
 import com.redlimerl.detailab.DetailArmorBar;
 import com.redlimerl.detailab.config.ConfigEnumType.DurabilityThreshold;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -11,33 +13,83 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayDeque;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Queue;
 
 import static com.redlimerl.detailab.DetailArmorBar.getConfig;
 
 
 public class DurabilityNotificationHandler {
+    public static final class VisualWarning {
+        private final EquipmentSlot slot;
+        private final DurabilityThreshold threshold;
+        private final long sequence;
 
-    private static final Map<EquipmentSlot, Map<DurabilityThreshold, Boolean>> triggeredThresholds = new EnumMap<>(EquipmentSlot.class);
-    private static final Map<EquipmentSlot, ItemStack> lastKnownItems = new EnumMap<>(EquipmentSlot.class);
-    public static long LAST_WARNING_50 = 0L;
-    public static long LAST_WARNING_25 = 0L;
-    public static long LAST_WARNING_10 = 0L;
-    public static long LAST_WARNING_5 = 0L;
-    public static DurabilityThreshold CURRENT_WARNING_LEVEL = null;
-    
-    static {
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-            triggeredThresholds.put(slot, new EnumMap<>(DurabilityThreshold.class));
-            lastKnownItems.put(slot, ItemStack.EMPTY);
+        private VisualWarning(EquipmentSlot slot, DurabilityThreshold threshold, long sequence) {
+            this.slot = slot;
+            this.threshold = threshold;
+            this.sequence = sequence;
+        }
+
+        public EquipmentSlot getSlot() {
+            return slot;
+        }
+
+        public DurabilityThreshold getThreshold() {
+            return threshold;
+        }
+
+        public long getSequence() {
+            return sequence;
         }
     }
 
-    public static void checkArmorDurability(Player player, Minecraft client) {
-        EquipmentSlot[] armorSlots = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
-        
-        for (EquipmentSlot slot : armorSlots) {
+    private static final EquipmentSlot[] ARMOR_SLOTS = {
+        EquipmentSlot.HEAD,
+        EquipmentSlot.CHEST,
+        EquipmentSlot.LEGS,
+        EquipmentSlot.FEET
+    };
+    private static final Map<EquipmentSlot, Map<DurabilityThreshold, Boolean>> triggeredThresholds = new EnumMap<>(EquipmentSlot.class);
+    private static final Map<EquipmentSlot, Map<DurabilityThreshold, Long>> lastSlotWarningTimes = new EnumMap<>(EquipmentSlot.class);
+    private static final Map<EquipmentSlot, ItemStack> lastKnownItems = new EnumMap<>(EquipmentSlot.class);
+    private static final Map<DurabilityThreshold, Long> lastWarningTimes = new EnumMap<>(DurabilityThreshold.class);
+    private static final Queue<VisualWarning> pendingVisualWarnings = new ArrayDeque<>();
+    private static DurabilityThreshold currentWarningLevel = null;
+    private static EquipmentSlot currentWarningSlot = null;
+    private static long warningSequence = 0L;
+    
+    static {
+        for (EquipmentSlot slot : ARMOR_SLOTS) {
+            triggeredThresholds.put(slot, new EnumMap<>(DurabilityThreshold.class));
+            lastSlotWarningTimes.put(slot, new EnumMap<>(DurabilityThreshold.class));
+            lastKnownItems.put(slot, ItemStack.EMPTY);
+        }
+        for (DurabilityThreshold threshold : DurabilityThreshold.values()) {
+            lastWarningTimes.put(threshold, 0L);
+        }
+    }
+
+    public static void register() {
+        NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> {
+            Minecraft client = Minecraft.getInstance();
+            if (!getConfig().getOptions().toggleDurabilityNotifications) {
+                return;
+            }
+            
+            Player player = client.player;
+            if (player == null) {
+                return;
+            }
+            
+            checkArmorDurability(player, client);
+        });
+    }
+
+    private static void checkArmorDurability(Player player, Minecraft client) {
+        for (EquipmentSlot slot : ARMOR_SLOTS) {
             ItemStack currentItem = player.getItemBySlot(slot);
             ItemStack lastItem = lastKnownItems.get(slot);
 
@@ -53,36 +105,49 @@ public class DurabilityNotificationHandler {
             
             float durabilityPercent = 1.0f - ((float) currentItem.getDamageValue() / (float) currentItem.getMaxDamage());
             durabilityPercent *= 100;
-            checkThreshold(slot, currentItem, durabilityPercent, DurabilityThreshold.HALF, 50, client);
-            checkThreshold(slot, currentItem, durabilityPercent, DurabilityThreshold.QUARTER, 25, client);
-            checkThreshold(slot, currentItem, durabilityPercent, DurabilityThreshold.LOW, 10, client);
-            checkThreshold(slot, currentItem, durabilityPercent, DurabilityThreshold.CRITICAL, 5, client);
+
+            DurabilityThreshold activeThreshold = getMostSevereEnabledThreshold(durabilityPercent);
+            resetRecoveredThresholds(slot, durabilityPercent);
+            if (activeThreshold != null) {
+                checkThreshold(slot, currentItem, durabilityPercent, activeThreshold, client);
+            }
         }
     }
     
     private static void checkThreshold(EquipmentSlot slot, ItemStack item, float durabilityPercent,
-                                       DurabilityThreshold threshold, float thresholdValue, Minecraft client) {
-        if (!isThresholdEnabled(threshold)) {
-            return;
-        }
-        
+                                       DurabilityThreshold threshold, Minecraft client) {
         Map<DurabilityThreshold, Boolean> slotThresholds = triggeredThresholds.get(slot);
         boolean alreadyTriggered = slotThresholds.getOrDefault(threshold, false);
         
-        if (durabilityPercent <= thresholdValue) {
-            if (!alreadyTriggered || getConfig().getOptions().toggleRepeatedDurabilityNotifications) {
-                if (alreadyTriggered && getConfig().getOptions().toggleRepeatedDurabilityNotifications) {
-                    long lastNotification = getLastWarningTime(threshold);
-                    if (DetailArmorBar.getTicks() - lastNotification < 100) {
-                        return;
-                    }
+        if (!alreadyTriggered || getConfig().getOptions().toggleRepeatedDurabilityNotifications) {
+            if (alreadyTriggered && getConfig().getOptions().toggleRepeatedDurabilityNotifications) {
+                long lastNotification = getLastWarningTime(slot, threshold);
+                if (DetailArmorBar.getTicks() - lastNotification < 100) {
+                    return;
                 }
-                
-                triggerNotification(slot, item, threshold, durabilityPercent, client);
-                slotThresholds.put(threshold, true);
             }
-        } else if (alreadyTriggered) {
-            slotThresholds.put(threshold, false);
+
+            triggerNotification(slot, item, threshold, durabilityPercent, client);
+            slotThresholds.put(threshold, true);
+        }
+    }
+
+    private static DurabilityThreshold getMostSevereEnabledThreshold(float durabilityPercent) {
+        DurabilityThreshold result = null;
+        for (DurabilityThreshold threshold : DurabilityThreshold.values()) {
+            if (isThresholdEnabled(threshold) && durabilityPercent <= threshold.getPercentage()) {
+                result = threshold;
+            }
+        }
+        return result;
+    }
+
+    private static void resetRecoveredThresholds(EquipmentSlot slot, float durabilityPercent) {
+        Map<DurabilityThreshold, Boolean> slotThresholds = triggeredThresholds.get(slot);
+        for (DurabilityThreshold threshold : DurabilityThreshold.values()) {
+            if (durabilityPercent > threshold.getPercentage() && slotThresholds.getOrDefault(threshold, false)) {
+                slotThresholds.put(threshold, false);
+            }
         }
     }
     
@@ -94,26 +159,44 @@ public class DurabilityNotificationHandler {
             case CRITICAL -> getConfig().getOptions().toggleThreshold5;
         };
     }
-    
-    private static long getLastWarningTime(DurabilityThreshold threshold) {
-        return switch (threshold) {
-            case HALF -> LAST_WARNING_50;
-            case QUARTER -> LAST_WARNING_25;
-            case LOW -> LAST_WARNING_10;
-            case CRITICAL -> LAST_WARNING_5;
-        };
+
+    public static long getLastWarningTime(DurabilityThreshold threshold) {
+        return lastWarningTimes.getOrDefault(threshold, 0L);
+    }
+
+    public static long getLastWarningTime(EquipmentSlot slot, DurabilityThreshold threshold) {
+        Map<DurabilityThreshold, Long> slotWarningTimes = lastSlotWarningTimes.get(slot);
+        if (slotWarningTimes == null) {
+            return 0L;
+        }
+        return slotWarningTimes.getOrDefault(threshold, 0L);
+    }
+
+    public static VisualWarning pollVisualWarning() {
+        return pendingVisualWarnings.poll();
+    }
+
+    public static DurabilityThreshold getCurrentWarningLevel() {
+        return currentWarningLevel;
+    }
+
+    public static EquipmentSlot getCurrentWarningSlot() {
+        return currentWarningSlot;
+    }
+
+    public static void clearCurrentWarningLevel() {
+        currentWarningLevel = null;
+        currentWarningSlot = null;
     }
     
     private static void triggerNotification(EquipmentSlot slot, ItemStack item, DurabilityThreshold threshold,
                                             float durabilityPercent, Minecraft client) {
         long currentTick = DetailArmorBar.getTicks();
-        switch (threshold) {
-            case HALF -> LAST_WARNING_50 = currentTick;
-            case QUARTER -> LAST_WARNING_25 = currentTick;
-            case LOW -> LAST_WARNING_10 = currentTick;
-            case CRITICAL -> LAST_WARNING_5 = currentTick;
-        }
-        CURRENT_WARNING_LEVEL = threshold;
+        lastWarningTimes.put(threshold, currentTick);
+        lastSlotWarningTimes.get(slot).put(threshold, currentTick);
+        currentWarningLevel = threshold;
+        currentWarningSlot = slot;
+        pendingVisualWarnings.add(new VisualWarning(slot, threshold, ++warningSequence));
         
         if (getConfig().getOptions().toggleDurabilitySoundNotification && client.player != null) {
             var sound = switch (threshold) {
@@ -163,7 +246,7 @@ public class DurabilityNotificationHandler {
             );
         }
     }
-    
+
     private static void resetThresholdsForSlot(EquipmentSlot slot) {
         Map<DurabilityThreshold, Boolean> slotThresholds = triggeredThresholds.get(slot);
         if (slotThresholds != null) {
@@ -172,10 +255,17 @@ public class DurabilityNotificationHandler {
     }
     
     public static void resetAll() {
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ARMOR_SLOTS) {
             resetThresholdsForSlot(slot);
+            lastSlotWarningTimes.get(slot).clear();
             lastKnownItems.put(slot, ItemStack.EMPTY);
         }
-        CURRENT_WARNING_LEVEL = null;
+        for (DurabilityThreshold threshold : DurabilityThreshold.values()) {
+            lastWarningTimes.put(threshold, 0L);
+        }
+        currentWarningLevel = null;
+        currentWarningSlot = null;
+        pendingVisualWarnings.clear();
+        warningSequence = 0L;
     }
 }

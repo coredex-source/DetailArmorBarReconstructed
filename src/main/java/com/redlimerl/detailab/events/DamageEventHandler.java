@@ -1,8 +1,19 @@
 package com.redlimerl.detailab.events;
 
+import com.redlimerl.detailab.DetailArmorBar;
+import com.redlimerl.detailab.render.ArmorBarRenderer;
+import com.redlimerl.detailab.render.ArmorBarUtils;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Holder;
+import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 
@@ -10,16 +21,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Handles damage events to trigger thorns animation.
- * In NeoForge, the tick handling is done in DetailArmorBarClient.
+ * Handles damage events to trigger thorns animation
  */
 public class DamageEventHandler {
+    // Last health value to detect changes
+    private static float lastHealth = -1;
+    
+    /**
+     * Register the event handlers
+     */
+    public static void register() {
+        // Monitor player health changes each tick to detect damage
+        NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> {
+            Minecraft client = Minecraft.getInstance();
+            Player player = client.player;
+            if (player != null) {
+                float currentHealth = player.getHealth();
+                
+                // If health decreased, player took damage - update thorns timestamp
+                if (lastHealth > currentHealth && lastHealth != -1 && hasThorns(player)) {
+                    ArmorBarRenderer.LAST_THORNS = DetailArmorBar.getTicks();
+                }
+                
+                lastHealth = currentHealth;
+            } else {
+                lastHealth = -1; // Reset when player is null
+            }
+        });
+    }
     
     /**
      * Check if player has any armor with thorns enchantment
      */
-    public static boolean hasThorns(Player player) {
-        List<ItemStack> armor = getArmorItems(player);
+    private static boolean hasThorns(Player player) {
+        List<ItemStack> armor = ArmorBarUtils.getArmorItems(player);
         for (ItemStack item : armor) {
             if (!item.isEmpty()) {
                 // Use EnchantmentHelper to check for thorns enchantment
@@ -35,17 +70,5 @@ public class DamageEventHandler {
             }
         }
         return false;
-    }
-    
-    /**
-     * Get all armor items worn by the player
-     */
-    private static List<ItemStack> getArmorItems(Player player) {
-        List<ItemStack> list = new ArrayList<>();
-        list.add(player.getItemBySlot(EquipmentSlot.HEAD));
-        list.add(player.getItemBySlot(EquipmentSlot.CHEST));
-        list.add(player.getItemBySlot(EquipmentSlot.LEGS));
-        list.add(player.getItemBySlot(EquipmentSlot.FEET));
-        return list;
     }
 }
